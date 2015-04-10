@@ -1,6 +1,7 @@
 cdef extern from "AlazarCmd.h":
 	#Cython API for AlazarCmd.h
-	pass
+	cdef int LED_OFF
+	cdef int LED_ON
 
 cdef extern from "AlazarError.h":
 	#Cython API for definitions in AlazarError.h
@@ -22,7 +23,7 @@ cdef extern from "AlazarApi.h":
 	ctypedef unsigned long U32
 	# Keep the Alazar conventions for integert type shorthand.
 
-	ctypedef void* Handle
+	ctypedef void* HANDLE
 	# Raw pointer to an Alazar board.
 
 	# handle and system management
@@ -33,9 +34,11 @@ cdef extern from "AlazarApi.h":
 	U32 AlazarBoardsInSystemBySystemID(U32 system_id)
 	# Get the number of boards in a board system.
 
-	Handle AlazarGetBoardBySystemID(U32 system_id, U32 board_number)
+	HANDLE AlazarGetBoardBySystemID(U32 system_id, U32 board_number)
 	# Get a handle to an Alazar board by board system id and board number.
 
-	ReturnCode AlazarSetLED(Handle h, U32 state)
+	U32 AlazarGetBoardKind(HANDLE h)
+
+	ReturnCode AlazarSetLED(HANDLE h, U32 state)
 	# Set the LED on a board; off = 0, on = 1.
 	

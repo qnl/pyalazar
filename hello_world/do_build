@@ -1,0 +1,3 @@
+#!/bin/bash
+# My first script
+python.exe setup.py build_ext --inplace --compiler=msvc
