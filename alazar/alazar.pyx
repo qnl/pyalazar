@@ -9,7 +9,7 @@ cdef class Alazar(object):
 	# use __cinit__ to make sure this is run
 	def __cinit__(self, systemID, boardID):
 		self.board = c_alazar_api.AlazarGetBoardBySystemID(systemID,boardID)
-		if board is NULL:
+		if self.board is NULL:
 			raise AlazarException("Could not connect to an Alazar board with system ID " + str(systemID) + ", board ID " + str(boardID))
 
 	def set_capture_clock(self, clock_soure, sample_rate, decimation, edge):
