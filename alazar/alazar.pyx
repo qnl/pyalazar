@@ -1,7 +1,7 @@
 cimport c_alazar_api
 
 # C wrapper class to represent an Alazar digitizer
-cpdef class Alazar(object):
+cdef class Alazar(object):
 
 	# handle to an alazar board
 	cdef c_alazar_api.HANDLE board
