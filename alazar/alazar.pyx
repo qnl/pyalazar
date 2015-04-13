@@ -13,8 +13,11 @@ cdef class Alazar(object):
 			raise AlazarException("Could not connect to an Alazar board with system ID " + str(systemID) + ", board ID " + str(boardID))
 
 	def set_capture_clock(self, clock_soure, sample_rate, decimation, edge):
-		
-		c_alazar_api.AlazarSetCaptureClock(self.board, clock_source, sample_rate, edge, decimation)
+		cdef U32 csource = clock_source
+		cdef U32 srate = sample_rate
+		cdef U32 dec = decimation
+		cdef U32 ed = edge
+		c_alazar_api.AlazarSetCaptureClock(self.board, csource, srate, ed, dec)
 
 
 def get_systems_and_boards():
