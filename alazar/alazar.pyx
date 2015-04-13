@@ -12,7 +12,7 @@ cdef class Alazar(object):
 		if self.board is NULL:
 			raise AlazarException("Could not connect to an Alazar board with system ID " + str(systemID) + ", board ID " + str(boardID))
 
-	def set_capture_clock(self, clock_soure, sample_rate, decimation, edge):
+	def set_capture_clock(self, clock_source, sample_rate, decimation, edge):
 		c_alazar_api.AlazarSetCaptureClock(self.board, clock_source, sample_rate, edge, decimation)
 		# c_alazar_api.AlazarSetCaptureClock(self.board, 1, 1, 1, 1)
 
