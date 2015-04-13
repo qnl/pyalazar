@@ -27,8 +27,6 @@ cdef extern from "AlazarApi.h":
 	ctypedef unsigned short U16
 	ctypedef signed long S32
 	ctypedef unsigned long U32
-	ctypedef signed _int64 S64
-	ctypedef unsigned _int64 U64
 
 	ctypedef void* HANDLE
 	# Raw pointer to an Alazar board.
