@@ -17,11 +17,12 @@ cdef class Alazar(object):
 		# c_alazar_api.AlazarSetCaptureClock(self.board, 1, 1, 1, 1)
 
 def get_systems_and_boards():
-	"""Return a list of the number of boards in each Alazar system detected."""
-	n_sys = c_alazar_api.AlazarNumberOfSystems()
+	"""Return a list of the number of boards in each Alazar system detected.
+	Obnoxiously, Alazar indexes the systems and boards from 0 rather than 1."""
+	n_sys = c_alazar_api.AlazarNumOfSystems()
 	n_b = []
 	for s in range(n_sys):
-		n_b.append(c_alazar_api.AlazarBoardsInSystemBySystemID(s))
+		n_b.append(c_alazar_api.AlazarBoardsInSystemBySystemID(s+1))
 
 	return n_b
 

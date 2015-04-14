@@ -224,8 +224,8 @@ void __Pyx_call_destructor(T* x) {
 #define _USE_MATH_DEFINES
 #endif
 #include <math.h>
-#define __PYX_HAVE__alazar_hello_world
-#define __PYX_HAVE_API__alazar_hello_world
+#define __PYX_HAVE__hello_world__alazar_hello_world
+#define __PYX_HAVE_API__hello_world__alazar_hello_world
 #include "AlazarCmd.h"
 #include "AlazarError.h"
 #include "AlazarApi.h"
@@ -411,7 +411,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "alazar_hello_world.pyx",
+  "hello_world\\alazar_hello_world.pyx",
 };
 
 /*--- Type declarations ---*/
@@ -492,9 +492,9 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
 #define __Pyx_PyObject_GetAttrStr(o,n) PyObject_GetAttr(o,n)
 #endif
 
-static PyObject *__Pyx_GetBuiltinName(PyObject *name);
-
 static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
+
+static PyObject *__Pyx_GetBuiltinName(PyObject *name);
 
 static CYTHON_INLINE PyObject *__Pyx_GetModuleGlobalName(PyObject *name);
 
@@ -544,16 +544,15 @@ static int __Pyx_check_binary_version(void);
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 
-/* Module declarations from 'c_alazar_api' */
+/* Module declarations from 'hello_world.c_alazar_api' */
 
-/* Module declarations from 'alazar_hello_world' */
-static HANDLE __pyx_v_18alazar_hello_world_board;
-#define __Pyx_MODULE_NAME "alazar_hello_world"
-int __pyx_module_is_main_alazar_hello_world = 0;
+/* Module declarations from 'hello_world.alazar_hello_world' */
+static HANDLE __pyx_v_11hello_world_18alazar_hello_world_board;
+#define __Pyx_MODULE_NAME "hello_world.alazar_hello_world"
+int __pyx_module_is_main_hello_world__alazar_hello_world = 0;
 
-/* Implementation of 'alazar_hello_world' */
-static PyObject *__pyx_builtin_range;
-static char __pyx_k_i[] = "i";
+/* Implementation of 'hello_world.alazar_hello_world' */
+static PyObject *__pyx_pf_11hello_world_18alazar_hello_world_num_systems(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
 static char __pyx_k_end[] = "end";
 static char __pyx_k_n_b[] = "n_b";
 static char __pyx_k_n_s[] = "n_s";
@@ -564,34 +563,93 @@ static char __pyx_k_test[] = "__test__";
 static char __pyx_k_time[] = "time";
 static char __pyx_k_Found[] = "Found ";
 static char __pyx_k_print[] = "print";
-static char __pyx_k_range[] = "range";
 static char __pyx_k_sleep[] = "sleep";
 static char __pyx_k_import[] = "__import__";
 static char __pyx_k_board_s[] = " board(s).";
+static char __pyx_k_num_systems[] = "num_systems";
 static char __pyx_k_Searching_for_boards[] = "Searching for boards.";
 static char __pyx_k_board_system_s_system_1_has[] = " board system(s); system 1 has ";
+static char __pyx_k_hello_world_alazar_hello_world[] = "hello_world.alazar_hello_world";
+static char __pyx_k_C_Users_chrismacklin_src_pyalaza[] = "C:\\Users\\chrismacklin\\src\\pyalazar\\hello_world\\alazar_hello_world.pyx";
+static PyObject *__pyx_kp_s_C_Users_chrismacklin_src_pyalaza;
 static PyObject *__pyx_kp_s_Found;
 static PyObject *__pyx_kp_s_Searching_for_boards;
 static PyObject *__pyx_kp_s_board_s;
 static PyObject *__pyx_kp_s_board_system_s_system_1_has;
 static PyObject *__pyx_n_s_end;
 static PyObject *__pyx_n_s_file;
-static PyObject *__pyx_n_s_i;
+static PyObject *__pyx_n_s_hello_world_alazar_hello_world;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_kind;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_n_b;
 static PyObject *__pyx_n_s_n_s;
+static PyObject *__pyx_n_s_num_systems;
 static PyObject *__pyx_n_s_print;
-static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_sleep;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_time;
-static PyObject *__pyx_float_0_5;
-static PyObject *__pyx_int_10;
-static PyObject *__pyx_tuple_;
-static PyObject *__pyx_tuple__2;
-static PyObject *__pyx_tuple__3;
+static PyObject *__pyx_codeobj_;
+
+/* "hello_world\alazar_hello_world.pyx":16
+ * 	print str(kind)
+ * 
+ * def num_systems():             # <<<<<<<<<<<<<<
+ * 	return c_alazar_api.AlazarNumOfSystems()
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_11hello_world_18alazar_hello_world_1num_systems(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_11hello_world_18alazar_hello_world_1num_systems = {"num_systems", (PyCFunction)__pyx_pw_11hello_world_18alazar_hello_world_1num_systems, METH_NOARGS, 0};
+static PyObject *__pyx_pw_11hello_world_18alazar_hello_world_1num_systems(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("num_systems (wrapper)", 0);
+  __pyx_r = __pyx_pf_11hello_world_18alazar_hello_world_num_systems(__pyx_self);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11hello_world_18alazar_hello_world_num_systems(CYTHON_UNUSED PyObject *__pyx_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("num_systems", 0);
+
+  /* "hello_world\alazar_hello_world.pyx":17
+ * 
+ * def num_systems():
+ * 	return c_alazar_api.AlazarNumOfSystems()             # <<<<<<<<<<<<<<
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_U32(AlazarNumOfSystems()); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "hello_world\alazar_hello_world.pyx":16
+ * 	print str(kind)
+ * 
+ * def num_systems():             # <<<<<<<<<<<<<<
+ * 	return c_alazar_api.AlazarNumOfSystems()
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("hello_world.alazar_hello_world.num_systems", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
 
 static PyMethodDef __pyx_methods[] = {
   {0, 0, 0, 0}
@@ -616,68 +674,41 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_kp_s_C_Users_chrismacklin_src_pyalaza, __pyx_k_C_Users_chrismacklin_src_pyalaza, sizeof(__pyx_k_C_Users_chrismacklin_src_pyalaza), 0, 0, 1, 0},
   {&__pyx_kp_s_Found, __pyx_k_Found, sizeof(__pyx_k_Found), 0, 0, 1, 0},
   {&__pyx_kp_s_Searching_for_boards, __pyx_k_Searching_for_boards, sizeof(__pyx_k_Searching_for_boards), 0, 0, 1, 0},
   {&__pyx_kp_s_board_s, __pyx_k_board_s, sizeof(__pyx_k_board_s), 0, 0, 1, 0},
   {&__pyx_kp_s_board_system_s_system_1_has, __pyx_k_board_system_s_system_1_has, sizeof(__pyx_k_board_system_s_system_1_has), 0, 0, 1, 0},
   {&__pyx_n_s_end, __pyx_k_end, sizeof(__pyx_k_end), 0, 0, 1, 1},
   {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
-  {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
+  {&__pyx_n_s_hello_world_alazar_hello_world, __pyx_k_hello_world_alazar_hello_world, sizeof(__pyx_k_hello_world_alazar_hello_world), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_kind, __pyx_k_kind, sizeof(__pyx_k_kind), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_n_b, __pyx_k_n_b, sizeof(__pyx_k_n_b), 0, 0, 1, 1},
   {&__pyx_n_s_n_s, __pyx_k_n_s, sizeof(__pyx_k_n_s), 0, 0, 1, 1},
+  {&__pyx_n_s_num_systems, __pyx_k_num_systems, sizeof(__pyx_k_num_systems), 0, 0, 1, 1},
   {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
-  {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_sleep, __pyx_k_sleep, sizeof(__pyx_k_sleep), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
-  __pyx_L1_error:;
-  return -1;
 }
 
 static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "alazar_hello_world.pyx":15
- * 	kind = c_alazar_api.AlazarGetBoardKind(board)
+  /* "hello_world\alazar_hello_world.pyx":16
  * 	print str(kind)
- * 	for i in range(10):             # <<<<<<<<<<<<<<
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)
- * 		sleep(0.5)
- */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_int_10); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple_);
-  __Pyx_GIVEREF(__pyx_tuple_);
-
-  /* "alazar_hello_world.pyx":17
- * 	for i in range(10):
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)
- * 		sleep(0.5)             # <<<<<<<<<<<<<<
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_OFF)
- * 		sleep(0.5)
- */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_float_0_5); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__2);
-  __Pyx_GIVEREF(__pyx_tuple__2);
-
-  /* "alazar_hello_world.pyx":19
- * 		sleep(0.5)
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_OFF)
- * 		sleep(0.5)             # <<<<<<<<<<<<<<
  * 
- * 
+ * def num_systems():             # <<<<<<<<<<<<<<
+ * 	return c_alazar_api.AlazarNumOfSystems()
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_float_0_5); if (unlikely(!__pyx_tuple__3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple__3);
-  __Pyx_GIVEREF(__pyx_tuple__3);
+  __pyx_codeobj_ = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_chrismacklin_src_pyalaza, __pyx_n_s_num_systems, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -687,8 +718,6 @@ static int __Pyx_InitCachedConstants(void) {
 
 static int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
-  __pyx_float_0_5 = PyFloat_FromDouble(0.5); if (unlikely(!__pyx_float_0_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -706,8 +735,6 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   int __pyx_t_4;
-  Py_ssize_t __pyx_t_5;
-  PyObject *(*__pyx_t_6)(PyObject *);
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -760,14 +787,14 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #endif
-  if (__pyx_module_is_main_alazar_hello_world) {
+  if (__pyx_module_is_main_hello_world__alazar_hello_world) {
     if (PyObject_SetAttrString(__pyx_m, "__name__", __pyx_n_s_main) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    if (!PyDict_GetItemString(modules, "alazar_hello_world")) {
-      if (unlikely(PyDict_SetItemString(modules, "alazar_hello_world", __pyx_m) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!PyDict_GetItemString(modules, "hello_world.alazar_hello_world")) {
+      if (unlikely(PyDict_SetItemString(modules, "hello_world.alazar_hello_world", __pyx_m) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
@@ -784,7 +811,7 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   /*--- Function import code ---*/
   /*--- Execution code ---*/
 
-  /* "alazar_hello_world.pyx":3
+  /* "hello_world\alazar_hello_world.pyx":3
  * cimport c_alazar_api
  * 
  * from time import sleep             # <<<<<<<<<<<<<<
@@ -805,7 +832,7 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "alazar_hello_world.pyx":5
+  /* "hello_world\alazar_hello_world.pyx":5
  * from time import sleep
  * 
  * print "Searching for boards."             # <<<<<<<<<<<<<<
@@ -814,7 +841,7 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
  */
   if (__Pyx_PrintOne(0, __pyx_kp_s_Searching_for_boards) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 5; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar_hello_world.pyx":6
+  /* "hello_world\alazar_hello_world.pyx":6
  * 
  * print "Searching for boards."
  * n_s = c_alazar_api.AlazarNumOfSystems()             # <<<<<<<<<<<<<<
@@ -826,7 +853,7 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_n_s, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "alazar_hello_world.pyx":7
+  /* "hello_world\alazar_hello_world.pyx":7
  * print "Searching for boards."
  * n_s = c_alazar_api.AlazarNumOfSystems()
  * n_b = c_alazar_api.AlazarBoardsInSystemBySystemID(1)             # <<<<<<<<<<<<<<
@@ -838,7 +865,7 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_n_b, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 7; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "alazar_hello_world.pyx":8
+  /* "hello_world\alazar_hello_world.pyx":8
  * n_s = c_alazar_api.AlazarNumOfSystems()
  * n_b = c_alazar_api.AlazarBoardsInSystemBySystemID(1)
  * print "Found " + str(n_s) + " board system(s); system 1 has " + str(n_b) + " board(s)."             # <<<<<<<<<<<<<<
@@ -881,43 +908,43 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   if (__Pyx_PrintOne(0, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar_hello_world.pyx":10
+  /* "hello_world\alazar_hello_world.pyx":10
  * print "Found " + str(n_s) + " board system(s); system 1 has " + str(n_b) + " board(s)."
  * 
  * cdef c_alazar_api.HANDLE board = c_alazar_api.AlazarGetBoardBySystemID(1,1)             # <<<<<<<<<<<<<<
  * 
  * if board is not NULL:
  */
-  __pyx_v_18alazar_hello_world_board = AlazarGetBoardBySystemID(1, 1);
+  __pyx_v_11hello_world_18alazar_hello_world_board = AlazarGetBoardBySystemID(1, 1);
 
-  /* "alazar_hello_world.pyx":12
+  /* "hello_world\alazar_hello_world.pyx":12
  * cdef c_alazar_api.HANDLE board = c_alazar_api.AlazarGetBoardBySystemID(1,1)
  * 
  * if board is not NULL:             # <<<<<<<<<<<<<<
  * 	kind = c_alazar_api.AlazarGetBoardKind(board)
  * 	print str(kind)
  */
-  __pyx_t_4 = ((__pyx_v_18alazar_hello_world_board != NULL) != 0);
+  __pyx_t_4 = ((__pyx_v_11hello_world_18alazar_hello_world_board != NULL) != 0);
   if (__pyx_t_4) {
 
-    /* "alazar_hello_world.pyx":13
+    /* "hello_world\alazar_hello_world.pyx":13
  * 
  * if board is not NULL:
  * 	kind = c_alazar_api.AlazarGetBoardKind(board)             # <<<<<<<<<<<<<<
  * 	print str(kind)
- * 	for i in range(10):
+ * 
  */
-    __pyx_t_1 = __Pyx_PyInt_From_U32(AlazarGetBoardKind(__pyx_v_18alazar_hello_world_board)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyInt_From_U32(AlazarGetBoardKind(__pyx_v_11hello_world_18alazar_hello_world_board)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (PyDict_SetItem(__pyx_d, __pyx_n_s_kind, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "alazar_hello_world.pyx":14
+    /* "hello_world\alazar_hello_world.pyx":14
  * if board is not NULL:
  * 	kind = c_alazar_api.AlazarGetBoardKind(board)
  * 	print str(kind)             # <<<<<<<<<<<<<<
- * 	for i in range(10):
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)
+ * 
+ * def num_systems():
  */
     __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_kind); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
@@ -931,125 +958,30 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__Pyx_PrintOne(0, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-    /* "alazar_hello_world.pyx":15
- * 	kind = c_alazar_api.AlazarGetBoardKind(board)
- * 	print str(kind)
- * 	for i in range(10):             # <<<<<<<<<<<<<<
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)
- * 		sleep(0.5)
- */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_GOTREF(__pyx_t_1);
-    if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
-      __pyx_t_3 = __pyx_t_1; __Pyx_INCREF(__pyx_t_3); __pyx_t_5 = 0;
-      __pyx_t_6 = NULL;
-    } else {
-      __pyx_t_5 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    for (;;) {
-      if (likely(!__pyx_t_6)) {
-        if (likely(PyList_CheckExact(__pyx_t_3))) {
-          if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_3)) break;
-          #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_5); __Pyx_INCREF(__pyx_t_1); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-          #else
-          __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-          #endif
-        } else {
-          if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
-          #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_5); __Pyx_INCREF(__pyx_t_1); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-          #else
-          __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-          #endif
-        }
-      } else {
-        __pyx_t_1 = __pyx_t_6(__pyx_t_3);
-        if (unlikely(!__pyx_t_1)) {
-          PyObject* exc_type = PyErr_Occurred();
-          if (exc_type) {
-            if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-          }
-          break;
-        }
-        __Pyx_GOTREF(__pyx_t_1);
-      }
-      if (PyDict_SetItem(__pyx_d, __pyx_n_s_i, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-      /* "alazar_hello_world.pyx":16
- * 	print str(kind)
- * 	for i in range(10):
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)             # <<<<<<<<<<<<<<
- * 		sleep(0.5)
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_OFF)
- */
-      AlazarSetLED(__pyx_v_18alazar_hello_world_board, LED_ON);
-
-      /* "alazar_hello_world.pyx":17
- * 	for i in range(10):
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)
- * 		sleep(0.5)             # <<<<<<<<<<<<<<
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_OFF)
- * 		sleep(0.5)
- */
-      __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_sleep); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-      /* "alazar_hello_world.pyx":18
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)
- * 		sleep(0.5)
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_OFF)             # <<<<<<<<<<<<<<
- * 		sleep(0.5)
- * 
- */
-      AlazarSetLED(__pyx_v_18alazar_hello_world_board, LED_OFF);
-
-      /* "alazar_hello_world.pyx":19
- * 		sleep(0.5)
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_OFF)
- * 		sleep(0.5)             # <<<<<<<<<<<<<<
- * 
- * 
- */
-      __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_sleep); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-      /* "alazar_hello_world.pyx":15
- * 	kind = c_alazar_api.AlazarGetBoardKind(board)
- * 	print str(kind)
- * 	for i in range(10):             # <<<<<<<<<<<<<<
- * 		c_alazar_api.AlazarSetLED(board, c_alazar_api.LED_ON)
- * 		sleep(0.5)
- */
-    }
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     goto __pyx_L2;
   }
   __pyx_L2:;
 
-  /* "alazar_hello_world.pyx":1
+  /* "hello_world\alazar_hello_world.pyx":16
+ * 	print str(kind)
+ * 
+ * def num_systems():             # <<<<<<<<<<<<<<
+ * 	return c_alazar_api.AlazarNumOfSystems()
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11hello_world_18alazar_hello_world_1num_systems, NULL, __pyx_n_s_hello_world_alazar_hello_world); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_num_systems, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "hello_world\alazar_hello_world.pyx":1
  * cimport c_alazar_api             # <<<<<<<<<<<<<<
  * 
  * from time import sleep
  */
-  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /*--- Wrapped vars code ---*/
 
@@ -1060,12 +992,12 @@ PyMODINIT_FUNC PyInit_alazar_hello_world(void)
   __Pyx_XDECREF(__pyx_t_3);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init alazar_hello_world", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init hello_world.alazar_hello_world", __pyx_clineno, __pyx_lineno, __pyx_filename);
       Py_DECREF(__pyx_d); __pyx_d = 0;
     }
     Py_DECREF(__pyx_m); __pyx_m = 0;
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init alazar_hello_world");
+    PyErr_SetString(PyExc_ImportError, "init hello_world.alazar_hello_world");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
@@ -1093,19 +1025,6 @@ end:
 }
 #endif
 
-static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
-    PyObject* result = __Pyx_PyObject_GetAttrStr(__pyx_b, name);
-    if (unlikely(!result)) {
-        PyErr_Format(PyExc_NameError,
-#if PY_MAJOR_VERSION >= 3
-            "name '%U' is not defined", name);
-#else
-            "name '%.200s' is not defined", PyString_AS_STRING(name));
-#endif
-    }
-    return result;
-}
-
 static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
     PyObject* value = __Pyx_PyObject_GetAttrStr(module, name);
     if (unlikely(!value) && PyErr_ExceptionMatches(PyExc_AttributeError)) {
@@ -1117,6 +1036,19 @@ static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
         #endif
     }
     return value;
+}
+
+static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
+    PyObject* result = __Pyx_PyObject_GetAttrStr(__pyx_b, name);
+    if (unlikely(!result)) {
+        PyErr_Format(PyExc_NameError,
+#if PY_MAJOR_VERSION >= 3
+            "name '%U' is not defined", name);
+#else
+            "name '%.200s' is not defined", PyString_AS_STRING(name));
+#endif
+    }
+    return result;
 }
 
 static CYTHON_INLINE PyObject *__Pyx_GetModuleGlobalName(PyObject *name) {

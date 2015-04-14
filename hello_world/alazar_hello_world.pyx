@@ -13,3 +13,5 @@ if board is not NULL:
 	kind = c_alazar_api.AlazarGetBoardKind(board)
 	print str(kind)
 
+def num_systems():
+	return c_alazar_api.AlazarNumOfSystems()
