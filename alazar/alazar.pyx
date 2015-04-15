@@ -5,6 +5,7 @@ cdef class Alazar(object):
 
 	# handle to an alazar board
 	cdef c_alazar_api.HANDLE board
+	cdef int board_type
 
 	# use __cinit__ to make sure this is run
 	def __cinit__(self, systemID, boardID):
@@ -18,7 +19,7 @@ cdef class Alazar(object):
 		if self.board is NULL:
 			raise AlazarException("Could not connect to an Alazar board with system ID {}, board ID {}.".format(systemID,boardID))
 		
-		self.board_type = c_alazar_api.AlazarGetBoardKind()
+		self.board_type = c_alazar_api.AlazarGetBoardKind(self.board)
 		if self.board_type == 0:
 			raise AlazarException("Connected to board with system ID {}, board ID {}, but could not identify board!".format(systemID,boardID))
 
@@ -65,10 +66,10 @@ cdef class Alazar(object):
 			except KeyError:
 				raise AlazarException("Sample rate '{}' is not valid.".format(sample_rate))
 
-			if sample_rate == "User-defined" or sample_rate = "10 MHz ref":
+			if sample_rate == "User-defined" or sample_rate == "10 MHz ref":
 				raise AlazarException("Internal clock requires an explicit sample rate; supplied: '{}'".format(sample_rate))
 
-			code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, 0)
+			ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, 0)
 
 		else:
 			if check_decimation(self.board_type, clock_source, decimation):
@@ -81,10 +82,10 @@ cdef class Alazar(object):
 				raise AlazarException("Invalid decimation '{}' for clock source '{}'.".format(decimation,clock_source))
 		
 		# raise exception if ret_code was an error
-		check_return_code(ret_code, "Set capture clock failed:")
+		check_return_code(ret_code, "Set capture clock failed with code {}:".format(ret_code))
 
 
-	def setup_input_channels(self, channel="all", coupling="dc", input_range, impedance="50ohm", bw="open"):
+	def setup_input_channels(self, input_range, channel="all", coupling="dc", impedance="50ohm", bw="open"):
 		"""Set the input parameters for a digitizer channel.
 
 		If channel = "all", all available channels are set to the given parameters.
@@ -148,10 +149,10 @@ cdef class Alazar(object):
 													   range_code,
 													   2)
 			# check for API success
-			check_return_code(ret_code, "Error setting channel {} input:".format(chan))
+			check_return_code(ret_code, "Error setting channel {} input:".format(channel))
 
 			ret_code = c_alazar_api.AlazarSetBWLimit(self.board, chan_code, bw_code)
-			check_return_code(ret_code, "Error setting channel {} BW limit:".format(chan))
+			check_return_code(ret_code, "Error setting channel {} BW limit:".format(channel))
 
 	def setup_one_trigger(self,
 						  source_channel="ext",
@@ -182,14 +183,14 @@ cdef class Alazar(object):
 
 		# validate source channel
 		try:
-			source_code = trigger_sources()[source_channel]
+			source_code = trigger_sources(self.board_type)[source_channel]
 		except KeyError:
 			raise AlazarException("Invalid trigger source channel: '{}'".format(source_channel))
 
 		# validate slope
-		if slope = "rising":
+		if slope == "rising":
 			slope_code = 1
-		elif slope = "falling":
+		elif slope == "falling":
 			slope_code = 2
 		else:
 			raise AlazarException("Slope must be 'rising' or 'falling'; provided: '{}'".format(slope))
@@ -392,12 +393,12 @@ def check_decimation(board_type, clock_source, decimation):
 	if board_type == 13 or board_type == "ATS9870":
 		if clock_source == "external 10 MHz ref":
 			# 10 MHz ref requires decimation of 1, 2, 4, or mult. of 10
-			if decimation in [1,2,4] or (decimation != 0 and decimation and 10 == 0) and decimation <= max_decimation:
+			if decimation in [1,2,4] or (decimation != 0 and decimation % 10 == 0) and decimation <= max_decimation:
 				return True
 			else:
 				return False
 
-		elif clock_soure == "external slow" or clock_source == "external fast":
+		elif clock_source == "external slow" or clock_source == "external fast":
 			if decimation >= 0 and decimation <= max_decimation:
 				return True
 			else:
