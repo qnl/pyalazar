@@ -44,7 +44,7 @@ cdef class Alazar(object):
 		"""
 		if edge == "rising":
 			edge_code = 0
-		else if edge == "falling":
+		elif edge == "falling":
 			edge_code = 1
 		else:
 			raise AlazarException("Edge must be either 'rising' or 'falling'; supplied: '{}'".format(edge))
@@ -98,7 +98,7 @@ cdef class Alazar(object):
 		# validate coupling
 		if coupling == "ac":
 			coupling_code = 1
-		else if coupling == "dc":
+		elif coupling == "dc":
 			coupling_code = 2
 		else:
 			raise AlazarException("Input coupling must be 'ac' or 'dc'; provided: '{}'".format(coupling))
@@ -116,7 +116,7 @@ cdef class Alazar(object):
 		# validate bandwidth
 		if bw == "open":
 			bw_code = 0
-		else if bw == "limit":
+		elif bw == "limit":
 			bw_code = 1
 		else:
 			raise AlazarException("Bandwidth must be 'open' or 'limit'; provided: '{}'".format(bw))
@@ -131,10 +131,10 @@ cdef class Alazar(object):
 														   range_code,
 														   2)
 				# check for API success
-				check_return_code(ret_code, "Error setting channel {}:".format(chan))
+				check_return_code(ret_code, "Error setting channel {} input:".format(chan))
 
 				ret_code = c_alazar_api.AlazarSetBWLimit(self.board, chan_code, bw_code)
-				check_return_code(ret_code, "Error setting channel {}:".format(chan))
+				check_return_code(ret_code, "Error setting channel {} BW limit:".format(chan))
 		else:
 			try:
 				chan_code = channels(self.board_type)[channel]
@@ -148,23 +148,26 @@ cdef class Alazar(object):
 													   range_code,
 													   2)
 			# check for API success
-			check_return_code(ret_code, "Error setting channel {}:".format(chan))
+			check_return_code(ret_code, "Error setting channel {} input:".format(chan))
 
 			ret_code = c_alazar_api.AlazarSetBWLimit(self.board, chan_code, bw_code)
-			check_return_code(ret_code, "Error setting channel {}:".format(chan))
+			check_return_code(ret_code, "Error setting channel {} BW limit:".format(chan))
 
 	def setup_one_trigger(self,
 						  source_channel="ext",
 						  slope="rising",
 						  level=0.0,
 						  ext_coupling="dc",
-						  ext_range="TTL"):
+						  ext_range="TTL",
+						  delay = 0):
 		"""Configure the Alazar trigger engine.
 
 		The Alazar boards actually have two trigger engines which can be combined
 		in interesting and complex ways, which we have never used even once.
-		So, this function configures just one engine (J) and disables the other.
+		So, this function configures just one engine (J) and disables the other (K).
 		This function defaults to configuring an external rising TTL half-scale trigger.
+		This function always disables trigger timeout to ensure the board does not self-
+			trigger.
 
 		channel is a named channel 'A', 'B', or 'ext' to use the external input
 		slope is "rising" or "falling"
@@ -172,6 +175,9 @@ cdef class Alazar(object):
 			at which the trigger engine fires.
 		ext_couping is "ac" or "dc", defaults to "dc"
 		ext_range should be a selection from the valid external trigger ranges
+		delay is the number of samples between the trigger and the start of acquisition;
+			The ATS9870 requires this to be a multiple of 16 for a 1-channel acquisition
+			or a multiple of 8 for a 2-channel acquisition.
 		"""
 
 		# validate source channel
@@ -183,7 +189,7 @@ cdef class Alazar(object):
 		# validate slope
 		if slope = "rising":
 			slope_code = 1
-		else if slope = "falling":
+		elif slope = "falling":
 			slope_code = 2
 		else:
 			raise AlazarException("Slope must be 'rising' or 'falling'; provided: '{}'".format(slope))
@@ -197,7 +203,7 @@ cdef class Alazar(object):
 		# validate external coupling
 		if ext_coupling == "ac":
 			coupling_code = 1
-		else if ext_coupling == "dc":
+		elif ext_coupling == "dc":
 			coupling_code = 2
 		else:
 			raise AlazarException("External coupling must be 'ac' or 'dc'; provided: '{}'".format(ext_coupling))
@@ -207,6 +213,13 @@ cdef class Alazar(object):
 			range_code = ext_trig_range()[ext_range]
 		except KeyError:
 			raise AlazarException("Invalid external trigger range: '{}'".format(ext_range))
+
+		# validate delay
+		delay = int(delay)
+		if delay < 0 or delay > 9999999:
+			raise AlazarException("Delay must be >= 0 and <9,999,999; provided: '{}'".format(delay))
+		elif delay % 8 != 0:
+			raise AlazarException("Delay must be a multiple of 8; provided: '{}'".format(delay))
 
 		ret_code = c_alazar_api.AlazarSetTriggerOperation(self.board,
 														  0, # use trigger engine J
@@ -218,17 +231,21 @@ cdef class Alazar(object):
 														  0x3, # disable K
 														  1, # set K slope positive
 														  128) # set K level mid-range
-
 		check_return_code(ret_code, "Error setting trigger operation:")
 
 		# configure external trigger if using
 		if source_channel == "ext":
 
 			ret_code = c_alazar_api.AlazarSetExternalTrigger(self.board, coupling_code, range_code)
-
 			check_return_code(ret_code, "Error setting external trigger:")
 
+		# set trigger delay
+		ret_code = c_alazar_api.AlazarSetTriggerDelay(self.board, delay)
+		check_return_code(ret_code, "Error setting trigger delay:")
 
+		# disable trigger timeout
+		ret_code = c_alazar_api.AlazarSetTriggerTimeOut(self.board, 0)
+		check_return_code(ret_code, "Error setting trigger timeout:")
 
 
 def get_systems_and_boards():
@@ -380,7 +397,7 @@ def check_decimation(board_type, clock_source, decimation):
 			else:
 				return False
 
-		else if clock_soure == "external slow" or clock_source == "external fast":
+		elif clock_soure == "external slow" or clock_source == "external fast":
 			if decimation >= 0 and decimation <= max_decimation:
 				return True
 			else:
