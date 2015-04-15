@@ -12,6 +12,3 @@ cdef c_alazar_api.HANDLE board = c_alazar_api.AlazarGetBoardBySystemID(1,1)
 if board is not NULL:
 	kind = c_alazar_api.AlazarGetBoardKind(board)
 	print str(kind)
-
-def num_systems():
-	return c_alazar_api.AlazarNumOfSystems()

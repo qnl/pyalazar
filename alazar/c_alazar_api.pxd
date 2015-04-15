@@ -31,9 +31,6 @@ cdef extern from "AlazarApi.h":
 	ctypedef void* HANDLE
 	# Raw pointer to an Alazar board.
 
-	enum MSILS:
-		pass
-
 
 	# --- troubleshooting functions
 
@@ -47,7 +44,7 @@ cdef extern from "AlazarApi.h":
 	U32 AlazarBoardsFound()
 	HANDLE AlazarOpen(char* BoardNameID); # e.x. ATS850-0, ATS850-1 ....
 	void AlazarClose(HANDLE h);
-	MSILS AlazarGetBoardKind(HANDLE h);
+	U32 AlazarGetBoardKind(HANDLE h);
 	RETURN_CODE AlazarGetCPLDVersion(HANDLE h, U8* Major, U8* Minor);
 	RETURN_CODE AlazarGetChannelInfo(HANDLE h, U32* MemSize, U8* SampleSize);
 	RETURN_CODE AlazarGetSDKVersion(U8* Major, U8* Minor, U8* Revision);
