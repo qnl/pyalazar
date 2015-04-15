@@ -247,7 +247,7 @@ cdef class Alazar(object):
 		# disable trigger timeout
 		ret_code = c_alazar_api.AlazarSetTriggerTimeOut(self.board, 0)
 		check_return_code(ret_code, "Error setting trigger timeout:")
-
+# end of Alazar() class definition
 
 def get_systems_and_boards():
 	"""Return a dict of the number of boards in each Alazar system detected.
