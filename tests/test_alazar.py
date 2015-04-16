@@ -1,13 +1,12 @@
 import alazar.alazar as alz
 
-# nose module setup
-def setup():
-	boards = alz.get_systems_and_boards()
-
 class TestAlazar(object):
+	@classmethod
+	def setup_class(cls):
+		self.boards = alz.get_systems_and_boards()
 
-	def test_systems_available():
-		assert boards
+	def test_systems_available(self):
+		assert self.boards
 
-	def test():
+	def test(self):
 		pass
