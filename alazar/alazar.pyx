@@ -23,6 +23,10 @@ cdef class Alazar(object):
 		if self.board_type == 0:
 			raise AlazarException("Connected to board with system ID {}, board ID {}, but could not identify board!".format(systemID,boardID))
 
+	# need a getter to access this from python
+	def board_type(self):
+		return self.board_type
+
 
 	def setup_capture_clock(self, clock_source, sample_rate, decimation=0, edge="rising"):
 		"""Set the capture clock for this alazar board.
@@ -43,6 +47,8 @@ cdef class Alazar(object):
 		The logic of this function is presently hardwired for the ATS9870.
 		Extending to other models will require modifying this function.
 		"""
+
+		# validate edge
 		if edge == "rising":
 			edge_code = 0
 		elif edge == "falling":
@@ -52,31 +58,34 @@ cdef class Alazar(object):
 
 
 
-		# get the clock source ID
+		# validate clock_source and get code
 		try:
 			source_code = clock_sources(self.board_type)[clock_source]
 		except KeyError:
 			raise AlazarException("Clock source '{}' is not valid.".format(clock_source))
 
 
+		# validate sample_rate, decimation, and set the board
 		if clock_source == "internal":
+
 			# get the sample rate ID
 			try:
 				rate_code = sample_rates(self.board_type)[sample_rate]
 			except KeyError:
 				raise AlazarException("Sample rate '{}' is not valid.".format(sample_rate))
 
-			if sample_rate == "User-defined" or sample_rate == "10 MHz ref":
+			if sample_rate == "user-defined" or sample_rate == "10 MHz ref":
 				raise AlazarException("Internal clock requires an explicit sample rate; supplied: '{}'".format(sample_rate))
 
 			ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, 0)
 
 		else:
+			# validate the decimation parameter
 			if check_decimation(self.board_type, clock_source, decimation):
 				if clock_source == "external 10 MHz ref":
 					rate_code = sample_rates(self.board_type)["10 MHz ref"]
 				else:
-					rate_code = sample_rates(self.board_type)["User-defined"]
+					rate_code = sample_rates(self.board_type)["user-defined"]
 				ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, decimation)
 			else:
 				raise AlazarException("Invalid decimation '{}' for clock source '{}'.".format(decimation,clock_source))
@@ -349,7 +358,7 @@ def sample_rates(board_type):
 				"250 MS/s": 0x2B,
 				"500 MS/s": 0x30,
 				"1 GS/s": 0x35,
-				"User-defined": 0x40,
+				"user-defined": 0x40,
 				"10 MHz ref": 1000000000}
 	else:
 		raise AlazarException("Could not get sample rates for board type " + str(board_type))
@@ -405,5 +414,4 @@ def check_decimation(board_type, clock_source, decimation):
 				return False
 
 	else:
-		raise ( AlazarException("Could not check decimation for board type '"
-			   + str(board_type) + "' for clock source '" + str(clock_source) +"'") )
+		return False
