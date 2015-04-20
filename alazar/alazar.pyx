@@ -256,6 +256,18 @@ cdef class Alazar(object):
 		# disable trigger timeout
 		ret_code = c_alazar_api.AlazarSetTriggerTimeOut(self.board, 0)
 		check_return_code(ret_code, "Error setting trigger timeout:")
+
+		def acquire(self, samples_per_record, n_records, records_per_buffer, channels_to_acquire="all"):
+			cdef c_alazar_api.U8 bits_per_sample
+			cdef c_alazar_api.U32 max_samples_per_channel
+			ret_code = c_alazar_api.AlazarGetChannelInfo(self.board, &bits_per_sample, &max_samples_per_channel)
+			check_return_code(rec_code, "Get channel info failed:")
+
+			print bits_per_sample
+			print max_samples_per_channel
+
+
+
 # end of Alazar() class definition
 
 def get_systems_and_boards():
