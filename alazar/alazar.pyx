@@ -24,7 +24,7 @@ cdef class Alazar(object):
 			raise AlazarException("Connected to board with system ID {}, board ID {}, but could not identify board!".format(systemID,boardID))
 
 	# need a getter to access this from python
-	def board_type(self):
+	def get_board_type(self):
 		return self.board_type
 
 
@@ -399,10 +399,13 @@ def check_decimation(board_type, clock_source, decimation):
 	This function currently only supports the ATS9870
 	"""
 
+	if decimation >= max_decimation:
+		return False
+
 	if board_type == 13 or board_type == "ATS9870":
 		if clock_source == "external 10 MHz ref":
 			# 10 MHz ref requires decimation of 1, 2, 4, or mult. of 10
-			if decimation in [1,2,4] or (decimation != 0 and decimation % 10 == 0) and decimation <= max_decimation:
+			if decimation in [1,2,4] or (decimation != 0 and decimation % 10 == 0):
 				return True
 			else:
 				return False
