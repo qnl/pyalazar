@@ -24,7 +24,7 @@ cdef class Alazar(object):
 			raise AlazarException("Connected to board with system ID {}, board ID {}, but could not identify board!".format(systemID,boardID))
 
 	# need a getter to access this from python
-	def board_type(self):
+	def get_board_type(self):
 		return self.board_type
 
 

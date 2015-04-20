@@ -21,14 +21,21 @@ class TestAlazar(object):
 	# test the decimation parameter check for 10 MHz clock
 	def test_decimation_10MHz(self):
 		for board in self.boards:
-			for dec in range(-10,1000000):
-				yield check_decimation_10MHz, board.board_type(), dec
+			for dec in range(-1,11):
+				yield self.check_decimation_10MHz, board.get_board_type(), dec,
 		
-	def check_decimation_10MHz(board_type,dec):
+	def check_decimation_10MHz(self,board_type,dec):
 
 		dec_check = alz.check_decimation(board_type, "external 10 MHz ref", dec)
 
-		if dec in [1,2,4] or (dec > 0 and dec % 10):
+		assert board_type == 13 or board_type == "ATS9870"
+
+		if dec in [1,2,4] or (dec > 0 and dec % 10 == 0):
 			assert dec_check
 		else:
 			assert not dec_check
+
+	def test_max_decimation(self):
+		assert not alz.check_decimation(0, "", 100001)
+
+		
