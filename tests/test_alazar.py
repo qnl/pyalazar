@@ -28,7 +28,14 @@ class TestAlazar(object):
 
 		dec_check = alz.check_decimation(board_type, "external 10 MHz ref", dec)
 
+		assert board_type == 13 or board_type == "ATS9870"
+
 		if dec in [1,2,4] or (dec > 0 and dec % 10 == 0):
 			assert dec_check
 		else:
 			assert not dec_check
+
+	def test_max_decimation(self):
+		assert not alz.check_decimation(0, "", 100001)
+
+		
