@@ -24,6 +24,7 @@ alazar = Extension('alazar',
                   library_dirs = ['C:\\AlazarTech\\ATS-SDK\\6.2.0\\Samples\\Library\\x64','C:\\AlazarTech\\ATS-SDK\\6.2.0\\Samples_CSharp\\'],)
 
 setup(ext_modules = cythonize([alazar]),
+      include_dirs=[numpy.get_include()],
       **config
 )
 
