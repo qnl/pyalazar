@@ -23,7 +23,7 @@ class TestAlazar(object):
 		for board in self.boards:
 			for dec in range(-1,11):
 				yield self.check_decimation_10MHz, board.get_board_type(), dec,
-		
+
 	def check_decimation_10MHz(self,board_type,dec):
 
 		dec_check = alz.check_decimation(board_type, "external 10 MHz ref", dec)
@@ -38,4 +38,4 @@ class TestAlazar(object):
 	def test_max_decimation(self):
 		assert not alz.check_decimation(0, "", 100001)
 
-		
+

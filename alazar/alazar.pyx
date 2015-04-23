@@ -3,6 +3,8 @@ cimport c_alazar_api
 import numpy as np
 cimport numpy as np
 
+from contextlib import contextmanager
+
 
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
@@ -266,7 +268,8 @@ cdef class Alazar(object):
                 records_per_acquisition,
                 records_per_buffer,
                 channels_to_acquire="all",
-                buffer_count=4):
+                buffer_count=64,
+                timeout = 5000):
         """Perform an acquisition using two-port NPT DMA mode.
 
         THIS FUNCTION IS FOR BOARD AND CODE DEBUGGING AND SHOULD NOT BE USED IN A
@@ -280,7 +283,8 @@ cdef class Alazar(object):
         records_per_acquisition must be a multiple of records_per_buffer
 
         channels_to_acquire is "all" for all channels, or "A", "B" for a single channel.
-        buffer_count is the number of DMA buffers to allocate; default is 4, min is 2.
+        buffer_count is the number of DMA buffers to allocate; default is 64, min is 2.
+        timeout (ms) is the time to wait for a buffer to be filled by the board; default is 5000
         """
 
         # validate inputs
@@ -297,7 +301,7 @@ cdef class Alazar(object):
         check_buffer_alignment(self.board_type, samples_per_record)
 
         # validate channels, raises an exception on invalid input
-        channel_mask, channel_count = make_channel_mask(channels_to_acquire)
+        channel_mask, channel_count = make_channel_mask(self.board_type, channels_to_acquire)
 
         # check buffer count
         if buffer_count < 2:
@@ -316,23 +320,101 @@ cdef class Alazar(object):
         bytes_per_record = bytes_per_sample * samples_per_record
         bytes_per_buffer = bytes_per_record * records_per_buffer * channel_count
 
+        # set the record size
+        ret_code = c_alazar_api.AlazarSetRecordSize(self.board, 0, samples_per_record)
+        check_return_code(ret_code, "Set record size failed for {} samples:".format(samples_per_record))
+
         # allocate list of NumPy arrays as data buffers
         # indexing this will cost a Python overhead, but this may not be important
-        buffers = [np.empty(bytes_per_record, dtype=np.uint8) for n in range(buffer_count)]
+        # these are refcounted so we don't need to manually manage their memory
+        buffers = [np.empty(bytes_per_buffer, dtype=np.uint8) for n in range(buffer_count)]
 
         # make a list of the address of each buffer to pass to the digitizer
         cdef list buffer_addresses = []
 
+        # make a Cython memoryview of each buffer and add it to the list
+        # get a C pointer to the buffer with the syntax &buf_vew[0]
         cdef unsigned char[:] buf_view
         for buf in buffers:
             buf_view = buf
             buffer_addresses.append(buf_view)
 
-        for view in buffer_addresses:
-            print view
+        # configure the board to make an NPT AutoDMA acquisition
+        # first flag is the value of ADMA_EXTERNAL_STARTCAPTURE
+        # second flag is the value of ADMA_NPT and sets no pretrigger sample acquisition
+        autoDMA_flags = 0x00000001 | 0x00000200
 
-        return buffer_addresses
-        # TODO: complete this function
+        ret_code = c_alazar_api.AlazarBeforeAsyncRead(self.board,
+                                                      channel_mask,
+                                                      0,
+                                                      samples_per_record,
+                                                      records_per_buffer,
+                                                      records_per_acquisition,
+                                                      autoDMA_flags)
+        check_return_code(ret_code,"Setup NPT AutoDMA acquisition failed:")
+
+        # have to preallocate all of the c variables
+        cdef unsigned char[:] data_view
+        cdef int buffers_per_acquisition
+        cdef int buffers_completed
+        cdef long long bytes_handled
+        cdef int buffer_index
+
+        # initialize a NumPy array to hold the data, temporary for this test function
+        data = np.empty((bytes_per_record * records_per_acquisition * channel_count), dtype=np.uint8)
+        data_view = data
+
+        # ensure we abort the acquisition after this point
+        # otherwise the digitizer will become stuck in DmaInProgress and require reboot
+        try:
+
+            # add the buffers to the list of buffers available to the board
+            for b in range(buffer_count):
+                buf_view = buffer_addresses[b]
+                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board, &buf_view[0], bytes_per_buffer)
+                check_return_code(ret_code, "Failed to send buffer address to board:")
+
+            # arm the board
+            ret_code = c_alazar_api.AlazarStartCapture(self.board)
+            check_return_code(ret_code, "Failed to start capture:")
+
+            # process buffers; for now stuff into a NumPy array
+
+            buffers_per_acquisition = records_per_acquisition / records_per_buffer
+
+            buffers_completed = 0
+            bytes_handled = 0
+
+            # handle each buffer
+            while buffers_completed < buffers_per_acquisition:
+                buffer_index = buffers_completed % buffer_count
+
+                buf_view = buffer_addresses[buffer_index]
+
+                ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board, &buf_view[0], timeout)
+                print "ret code from wait: {}".format(ret_code)
+                check_return_code(ret_code,"Wait for buffer complete failed:")
+                print "returned from checking code"
+                buffers_completed += 1
+
+                # for now, copy the data into pre-allocated array
+                data_view[bytes_handled:bytes_handled + bytes_per_buffer] = buf_view
+
+                bytes_handled += bytes_per_buffer
+
+                # hand the buffer back to the board
+                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board, &buf_view[0], bytes_per_buffer)
+                check_return_code(ret_code,"Failed to send buffer address back to board during acquisition:")
+
+        finally:
+            self._abort_acquisition()
+
+        # we acquired all the buffers, return the data
+        return data
+
+    def _abort_acquisition(self):
+        ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)
+        check_return_code(ret_code,"Failed to abort acquisition:")
 
 
 # end of Alazar() class definition
