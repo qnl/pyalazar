@@ -172,7 +172,7 @@ cdef class Alazar(object):
     def setup_one_trigger(self,
                           source_channel="ext",
                           slope="rising",
-                          level=0.4,
+                          level=0.2
                           ext_coupling="dc",
                           ext_range="5 V",
                           delay = 0):
@@ -182,7 +182,7 @@ cdef class Alazar(object):
         in interesting and complex ways, which we have never used even once.
         So, this function configures just one engine (J) and disables the other (K).
         This function defaults to configuring an external rising 5 V range trigger
-            with a crossing at about 2 V.  This should be TTL-compatible.
+            with a crossing at about 1 V.  This should be generally TTL-compatible.
         This function always disables trigger timeout to ensure the board does not self-
             trigger.
 
@@ -227,7 +227,7 @@ cdef class Alazar(object):
 
         # validate external range
         try:
-            range_code = ext_trig_range()[ext_range]
+            range_code = ext_trig_range(self.board_type)[ext_range]
         except KeyError:
             raise AlazarException("Invalid external trigger range: '{}'".format(ext_range))
 
