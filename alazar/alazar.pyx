@@ -172,7 +172,7 @@ cdef class Alazar(object):
     def setup_one_trigger(self,
                           source_channel="ext",
                           slope="rising",
-                          level=0.2
+                          level=0.2,
                           ext_coupling="dc",
                           ext_range="5 V",
                           delay = 0):
