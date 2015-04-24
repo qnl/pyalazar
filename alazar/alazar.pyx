@@ -373,7 +373,8 @@ cdef class Alazar(object):
         data_view = data
 
         # ensure we abort the acquisition after this point
-        # otherwise the digitizer will become stuck in DmaInProgress and require reboot
+        # otherwise the digitizer will become stuck in DmaInProgress and require manual abort command
+        # would be nice to use a contextmanager here but it gets weird with Cython cdefs
         try:
 
             # add the buffers to the list of buffers available to the board
@@ -400,9 +401,9 @@ cdef class Alazar(object):
                 buf_view = buffer_addresses[buffer_index]
 
                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board, &buf_view[0], timeout)
-                print "ret code from wait: {}".format(ret_code)
+                
                 check_return_code(ret_code,"Wait for buffer complete failed on buffer {}:".format(buffers_completed))
-                print "returned from checking code"
+                
                 buffers_completed += 1
 
                 # for now, copy the data into pre-allocated array
@@ -421,6 +422,12 @@ cdef class Alazar(object):
         return data
 
     def _abort_acquisition(self):
+        """Command the board to abort a running acquisition.
+
+        The user should never need to call this manually, as any acquisition code should
+        ensure that this is called regardless of what happens.
+        This is left exposed as a method for debugging purposes if the board has gotten
+        stuck in DmaInProgress."""
         ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)
         check_return_code(ret_code,"Failed to abort acquisition:")
 
