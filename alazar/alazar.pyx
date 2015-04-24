@@ -186,7 +186,7 @@ cdef class Alazar(object):
         This function always disables trigger timeout to ensure the board does not self-
             trigger.
 
-        channel is a named channel 'A', 'B', or 'ext' to use the external input
+        source_channel is a named channel 'A', 'B', or 'ext' to use the external input
         slope is "rising" or "falling"
         level is a float on the range -1 to 1 which determines the scaled input level
             at which the trigger engine fires.
@@ -211,11 +211,18 @@ cdef class Alazar(object):
         else:
             raise AlazarException("Slope must be 'rising' or 'falling'; provided: '{}'".format(slope))
 
+        # get channel bit depth
+        cdef c_alazar_api.U8 bits_per_sample
+        cdef c_alazar_api.U32 max_samples_per_channel
+        ret_code = c_alazar_api.AlazarGetChannelInfo(self.board, &max_samples_per_channel, &bits_per_sample,)
+        check_return_code(ret_code, "Failed to get channel bit depth:")
+
         # validate level
         if level < -1.0 or level > 1.0:
             raise AlazarException("Level must be in the range [-1,1]; provided: {}".format(level))
         else:
-            level_code = int((level + 1.0)*127.5)
+            # set level code using the bit depth from the board
+            level_code = int((level + 1.0)*( (2.**bits_per_sample - 1)/2.)
 
         # validate external coupling
         if ext_coupling == "ac":
