@@ -335,6 +335,10 @@ cdef class Alazar(object):
         # allocate list of NumPy arrays as data buffers
         # indexing this will cost a Python overhead, but this may not be important
         # these are refcounted so we don't need to manually manage their memory
+        # right now this is hardcoded to only work with 8-bit digitizers.
+        # since we're working in a modern system, each element is probably encoded in at least
+        # two bytes (or even 4) so we may not lose any efficiency by setting this to uint16
+        # and implicitly supporting the 12-bit and 16-bit Alazar boards.
         buffers = [np.empty(bytes_per_buffer, dtype=np.uint8) for n in range(buffer_count)]
 
         # make a list of the address of each buffer to pass to the digitizer
