@@ -172,16 +172,17 @@ cdef class Alazar(object):
     def setup_one_trigger(self,
                           source_channel="ext",
                           slope="rising",
-                          level=0.0,
+                          level=0.4,
                           ext_coupling="dc",
-                          ext_range="TTL",
+                          ext_range="5 V",
                           delay = 0):
         """Configure the Alazar trigger engine.
 
         The Alazar boards actually have two trigger engines which can be combined
         in interesting and complex ways, which we have never used even once.
         So, this function configures just one engine (J) and disables the other (K).
-        This function defaults to configuring an external rising TTL half-scale trigger.
+        This function defaults to configuring an external rising 5 V range trigger
+            with a crossing at about 2 V.  This should be TTL-compatible.
         This function always disables trigger timeout to ensure the board does not self-
             trigger.
 
@@ -393,7 +394,7 @@ cdef class Alazar(object):
 
                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board, &buf_view[0], timeout)
                 print "ret code from wait: {}".format(ret_code)
-                check_return_code(ret_code,"Wait for buffer complete failed:")
+                check_return_code(ret_code,"Wait for buffer complete failed on buffer {}:".format(buffers_completed))
                 print "returned from checking code"
                 buffers_completed += 1
 
@@ -541,12 +542,18 @@ def ranges(board_type):
     else:
         raise AlazarException("Could not get input ranges for board type " + str(board_type))
 
-def ext_trig_range():
-    """Get the dictionary of valid external trigger ranges."""
-    return {"1 V": 1,
-            "2.5 V": 3,
-            "5 V": 0,
-            "TTL": 2}
+def ext_trig_range(board_type):
+    """Get the dictionary of valid external trigger ranges.
+
+    board_type can be the numerical ID or the string "ATS####"
+    At present, only the ATS9870 is supported.
+    The SDK guide is incorrect in this section, as the 9870 only has +-5 V input
+        yet all of these are listed as valid options for all boards.
+    """
+    if board_type == 13 or board_type == "ATS9870":
+        return {"5 V": 0,}
+    else:
+        raise AlazarException("Could not get trigger input ranges for board type " + str(board_type))
 
 # --- parameter validation
 
