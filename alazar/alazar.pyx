@@ -222,7 +222,7 @@ cdef class Alazar(object):
             raise AlazarException("Level must be in the range [-1,1]; provided: {}".format(level))
         else:
             # set level code using the bit depth from the board
-            level_code = int((level + 1.0)*( (2.**bits_per_sample - 1)/2.)
+            level_code = int((level + 1.0)*( (2.**bits_per_sample - 1)/2.))
 
         # validate external coupling
         if ext_coupling == "ac":
