@@ -583,8 +583,7 @@ def sample_rates(board_type):
                 "1.2 GS/s": 0x37,
                 "1.5 GS/s": 0x3A,
                 "1.8 GS/s": 0x3D,
-                "user-defined": 0x40,
-                "10 MHz ref": 1000000000}
+                "user-defined": 0x40}
     else:
         raise AlazarException("Could not get sample rates for board type " + str(board_type))
 
