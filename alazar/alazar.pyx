@@ -87,7 +87,7 @@ cdef class Alazar(object):
 
         elif clock_source == "external 10 MHz ref": # 10 MHz PLL
 
-            if self.board_type == 13: # 9870:
+            if is_9870(self.board_type):
                 # validate the decimation parameter
                 if not _check_decimation(self.board_type, decimation):
                     raise AlazarException("Invalid decimation '{}' for clock source '{}'.".format(decimation,clock_source))
@@ -96,7 +96,7 @@ cdef class Alazar(object):
                 ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, decimation)
 
 
-            elif self.board_type == 25: # 9360:
+            elif is_9360(self.board_type):
                 # validate sample rate
                 if sample_rate < 300 or sample_rate > 1800:
                     raise AlazarException("Sample rate for 10 MHz ref must be between 300 MHz and 1800 MHz; supplied: {}".format(sample_rate))
@@ -496,8 +496,7 @@ def channels(board_type):
 
     board_type can be the numerical ID or the string "ATS####"
     """
-    if (board_type == 13 or board_type == "ATS9870" or
-        board_type == 25 or board_type == "ATS9360"):
+    if is_9870(board_type) or is_9360(board_type):
         return {"A":1,"B":2}
     else:
         AlazarException("Could not get channels for board type " + str(board_type))
@@ -507,8 +506,7 @@ def trigger_sources(board_type):
 
     board_type can be the numerical ID or the string "ATS####"
     """
-    if (board_type == 13 or board_type == "ATS9870" or
-        board_type == 25 or board_type == "ATS9360"):
+    if is_9870(board_type) or is_9360(board_type):
         return {"A":0x0,
                 "B":0x1,
                 "ext":0x2}
@@ -537,7 +535,7 @@ def sample_rates(board_type):
     board_type can be the numerical ID or the string "ATS####"
     At present, only the ATS9870 and ATS9360 are supported.
     """
-    if board_type == 13 or board_type == "ATS9870":
+    if is_9870(board_type):
         return {"1 kS/s": 0x1,
                 "2 kS/s": 0x2,
                 "5 kS/s": 0x4,
@@ -559,7 +557,7 @@ def sample_rates(board_type):
                 "1 GS/s": 0x35,
                 "user-defined": 0x40,
                 "10 MHz ref": 1000000000}
-    elif board_type == 25 or board_type == "ATS9360":
+    elif is_9360(board_type):
         return {"1 kS/s": 0x1,
                 "2 kS/s": 0x2,
                 "5 kS/s": 0x4,
@@ -594,14 +592,14 @@ def ranges(board_type):
     board_type can be the numerical ID or the string "ATS####"
     At present, only the ATS9870 and ATS9360 are supported.
     """
-    if board_type == 13 or board_type == "ATS9870":
+    if is_9870(board_type):
         return {"40 mV": 0x2,
                 "100 mV": 0x5,
                 "200 mV": 0x6,
                 "400 mV": 0x7,
                 "1 V": 0xA,
                 "2 V": 0xB}
-    elif board_type == 25 or board_type == "ATS9360":
+    elif is_9360(board_type):
         return {"400 mV": 0x7}
     else:
         raise AlazarException("Could not get input ranges for board type " + str(board_type))
@@ -612,10 +610,10 @@ def input_couplings(board_type):
     board_type can be the numerical ID or the string "ATS####"
     At present, only the ATS9870 and ATS9360 are supported.
     """
-    if board_type == 13 or board_type == "ATS9870":
+    if is_9870(board_type):
         return {"ac": 1,
                 "dc": 2}
-    elif board_type == 25 or board_type == "ATS9360":
+    elif is_9360(board_type):
         return {"dc": 2}
     else:
         raise AlazarException("Could not get input couplings for board type " + str(board_type))
@@ -627,9 +625,9 @@ def ext_trig_range(board_type):
     At present, only the ATS9870 and ATS9360 are supported.
     The SDK guide does specify which ranges are valid for which board.
     """
-    if board_type == 13 or board_type == "ATS9870":
+    if is_9870(board_type):
         return {"5 V": 0,}
-    elif board_type == 25 or board_type == "ATS9360":
+    elif is_9360(board_type):
         return {"2.5 V": 0x3,
                 "TTL": 0x2}
     else:
@@ -649,7 +647,7 @@ def _check_decimation(board_type, decimation):
     if decimation >= max_decimation:
         return False
 
-    if board_type == 13 or board_type == "ATS9870":
+    if is_9870(board_type):
         if decimation in [1,2,4] or (decimation >= 0 and decimation % 10 == 0):
             # 10 MHz ref requires decimation of 1, 2, 4, or mult. of 10
             return True
@@ -665,12 +663,12 @@ def _check_buffer_alignment(board_type, n_samples):
 
     This function currently only supports the ATS9870.
     """
-
-    if board_type == 13 or board_type == "ATS9870":
+    if is_9870(board_type):
         # ATS9870: min record size is 256, n_samples must be a multiple of 64.
         min_record_size = 256
         buffer_alignment = 64
-    elif board_type == 25 or board_type == "ATS9360":
+
+    elif is_9360(board_type):
         # ATS9360: min record size is 256, n_samples must be a multiple of 128.
         min_record_size = 256
         buffer_alignment = 128
@@ -697,8 +695,7 @@ def _make_channel_mask(board_type, channels):
 
     Returns a tuple with the channel mask and channel count.
     """
-    if (board_type == 13 or board_type == "ATS9870" or
-        board_type == 25 or board_type == "ATS9360"):
+    if is_9870(board_type) or is_9360(board_type):
 
         if channels == "all":
             return (3,2)
@@ -712,3 +709,10 @@ def _make_channel_mask(board_type, channels):
     else:
         raise AlazarException("Could not make channel mask for board type {}.".format(board_type))
 
+# --- helper functions
+
+def is_9870(board_type):
+    return board_type == 13 or board_type == "ATS9870"
+
+def is_9360(board_type):
+    return board_type == 25 or board_type == "ATS9360"
