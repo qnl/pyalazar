@@ -3,9 +3,6 @@ cimport c_alazar_api
 import numpy as np
 cimport numpy as np
 
-from contextlib import contextmanager
-
-
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
 
