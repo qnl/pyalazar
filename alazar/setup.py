@@ -28,7 +28,7 @@ alazar = Extension('alazar',
                   sources = ['alazar.pyx',],
                   include_dirs = [alazar_SDK_path + 'Samples\\Include',],
                   libraries = ['ATSApi',],
-                  library_dirs = [alazar_sdk_path + library_path, ],)
+                  library_dirs = [alazar_SDK_path + library_path, ],)
 
 setup(ext_modules = cythonize([alazar]),
       include_dirs=[numpy.get_include()],
