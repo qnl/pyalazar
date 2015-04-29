@@ -10,4 +10,4 @@ def do_acquire():
 	b.setup_input_channels("1 V")
 
 	b.setup_one_trigger()
-	return b.acquire(10240,65536,128,timeout=1000)
+	return b.acquire(4096,65536,512,timeout=1000,buffer_count = 128)

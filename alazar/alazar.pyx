@@ -7,6 +7,8 @@ import multiprocessing as mp
 
 import worker
 
+import time
+
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
 
@@ -327,6 +329,8 @@ cdef class Alazar(object):
 
         # all input has been validated
 
+        cdef int buffers_per_acquisition = records_per_acquisition / records_per_buffer
+
         cdef c_alazar_api.U8 bits_per_sample
         cdef c_alazar_api.U32 max_samples_per_channel
 
@@ -337,6 +341,7 @@ cdef class Alazar(object):
         bytes_per_sample = (bits_per_sample + 7) / 8
         bytes_per_record = bytes_per_sample * samples_per_record
         bytes_per_buffer = bytes_per_record * records_per_buffer * channel_count
+
 
         # set the record size
         ret_code = c_alazar_api.AlazarSetRecordSize(self.board, 0, samples_per_record)
@@ -384,7 +389,6 @@ cdef class Alazar(object):
 
         # have to preallocate all of the c variables
         cdef unsigned char[:] data_view
-        cdef int buffers_per_acquisition
         cdef int buffers_completed
         cdef long long bytes_handled
         cdef int buffer_index
@@ -402,23 +406,28 @@ cdef class Alazar(object):
 
 
             # get a pipe to send buffers to the worker
-            buf_queue_in, buf_queue_out = mp.Pipe()
+            buf_queue = mp.Queue()
 
             # start the worker to process buffers:
             accum_worker = mp.Process(target = worker.accum_channels_and_write,
-                                args = (buf_queue_out, samples_per_record, records_per_buffer, buffer_count, channel_count, "test.hdf5", sample_type))
+                                      args = (buf_queue,
+                                              samples_per_record,
+                                              records_per_buffer,
+                                              buffers_per_acquisition,
+                                              channel_count,
+                                              "test.hdf5",
+                                              sample_type))
             accum_worker.start()
 
             # arm the board
             ret_code = c_alazar_api.AlazarStartCapture(self.board)
             _check_return_code(ret_code, "Failed to start capture:")
 
-            # process buffers; for now stuff into a NumPy array
-
-            buffers_per_acquisition = records_per_acquisition / records_per_buffer
-
+            # process buffers
             buffers_completed = 0
             bytes_handled = 0
+
+            start_time = time.clock()
 
             # handle each buffer
             while buffers_completed < buffers_per_acquisition:
@@ -427,11 +436,10 @@ cdef class Alazar(object):
                 buf_view = buffer_addresses[buffer_index]
 
                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board, &buf_view[0], timeout)
-
                 _check_return_code(ret_code,"Wait for buffer complete failed on buffer {}:".format(buffers_completed))
 
                 # pickles the buffer and sends to the worker
-                buf_queue_in.send(buffers[buffer_index])
+                buf_queue.put(buffers[buffer_index])
 
                 bytes_handled += bytes_per_buffer
 
@@ -442,9 +450,13 @@ cdef class Alazar(object):
                 buffers_completed += 1
 
         finally:
+            stop_time = time.clock()
             self._abort_acquisition()
-            buf_queue_in.close()
+            buf_queue.close()
 
+        print str(bytes_handled / (stop_time - start_time) / (1024**2))
+
+        print "done, waiting for worker to finish"
         accum_worker.join()
 
     def _abort_acquisition(self):
@@ -476,7 +488,7 @@ def get_systems_and_boards():
 class AlazarException(Exception):
     pass
 
-def _check_return_code(return_code, msg):
+cdef _check_return_code(return_code, msg):
     """Check an Alazar return code for success.
 
     Raises an AlazarException if return_code is not 512, including the
@@ -486,7 +498,7 @@ def _check_return_code(return_code, msg):
         raise AlazarException(msg + " " + _return_code_to_string(return_code))
 
 
-def _return_code_to_string(return_code):
+cdef _return_code_to_string(return_code):
     """Convert a Alazar return code to a string.
 
     This function assumes a valid return code.
