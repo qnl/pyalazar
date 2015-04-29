@@ -5,6 +5,8 @@ cimport numpy as np
 
 import multiprocessing as mp
 
+import worker
+
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
 
@@ -348,7 +350,7 @@ cdef class Alazar(object):
         else:
             sample_type = np.uint16
 
-        buffers = [np.empty(bytes_per_buffer, dtype=sample_type) for n in range(buffer_count)]
+        cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type) for n in range(buffer_count)]
 
         # make a list of the address of each buffer to pass to the digitizer
         cdef list buffer_addresses = []
@@ -387,12 +389,6 @@ cdef class Alazar(object):
         cdef long long bytes_handled
         cdef int buffer_index
 
-        # initialize a NumPy array to hold the data, temporary for this test function
-        data = np.empty((bytes_per_record * records_per_acquisition * channel_count), dtype=sample_type)
-
-        # get a pointer to the NumPy backing array
-        data_view = data
-
         # ensure we abort the acquisition after this point
         # otherwise the digitizer will become stuck in DmaInProgress and require manual abort command
         # would be nice to use a contextmanager here but it gets weird with Cython cdefs
@@ -403,6 +399,15 @@ cdef class Alazar(object):
                 buf_view = buffer_addresses[b]
                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board, &buf_view[0], bytes_per_buffer)
                 _check_return_code(ret_code, "Failed to send buffer address to board:")
+
+
+            # get a pipe to send buffers to the worker
+            buf_queue_in, buf_queue_out = mp.Pipe()
+
+            # start the worker to process buffers:
+            worker = mp.Process(target = worker.accum_channels_and_write,
+                                args = (buf_queue_out, samples_per_record, records_per_buffer, buffer_count, channel_count, "test.hdf5", sample_type))
+            worker.start()
 
             # arm the board
             ret_code = c_alazar_api.AlazarStartCapture(self.board)
@@ -425,10 +430,8 @@ cdef class Alazar(object):
 
                 _check_return_code(ret_code,"Wait for buffer complete failed on buffer {}:".format(buffers_completed))
 
-                buffers_completed += 1
-
-                # for now, copy the data into pre-allocated array
-                data_view[bytes_handled:bytes_handled + bytes_per_buffer] = buf_view
+                # pickles the buffer and sends to the worker
+                buf_queue_in.send(buffers[buffer_index])
 
                 bytes_handled += bytes_per_buffer
 
@@ -436,11 +439,12 @@ cdef class Alazar(object):
                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board, &buf_view[0], bytes_per_buffer)
                 _check_return_code(ret_code,"Failed to send buffer address back to board during acquisition:")
 
+                buffers_completed += 1
+
         finally:
             self._abort_acquisition()
 
-        # we acquired all the buffers, return the data
-        return data
+        worker.join()
 
     def _abort_acquisition(self):
         """Command the board to abort a running acquisition.
