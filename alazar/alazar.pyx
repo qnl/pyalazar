@@ -405,9 +405,9 @@ cdef class Alazar(object):
             buf_queue_in, buf_queue_out = mp.Pipe()
 
             # start the worker to process buffers:
-            worker = mp.Process(target = worker.accum_channels_and_write,
+            accum_worker = mp.Process(target = worker.accum_channels_and_write,
                                 args = (buf_queue_out, samples_per_record, records_per_buffer, buffer_count, channel_count, "test.hdf5", sample_type))
-            worker.start()
+            accum_worker.start()
 
             # arm the board
             ret_code = c_alazar_api.AlazarStartCapture(self.board)
@@ -443,8 +443,9 @@ cdef class Alazar(object):
 
         finally:
             self._abort_acquisition()
+            buf_queue_in.close()
 
-        worker.join()
+        accum_worker.join()
 
     def _abort_acquisition(self):
         """Command the board to abort a running acquisition.
