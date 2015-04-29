@@ -3,6 +3,8 @@ cimport c_alazar_api
 import numpy as np
 cimport numpy as np
 
+import multiprocessing as mp
+
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
 
