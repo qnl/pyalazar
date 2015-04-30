@@ -550,7 +550,7 @@ def _handle_buffers(buf_queue,
 
 
 
-class AcqParams(object):
+class _AcqParams(object):
     """Helper object to pass around acquisition parameters to workers and processors."""
     def __init__(self,
                  samples_per_record,
