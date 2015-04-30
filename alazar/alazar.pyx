@@ -336,7 +336,7 @@ cdef class Alazar(object):
 
         # all input has been validated
 
-        params = AcqParams(samples_per_record,
+        params = _AcqParams(samples_per_record,
                            records_per_acquisition,
                            records_per_buffer,
                            channel_count,)
@@ -395,13 +395,14 @@ cdef class Alazar(object):
         buf_queue = mp.SimpleQueue()
 
         # start a buffer handler to do the acquisition:
-        buf_handler = mp.Process(target = _handle_buffers
+        buf_handler = mp.Process(target = _handle_buffers,
                                  args = (buf_queue,
                                          self.board,
                                          params,
                                          bytes_per_buffer,
                                          buffer_count,
-                                         sample_type))
+                                         sample_type,
+                                         timeout,))
         buf_handler.start()
 
         buf_num = 0
@@ -423,7 +424,7 @@ cdef class Alazar(object):
                     raise err
 
                 # reshape the buffer
-                chan_bufs = [reshape_buffer(buf, chan)
+                chan_bufs = [_reshape_buffer(buf, chan, params)
                              for chan in range(channel_count)]
 
                 for proc in processors:
@@ -439,14 +440,7 @@ cdef class Alazar(object):
 
         # done with acquisition
 
-        # helper function for processing
-        def reshape_buffer(self, buf, chan):
-            """Reshape a buffer from linear into n_records x m_samples."""
-            chunk_size = self.acq_params.channel_chunk_size
-            chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
-            chan_dat.shape = (self.acq_params.records_per_buffer,
-                              self.acq_params.samples_per_record)
-            return chan_dat
+
 
     def _abort_acquisition(self):
         """Command the board to abort a running acquisition.
@@ -458,15 +452,24 @@ cdef class Alazar(object):
         ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)
         _check_return_code(ret_code,"Failed to abort acquisition:")
 
+# helper function for processing
+def _reshape_buffer(buf, chan, acq_params):
+    """Reshape a buffer from linear into n_records x m_samples."""
+    chunk_size = acq_params.channel_chunk_size
+    chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
+    chan_dat.shape = (acq_params.records_per_buffer,
+                      acq_params.samples_per_record)
+    return chan_dat
 
 # end of Alazar() class definition
 
-def _handle_buffers(buf_queue,
-                    board_handle,
-                    acq_params,
-                    bytes_per_buffer,
-                    buffer_count,
-                    sample_type):
+cdef _handle_buffers(buf_queue,
+                     c_alazar_api.HANDLE board_handle,
+                     acq_params,
+                     int bytes_per_buffer,
+                     int buffer_count,
+                     sample_type,
+                     timeout):
     """Handle buffers from the board and pass them back to the main thread."""
 
     # allocate list of NumPy arrays as data buffers
@@ -485,7 +488,7 @@ def _handle_buffers(buf_queue,
         buffer_addresses.append(buf_view)
 
     # preallocate all of the c variables
-    cdef int buffers_completed
+    cdef int buf_num
     cdef int buffer_index
     cdef int buffers_per_acquisition = acq_params.buffers_per_acquisition
 
@@ -497,15 +500,15 @@ def _handle_buffers(buf_queue,
         ret_code = c_alazar_api.AlazarPostAsyncBuffer(board_handle,
                                                       &buf_view[0],
                                                       bytes_per_buffer)
-        if handle_return_code(ret_code, "Failed to send buffer address to board:", buf_queue):
+        if _handle_return_code(ret_code, "Failed to send buffer address to board:", buf_queue):
             failure = True
             break
     if failure:
         return
 
     # arm the board
-    ret_code = c_alazar_api.AlazarStartCapture(self.board)
-    if handle_return_code(ret_code, "Failed to start capture:", buf_queue):
+    ret_code = c_alazar_api.AlazarStartCapture(board_handle)
+    if _handle_return_code(ret_code, "Failed to start capture:", buf_queue):
         return
 
     # process buffers
@@ -513,13 +516,13 @@ def _handle_buffers(buf_queue,
     bytes_handled = 0
 
     # handle each buffer
-    while buffers_completed < buffers_per_acquisition:
-        buffer_index = buffers_completed % buffer_count
+    for buf_num in range(buffers_per_acquisition):
+        buffer_index = buf_num % buffer_count
 
         buf_view = buffer_addresses[buffer_index]
 
-        ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board, &buf_view[0], timeout)
-        if handle_return_code(ret_code,
+        ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(board_handle, &buf_view[0], timeout)
+        if _handle_return_code(ret_code,
                               "Wait for buffer complete failed on buffer {}:"
                               .format(buffers_completed),
                               buf_queue):
@@ -529,24 +532,22 @@ def _handle_buffers(buf_queue,
         buf_queue.put( (buffers[buffer_index], None) )
 
         # hand the buffer back to the board
-        ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board, &buf_view[0], bytes_per_buffer)
-        if handle_return_code(ret_code,
+        ret_code = c_alazar_api.AlazarPostAsyncBuffer(board_handle, &buf_view[0], bytes_per_buffer)
+        if _handle_return_code(ret_code,
                               "Failed to send buffer address back to board during acquisition:",
                               buf_queue):
             break
-
-        buffers_completed += 1
     # done with acquisition
 
-    def handle_return_code(ret_code, message, buf_queue):
-        """Helper function to report error state to main thread."""
-        try:
-            _check_return_code(ret_code,message)
-        except AlazarException as error:
-            buf_queue.put( (None, error) )
-            return True
+def _handle_return_code(ret_code, message, buf_queue):
+    """Helper function to report error state to main thread."""
+    try:
+        _check_return_code(ret_code,message)
+    except AlazarException as error:
+        buf_queue.put( (None, error) )
+        return True
 
-        return False
+    return False
 
 
 
@@ -582,7 +583,7 @@ def get_systems_and_boards():
 class AlazarException(Exception):
     pass
 
-cdef _check_return_code(return_code, msg):
+def _check_return_code(return_code, msg):
     """Check an Alazar return code for success.
 
     Raises an AlazarException if return_code is not 512, including the
@@ -592,7 +593,7 @@ cdef _check_return_code(return_code, msg):
         raise AlazarException(msg + " " + _return_code_to_string(return_code))
 
 
-cdef _return_code_to_string(return_code):
+def _return_code_to_string(return_code):
     """Convert a Alazar return code to a string.
 
     This function assumes a valid return code.
