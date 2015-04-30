@@ -36,7 +36,7 @@ def accum_channels_and_write(buf_queue, samples_per_record, records_per_buffer, 
         bufs_processed += 1
 
         if bufs_processed % 10 == 0:
-            
+
             print "processed {} buffers".format(bufs_processed)
 
     stop_time = time.clock()
@@ -44,5 +44,55 @@ def accum_channels_and_write(buf_queue, samples_per_record, records_per_buffer, 
 
     f.close()
 
+class AlazarWorker(mp.Process):
+    """A worker to process a queue of Alazar buffers."""
+
+    def __init__(self,
+                 buf_queue,
+                 samples_per_record,
+                 records_per_buffer,
+                 buffers_per_acquisition,
+                 channel_count,
+                 processors):
+        """Create a new AlazarWorker process for an acquisition.
+
+        buf_queue is the Queue the Alazar will send buffers over.
+        processors is a list of objects to handle the buffers.
+        """
+        super(AlazarWorker, self).__init__()
+
+        self.buf_queue = buf_queue
+        self.samples_per_record = samples_per_record
+        self.records_per_buffer = records_per_buffer
+        self.buffers_per_acquisition = buffers_per_acquisition
+        self.channel_count = channel_count
+        self.processors = processors
+        self.record_count = records_per_buffer * buffers_per_acquisition
+        self.channel_chunk_size = samples_per_record * records_per_buffer
+
+        # TODO: initialize processors
+
+    def run(self):
+        bufs_processed = 0
+
+        while bufs_processed < self.buffers_per_acquisition:
+            try:
+                buf = self.buf_queue.get()
+            except EOFError:
+                pass
+                # the queue closed prematurely, abort
+                # TODO: abort behavior
+
+            chan_bufs = [self._reshape_buffer(buf, chan) for chan in range(self.channel_count)]
+
+            for processor in self.processors:
+                processor.process(chan_bufs)
+                # TODO: exception handling for processor failure?
 
 
+
+    def _reshape_buffer(self, buf, chan):
+        """Reshape a buffer from linear into n_channels x n_records."""
+        chan_dat = buf[chan*self.channel_chunk_size : (chan+1)*self.channel_chunk_size]
+        chan_dat.shape = (self.records_per_buffer, self.samples_per_record)
+        return chan_dat

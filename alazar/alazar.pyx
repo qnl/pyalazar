@@ -405,7 +405,7 @@ cdef class Alazar(object):
                 _check_return_code(ret_code, "Failed to send buffer address to board:")
 
 
-            # get a pipe to send buffers to the worker
+            # get a queue to send buffers to the worker
             buf_queue = mp.Queue()
 
             # start the worker to process buffers:
