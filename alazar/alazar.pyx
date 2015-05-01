@@ -9,6 +9,8 @@ import worker
 
 import time
 
+from processor import BufferProcessor
+
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
 
@@ -288,7 +290,7 @@ cdef class Alazar(object):
                 records_per_acquisition,
                 records_per_buffer,
                 channels_to_acquire="all",
-                processors = None,
+                processors = [BufferProcessor()],
                 buffer_count = 64,
                 timeout = 5000):
         """Perform an acquisition using two-port NPT DMA mode.
