@@ -46,14 +46,14 @@ class BufferProcessor(object):
 
     def get_result(self):
         """Return the result of the acquisition."""
-        self._check_error()
+        self.check_error()
         pass
 
     def abort(self, error):
         """If the acquisition failed, clean up."""
         self.error = error
 
-    def _check_error(self):
+    def check_error(self):
         if self.error is not None:
             raise ProcessorException("Acquisition failed: " + str(self.error))
 
@@ -93,7 +93,7 @@ class Raw(BufferProcessor):
         """Return the data.
 
         Raises a ProcessorException if an error occurred."""
-        self._check_error()
+        self.check_error()
         return self.dat_bufs
 
 
@@ -127,7 +127,7 @@ class Average(BufferProcessor):
         """Return the averages.
 
         Raises a ProcessorException if an error occurred."""
-        self._check_error()
+        self.check_error()
         return self.ave_bufs
 
 
