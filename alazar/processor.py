@@ -26,15 +26,15 @@ class BufferProcessor(object):
         should safely clean up if this happens.
     """
     def __init__(self):
-        self.acq_params = None
+        self.params = None
         self.error = None
 
-    def initialize(self, acq_params):
+    def initialize(self, params):
         """Initialize this processor to process buffers.
 
         Do things like allocate memory here.
         """
-        self.acq_params = acq_params
+        self.params = params
 
     def process(self, chan_bufs, buf_num):
         """Process a list of channel buffers."""
@@ -46,35 +46,71 @@ class BufferProcessor(object):
 
     def get_result(self):
         """Return the result of the acquisition."""
-        self.check_error()
+        self._check_error()
         pass
 
     def abort(self, error):
         """If the acquisition failed, clean up."""
         self.error = error
 
-    def check_error(self):
+    def _check_error(self):
         if self.error is not None:
             raise ProcessorException("Acquisition failed: " + str(self.error))
 
+class Raw(BufferProcessor):
+    """Simple processor to return the raw acquisition data."""
 
+    def __init__(self):
+        super(Raw, self).__init__()
+        self.dat_bufs = None
 
-# ---
+    def initialize(self, params):
+        """Initialize the data buffer."""
+        super(Raw, self).initialize(params)
+
+        # create list of channel buffers to store the data
+        # initial shape is 1D for simplicity
+        self.dat_bufs = [np.empty((params.records_per_acquisition * params.samples_per_record,),
+                                  params.dtype,)
+                         for _ in range(params.channel_count)]
+
+    def process(self, chan_bufs, buf_num):
+        """Dump the buffer into the data buffer."""
+        # this should be the same as the length of chan_buf
+        chunk_size = self.params.channel_chunk_size
+
+        # copy each channel into the appropriate buffer
+        for (chan_buf, dat_buf) in zip(chan_bufs, self.dat_bufs):
+            dat_buf[buf_num*chunk_size:(buf_num+1)*chunk_size] = chan_buf
+
+    def post_process(self):
+        """Reshape data into n_records x n_samples."""
+        for dat_buf in self.dat_bufs:
+            dat_buf.shape = (params.records_per_acquisition,
+                             params.samples_per_record,)
+
+    def get_result(self):
+        """Return the data.
+
+        Raises a ProcessorException if an error occurred."""
+        self._check_error()
+        return self.dat_bufs
+
 
 class Average(BufferProcessor):
-    "Simple processor to average all buffers together."
+    """Simple processor to average all buffers together."""
 
     def __init__(self):
         super(Average, self).__init__()
         self.ave_bufs = None
 
-    def initialize(self, acq_params):
+    def initialize(self, params):
         """Initialize the averaging buffer."""
-        super(Average, self).initialize(acq_params)
+        super(Average, self).initialize(params)
 
         # create list of channel buffers to sum the results
-        self.ave_bufs = [np.zeros((acq_params.samples_per_record,), np.float)
-                         for _ in range(acq_params.channel_count)]
+        self.ave_bufs = [np.zeros((params.samples_per_record,), np.float)
+                         for _ in range(params.channel_count)]
 
     def process(self, chan_bufs, buf_num):
         """Average the channel records together and add them to the averaging buffer."""
@@ -85,13 +121,13 @@ class Average(BufferProcessor):
     def post_process(self):
         """Normalize the averages."""
         for ave_buf in self.ave_bufs:
-            ave_buf /= self.acq_params.records_per_acquisition
+            ave_buf /= self.params.records_per_acquisition
 
     def get_result(self):
         """Return the averages.
 
         Raises a ProcessorException if an error occurred."""
-        self.check_error()
+        self._check_error()
         return self.ave_bufs
 
 
