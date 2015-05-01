@@ -1,11 +1,12 @@
 import alazar.processor as proc
-#from alazar.alazar import AlazarException
+
+from alazar.processor import ProcessorException
 
 from nose.tools import raises
 
 class TestAverage(object):
 
-    @raises(Exception)
+    @raises(ProcessorException)
     def test_abort(self):
 
         ave = proc.Average()
