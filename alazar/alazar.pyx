@@ -336,11 +336,6 @@ cdef class Alazar(object):
 
         # all input has been validated
 
-        params = _AcqParams(samples_per_record,
-                           records_per_acquisition,
-                           records_per_buffer,
-                           channel_count,)
-
         cdef int buffers_per_acquisition = records_per_acquisition / records_per_buffer
 
         cdef c_alazar_api.U8 bits_per_sample
@@ -366,6 +361,12 @@ cdef class Alazar(object):
             sample_type = np.uint8
         else:
             sample_type = np.uint16
+
+        params = _AcqParams(samples_per_record,
+                            records_per_acquisition,
+                            records_per_buffer,
+                            channel_count,
+                            sample_type)
 
         # configure the board to make an NPT AutoDMA acquisition
         # first flag is the value of ADMA_EXTERNAL_STARTCAPTURE
@@ -557,7 +558,8 @@ class _AcqParams(object):
                  samples_per_record,
                  records_per_acquisition,
                  records_per_buffer,
-                 channel_count):
+                 channel_count,
+                 dtype):
         self.samples_per_record = samples_per_record
         self.records_per_acquisition = records_per_acquisition
         self.records_per_buffer = records_per_buffer
@@ -565,6 +567,8 @@ class _AcqParams(object):
         self.samples_per_buffer = samples_per_record * records_per_buffer * channel_count
         self.channel_chunk_size = samples_per_record * records_per_buffer
         self.buffers_per_acquisition = records_per_acquisition / records_per_buffer
+
+        self.dtype = dtype
 
 
 def get_systems_and_boards():
