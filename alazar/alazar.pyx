@@ -397,7 +397,7 @@ cdef class Alazar(object):
         # start a buffer handler to do the acquisition:
         buf_handler = mp.Process(target = _handle_buffers,
                                  args = (buf_queue,
-                                         self.board,
+                                         self,
                                          params,
                                          bytes_per_buffer,
                                          buffer_count,
@@ -463,13 +463,13 @@ def _reshape_buffer(buf, chan, acq_params):
 
 # end of Alazar() class definition
 
-cdef _handle_buffers(buf_queue,
-                     c_alazar_api.HANDLE board_handle,
-                     acq_params,
-                     int bytes_per_buffer,
-                     int buffer_count,
-                     sample_type,
-                     timeout):
+def _handle_buffers(buf_queue,
+                    Alazar board,
+                    acq_params,
+                    int bytes_per_buffer,
+                    int buffer_count,
+                    sample_type,
+                    timeout):
     """Handle buffers from the board and pass them back to the main thread."""
 
     # allocate list of NumPy arrays as data buffers
@@ -497,7 +497,7 @@ cdef _handle_buffers(buf_queue,
     # add the buffers to the list of buffers available to the board
     for b in range(buffer_count):
         buf_view = buffer_addresses[b]
-        ret_code = c_alazar_api.AlazarPostAsyncBuffer(board_handle,
+        ret_code = c_alazar_api.AlazarPostAsyncBuffer(board.board,
                                                       &buf_view[0],
                                                       bytes_per_buffer)
         if _handle_return_code(ret_code, "Failed to send buffer address to board:", buf_queue):
@@ -507,7 +507,7 @@ cdef _handle_buffers(buf_queue,
         return
 
     # arm the board
-    ret_code = c_alazar_api.AlazarStartCapture(board_handle)
+    ret_code = c_alazar_api.AlazarStartCapture(board.board)
     if _handle_return_code(ret_code, "Failed to start capture:", buf_queue):
         return
 
@@ -521,7 +521,7 @@ cdef _handle_buffers(buf_queue,
 
         buf_view = buffer_addresses[buffer_index]
 
-        ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(board_handle, &buf_view[0], timeout)
+        ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(board.board, &buf_view[0], timeout)
         if _handle_return_code(ret_code,
                               "Wait for buffer complete failed on buffer {}:"
                               .format(buffers_completed),
@@ -532,7 +532,7 @@ cdef _handle_buffers(buf_queue,
         buf_queue.put( (buffers[buffer_index], None) )
 
         # hand the buffer back to the board
-        ret_code = c_alazar_api.AlazarPostAsyncBuffer(board_handle, &buf_view[0], bytes_per_buffer)
+        ret_code = c_alazar_api.AlazarPostAsyncBuffer(board.board, &buf_view[0], bytes_per_buffer)
         if _handle_return_code(ret_code,
                               "Failed to send buffer address back to board during acquisition:",
                               buf_queue):
