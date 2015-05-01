@@ -37,5 +37,3 @@ class TestAlazar(object):
 
 	def test_max_decimation(self):
 		assert not alz.check_decimation(0, "", 100001)
-
-
