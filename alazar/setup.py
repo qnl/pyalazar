@@ -24,7 +24,7 @@ alazar_SDK_path = "C:\\AlazarTech\\ATS-SDK\\6.2.0\\"
 library_path = 'Samples\\Library\\x64'
 
 
-alazar = Extension('alazar',
+alazar = Extension('board',
                   sources = ['board.pyx',],
                   include_dirs = [alazar_SDK_path + 'Samples\\Include',],
                   libraries = ['ATSApi',],

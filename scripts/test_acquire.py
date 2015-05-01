@@ -1,4 +1,4 @@
-import alazar.alazar as alz
+import alazar.board as alz
 import alazar.processor as proc
 import numpy as np
 
