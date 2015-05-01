@@ -11,7 +11,7 @@ import worker
 
 import time
 
-from processor import BufferProcessor
+from processor import BufferProcessor, ProcessorException
 
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
@@ -218,16 +218,19 @@ cdef class Alazar(object):
             trigger.
         This default is not compatible with the 9360; 9360 users must specify a range if
             using an external trigger.
+        Args:
+            source_channel (str): A named channel 'A', 'B', or 'ext' to use the external input
+            slope (str): "rising" or "falling"
+            level (float): A float on the range -1 to 1 which determines the scaled input level
+                at which the trigger engine fires.
+            ext_couping (str): "ac" or "dc", defaults to "dc"
+            ext_range (str): A selection from the valid external trigger ranges.
+            delay (int): The number of samples between the trigger and the start of acquisition;
+                the ATS9870 requires this to be a multiple of 16 for a 1-channel acquisition
+                or a multiple of 8 for a 2-channel acquisition.
 
-        source_channel is a named channel 'A', 'B', or 'ext' to use the external input
-        slope is "rising" or "falling"
-        level is a float on the range -1 to 1 which determines the scaled input level
-            at which the trigger engine fires.
-        ext_couping is "ac" or "dc", defaults to "dc"
-        ext_range should be a selection from the valid external trigger ranges
-        delay is the number of samples between the trigger and the start of acquisition;
-            The ATS9870 requires this to be a multiple of 16 for a 1-channel acquisition
-            or a multiple of 8 for a 2-channel acquisition.
+        Raises:
+            AlazarException
         """
 
         # validate source channel
@@ -298,6 +301,7 @@ cdef class Alazar(object):
         ret_code = c_alazar_api.AlazarSetTriggerTimeOut(self.board, 0)
         _check_return_code(ret_code, "Error setting trigger timeout:")
 
+
     def acquire(self,
                 samples_per_record,
                 records_per_acquisition,
@@ -308,21 +312,30 @@ cdef class Alazar(object):
                 timeout = 5000):
         """Perform an acquisition using two-port NPT DMA mode.
 
-        THIS FUNCTION IS FOR BOARD AND CODE DEBUGGING AND SHOULD NOT BE USED IN A
-            REAL DATA ACQUISITION SITUATION.
+        Args:
+            samples_per_record (int): The number of individual measurements in a
+                measurement record; this has a minimum value of 256 and must be a
+                multiple of 64.
+            records_per_acquisition (int): The number of records to acquire.
+            records_per_buffer (int): The number of records in a single DMA buffer.
 
-        samples_per_record is the number of individual measurements in a
-            measurement record; this has a minimum value of 256 and must be a
-            multiple of 64.
-        records_per_acquisition is the number of records to acquire
-        records_per_buffer is the number of records in a single DMA buffer
+            channels_to_acquire (str): "all" for all channels, or "A", "B" for a single channel.
+            processors ([BufferProcessor]): The list of BufferProcessors to handle the incoming data.
+            buffer_count (int): The number of DMA buffers to allocate; default is 64, min is 2.
+            timeout (int): (ms) The time to wait for a buffer to be filled by the board;
+                default is 5000.
 
-        records_per_acquisition must be a multiple of records_per_buffer
+        Notes:
+            records_per_acquisition must be a multiple of records_per_buffer
 
-        channels_to_acquire is "all" for all channels, or "A", "B" for a single channel.
-        buffer_count is the number of DMA buffers to allocate; default is 64, min is 2.
-        timeout (ms) is the time to wait for a buffer to be filled by the board;
-            default is 5000
+        Returns:
+            List of processors containing results.
+            If processors encountered errors, they will not be raised until the
+                processors are explicitly queried about their error state or asked
+                for their result.
+
+        Raises:
+            AlazarException is an acquisition error occurred.
         """
 
         # validate inputs
@@ -403,62 +416,91 @@ cdef class Alazar(object):
                                                       autoDMA_flags)
         _check_return_code(ret_code,"Setup NPT AutoDMA acquisition failed:")
 
-        # initialize the buffer processors
-        for processor in processors:
-            processor.initialize(params)
 
-        # get a queue to receive buffers from the buffer handler
+        # get a queue to send buffers to the buffer processor
         buf_queue = mp.Queue()
 
-        # start a buffer handler to do the acquisition:
-        buf_handler = mp.Process(target = _handle_buffers,
-                                 args = (buf_queue,
-                                         self,
-                                         params,
-                                         bytes_per_buffer,
-                                         buffer_count,
-                                         sample_type,
-                                         timeout,))
-        buf_handler.start()
+        # get a queue to receive messages back from the processors
+        comm = mp.Queue()
 
-        buf_num = 0
+        # start a buffer processor to do the acquisition:
+        buf_processor = mp.Process(target = _handle_buffers,
+                                   args = (buf_queue,
+                                           comm,
+                                           processors,
+                                           params,))
+        buf_processor.start()
 
-        # if an exception occurs, make sure we abort the acquisition
+        # enure that from this point on, if we throw any exceptions we send them
+        # to the processor or it will never return
+
+        # allocate list of NumPy arrays as data buffers
+        # indexing this will cost a Python overhead, but this probably isn't important
+        # these are refcounted so we don't need to manually manage their memory
+        cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type) for n in range(buffer_count)]
+
+        # make a list of the address of each buffer to pass to the digitizer
+        cdef list buffer_addresses = []
+
+        # make a Cython memoryview of each buffer and add it to the list
+        # get a C pointer to the buffer with the syntax &buf_vew[0]
+        cdef unsigned char[:] buf_view
+        for buf in buffers:
+            buf_view = buf
+            buffer_addresses.append(buf_view)
+
+        # preallocate all of the c variables
+        cdef int buf_num
+        cdef int buffer_index
+        cdef int buffers_per_acquisition = params.buffers_per_acquisition
+
         try:
-            # loop over all the buffers we expect to receive
+            # add the buffers to the list of buffers available to the board
+            for b in range(buffer_count):
+                buf_view = buffer_addresses[b]
+                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+                                                              &buf_view[0],
+                                                              bytes_per_buffer)
+
+                _check_return_code_processing(ret_code,
+                                              "Failed to send buffer address to board:",
+                                              buf_queue)
+
+
+            # arm the board
+            ret_code = c_alazar_api.AlazarStartCapture(board.board)
+            _check_return_code_processing(ret_code,
+                                          "Failed to start capture:",
+                                          buf_queue)
+
+            # handle each buffer
             for buf_num in range(buffers_per_acquisition):
-                # get the next buffer from the queue
-                (buf, err) = buf_queue.get()
+                buffer_index = buf_num % buffer_count
 
-                # check for error condition
-                if err is not None:
-                    # tell the data processors to abort
-                    for proc in processors:
-                        proc.abort(err)
+                buf_view = buffer_addresses[buffer_index]
 
-                    # re-raise the error from the digitizer
-                    raise err
+                ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(board.board, &buf_view[0], timeout)
+                _check_return_code_processing(ret_code,
+                                              "Wait for buffer complete failed on buffer {}:"
+                                              .format(buffers_completed),
+                                              buf_queue):
 
-                # reshape the buffer
-                chan_bufs = [_reshape_buffer(buf, chan, params)
-                             for chan in range(channel_count)]
+                # pickles the buffer and sends to the worker
+                buf_queue.put( (buffers[buffer_index], None) )
 
-                for proc in processors:
-                    proc.process(chan_bufs, buf_num)
-                    # TODO: exception handling for processor failure?
-
+                # hand the buffer back to the board
+                ret_code = c_alazar_api.AlazarPostAsyncBuffer(board.board, &buf_view[0], bytes_per_buffer)
+                _check_return_code_processing(ret_code,
+                                              "Failed to send buffer address back to board during acquisition:",
+                                              buf_queue):
+            # done with acquisition
         finally:
-            # make sure the buffer handler has closed
-            buf_handler.join()
-
-            # ensure we abort the acquisition
+            # make sure we abort the acquisition so the board doesn't get stuck
             self._abort_acquisition()
 
-        # acquisition was successful, do post-processing
-        for proc in processors:
-            proc.post_process()
+        # get the processors and return them
+        return comm.get()
 
-        # done with acquisition
 
 
 
@@ -483,91 +525,49 @@ def _reshape_buffer(buf, chan, acq_params):
 
 # end of Alazar() class definition
 
-def _handle_buffers(buf_queue,
-                    Alazar board,
-                    acq_params,
-                    int bytes_per_buffer,
-                    int buffer_count,
-                    sample_type,
-                    timeout):
-    """Handle buffers from the board and pass them back to the main thread."""
+def _process_buffers(buf_queue,
+                    comm,
+                    processors,
+                    acq_params,):
+    """Process buffers from the board."""
 
-    # allocate list of NumPy arrays as data buffers
-    # indexing this will cost a Python overhead, but this probably isn't important
-    # these are refcounted so we don't need to manually manage their memory
-    cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type) for n in range(buffer_count)]
-
-    # make a list of the address of each buffer to pass to the digitizer
-    cdef list buffer_addresses = []
-
-    # make a Cython memoryview of each buffer and add it to the list
-    # get a C pointer to the buffer with the syntax &buf_vew[0]
-    cdef unsigned char[:] buf_view
-    for buf in buffers:
-        buf_view = buf
-        buffer_addresses.append(buf_view)
-
-    # preallocate all of the c variables
-    cdef int buf_num
-    cdef int buffer_index
-    cdef int buffers_per_acquisition = acq_params.buffers_per_acquisition
+    # initialize the buffer processors
+    for processor in processors:
+        processor.initialize(params)
 
     failure = False
 
-    # add the buffers to the list of buffers available to the board
-    for b in range(buffer_count):
-        buf_view = buffer_addresses[b]
-        ret_code = c_alazar_api.AlazarPostAsyncBuffer(board.board,
-                                                      &buf_view[0],
-                                                      bytes_per_buffer)
-        if _handle_return_code(ret_code, "Failed to send buffer address to board:", buf_queue):
-            failure = True
-            break
-    if failure:
-        return
-
-    # arm the board
-    ret_code = c_alazar_api.AlazarStartCapture(board.board)
-    if _handle_return_code(ret_code, "Failed to start capture:", buf_queue):
-        return
-
-    # process buffers
-    buffers_completed = 0
-    bytes_handled = 0
-
-    # handle each buffer
+    # loop over all the buffers we expect to receive
     for buf_num in range(buffers_per_acquisition):
-        buffer_index = buf_num % buffer_count
+        # get the next buffer from the queue
+        (buf, err) = buf_queue.get()
 
-        buf_view = buffer_addresses[buffer_index]
-
-        ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(board.board, &buf_view[0], timeout)
-        if _handle_return_code(ret_code,
-                               "Wait for buffer complete failed on buffer {}:"
-                               .format(buffers_completed),
-                               buf_queue):
+        # check for error condition
+        if err is not None:
+            # tell the data processors to abort
+            for proc in processors:
+                proc.abort(err)
+            failure = True
+            # end processing
             break
 
-        # pickles the buffer and sends to the worker
-        buf_queue.put( (buffers[buffer_index], None) )
+        # reshape the buffer
+        chan_bufs = [_reshape_buffer(buf, chan, params)
+                     for chan in range(channel_count)]
 
-        # hand the buffer back to the board
-        ret_code = c_alazar_api.AlazarPostAsyncBuffer(board.board, &buf_view[0], bytes_per_buffer)
-        if _handle_return_code(ret_code,
-                               "Failed to send buffer address back to board during acquisition:",
-                               buf_queue):
-            break
-    # done with acquisition
+        for proc in processors:
+            proc.process(chan_bufs, buf_num)
+            # TODO: exception handling for processor failure?
 
-def _handle_return_code(ret_code, message, buf_queue):
-    """Helper function to report error state to main thread."""
-    try:
-        _check_return_code(ret_code,message)
-    except AlazarException as error:
-        buf_queue.put( (None, error) )
-        return True
+    # acquisition was successful, do post-processing
+    if not failure:
+        for proc in processors:
+            proc.post_process()
 
-    return False
+    # send the finished processors back
+    comm.put(processors)
+
+    # done with buffer processing
 
 
 
@@ -614,6 +614,15 @@ def _check_return_code(return_code, msg):
     """
     if return_code != 512:
         raise AlazarException(msg + " " + _return_code_to_string(return_code))
+
+
+def _check_return_code_processing(return_code, msg, buf_queue):
+    """Check an Alazar return code for success and send error to processor."""
+    try:
+        _check_return_code(return_code, msg)
+    except AlazarException as err:
+        buf_queue.put(None, err)
+        raise err
 
 
 def _return_code_to_string(return_code):
