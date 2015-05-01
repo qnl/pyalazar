@@ -25,7 +25,7 @@ library_path = 'Samples\\Library\\x64'
 
 
 alazar = Extension('alazar',
-                  sources = ['alazar.pyx',],
+                  sources = ['board.pyx',],
                   include_dirs = [alazar_SDK_path + 'Samples\\Include',],
                   libraries = ['ATSApi',],
                   library_dirs = [alazar_SDK_path + library_path, ],)

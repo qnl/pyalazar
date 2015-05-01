@@ -1,4 +1,4 @@
-import alazar.alazar as alz
+import alazar.board as alz
 
 class TestAlazar(object):
 
