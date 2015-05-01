@@ -13,7 +13,8 @@ def do_acquire():
     b.setup_one_trigger()
 
     raw_proc = proc.Raw()
+    ave = proc.Average()
 
-    b.acquire(1024, 128, 128, processors=[raw_proc], timeout=1000)
+    procs = b.acquire(1024, 128, 128, processors=[raw_proc, ave], timeout=1000)
 
-    return raw_proc
+    return procs

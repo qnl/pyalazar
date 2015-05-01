@@ -70,24 +70,20 @@ class Raw(BufferProcessor):
 
         # create list of channel buffers to store the data
         # initial shape is 1D for simplicity
-        self.dat_bufs = [np.empty((params.records_per_acquisition * params.samples_per_record,),
+        self.dat_bufs = [np.empty((params.records_per_acquisition, params.samples_per_record,),
                                   params.dtype,)
                          for _ in range(params.channel_count)]
 
     def process(self, chan_bufs, buf_num):
         """Dump the buffer into the data buffer."""
-        # this should be the same as the length of chan_buf
-        chunk_size = self.params.channel_chunk_size
+        recs_per_buf = self.params.records_per_buffer
 
         # copy each channel into the appropriate buffer
         for (chan_buf, dat_buf) in zip(chan_bufs, self.dat_bufs):
-            dat_buf[buf_num*chunk_size:(buf_num+1)*chunk_size] = chan_buf
+            dat_buf[buf_num*recs_per_buf: (buf_num+1)*recs_per_buf,:] = chan_buf
 
     def post_process(self):
-        """Reshape data into n_records x n_samples."""
-        for dat_buf in self.dat_bufs:
-            dat_buf.shape = (params.records_per_acquisition,
-                             params.samples_per_record,)
+        pass
 
     def get_result(self):
         """Return the data.

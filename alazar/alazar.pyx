@@ -424,7 +424,7 @@ cdef class Alazar(object):
         comm = mp.Queue()
 
         # start a buffer processor to do the acquisition:
-        buf_processor = mp.Process(target = _handle_buffers,
+        buf_processor = mp.Process(target = _process_buffers,
                                    args = (buf_queue,
                                            comm,
                                            processors,
@@ -452,7 +452,6 @@ cdef class Alazar(object):
         # preallocate all of the c variables
         cdef int buf_num
         cdef int buffer_index
-        cdef int buffers_per_acquisition = params.buffers_per_acquisition
 
         try:
             # add the buffers to the list of buffers available to the board
@@ -468,7 +467,7 @@ cdef class Alazar(object):
 
 
             # arm the board
-            ret_code = c_alazar_api.AlazarStartCapture(board.board)
+            ret_code = c_alazar_api.AlazarStartCapture(self.board)
             _check_return_code_processing(ret_code,
                                           "Failed to start capture:",
                                           buf_queue)
@@ -479,20 +478,20 @@ cdef class Alazar(object):
 
                 buf_view = buffer_addresses[buffer_index]
 
-                ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(board.board, &buf_view[0], timeout)
+                ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board, &buf_view[0], timeout)
                 _check_return_code_processing(ret_code,
                                               "Wait for buffer complete failed on buffer {}:"
-                                              .format(buffers_completed),
-                                              buf_queue):
+                                              .format(buf_num),
+                                              buf_queue)
 
                 # pickles the buffer and sends to the worker
                 buf_queue.put( (buffers[buffer_index], None) )
 
                 # hand the buffer back to the board
-                ret_code = c_alazar_api.AlazarPostAsyncBuffer(board.board, &buf_view[0], bytes_per_buffer)
+                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board, &buf_view[0], bytes_per_buffer)
                 _check_return_code_processing(ret_code,
                                               "Failed to send buffer address back to board during acquisition:",
-                                              buf_queue):
+                                              buf_queue)
             # done with acquisition
         finally:
             # make sure we abort the acquisition so the board doesn't get stuck
@@ -533,12 +532,12 @@ def _process_buffers(buf_queue,
 
     # initialize the buffer processors
     for processor in processors:
-        processor.initialize(params)
+        processor.initialize(acq_params)
 
     failure = False
 
     # loop over all the buffers we expect to receive
-    for buf_num in range(buffers_per_acquisition):
+    for buf_num in range(acq_params.buffers_per_acquisition):
         # get the next buffer from the queue
         (buf, err) = buf_queue.get()
 
@@ -552,8 +551,8 @@ def _process_buffers(buf_queue,
             break
 
         # reshape the buffer
-        chan_bufs = [_reshape_buffer(buf, chan, params)
-                     for chan in range(channel_count)]
+        chan_bufs = [_reshape_buffer(buf, chan, acq_params)
+                     for chan in range(acq_params.channel_count)]
 
         for proc in processors:
             proc.process(chan_bufs, buf_num)
