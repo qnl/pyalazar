@@ -3,6 +3,8 @@ cimport c_alazar_api
 import numpy as np
 cimport numpy as np
 
+from cpython cimport PyObject
+
 import multiprocessing as mp
 
 import worker
@@ -17,6 +19,8 @@ cdef class Alazar(object):
     # handle to an alazar board
     cdef c_alazar_api.HANDLE board
     cdef int board_type
+    cdef int systemID
+    cdef int boardID
 
     # use __cinit__ to make sure this is run
     def __cinit__(self, systemID, boardID):
@@ -33,6 +37,15 @@ cdef class Alazar(object):
         self.board_type = c_alazar_api.AlazarGetBoardKind(self.board)
         if self.board_type == 0:
             raise AlazarException("Connected to board with system ID {}, board ID {}, but could not identify board!".format(systemID,boardID))
+
+        self.systemID = systemID
+        self.boardID = boardID
+
+    # add pickle support
+    def __reduce__(self):
+        # to pickle, we just store system and board ID and reconstitute in a new thread
+        # this will get a fresh handle to the board
+        return(Alazar, (self.systemID, self.boardID) )
 
     # need a getter to access this from python
     def get_board_type(self):
@@ -421,7 +434,7 @@ cdef class Alazar(object):
                 if err is not None:
                     # tell the data processors to abort
                     for proc in processors:
-                        proc.abort()
+                        proc.abort(err)
 
                     # re-raise the error from the digitizer
                     raise err
@@ -435,6 +448,10 @@ cdef class Alazar(object):
                     # TODO: exception handling for processor failure?
 
         finally:
+            # make sure the buffer handler has closed
+            buf_handler.join()
+
+            # ensure we abort the acquisition
             self._abort_acquisition()
 
         # acquisition was successful, do post-processing
@@ -526,9 +543,9 @@ def _handle_buffers(buf_queue,
 
         ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(board.board, &buf_view[0], timeout)
         if _handle_return_code(ret_code,
-                              "Wait for buffer complete failed on buffer {}:"
-                              .format(buffers_completed),
-                              buf_queue):
+                               "Wait for buffer complete failed on buffer {}:"
+                               .format(buffers_completed),
+                               buf_queue):
             break
 
         # pickles the buffer and sends to the worker
@@ -537,8 +554,8 @@ def _handle_buffers(buf_queue,
         # hand the buffer back to the board
         ret_code = c_alazar_api.AlazarPostAsyncBuffer(board.board, &buf_view[0], bytes_per_buffer)
         if _handle_return_code(ret_code,
-                              "Failed to send buffer address back to board during acquisition:",
-                              buf_queue):
+                               "Failed to send buffer address back to board during acquisition:",
+                               buf_queue):
             break
     # done with acquisition
 
