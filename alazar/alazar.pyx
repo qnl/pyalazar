@@ -395,7 +395,7 @@ cdef class Alazar(object):
             processor.initialize(params)
 
         # get a queue to receive buffers from the buffer handler
-        buf_queue = mp.SimpleQueue()
+        buf_queue = mp.Queue()
 
         # start a buffer handler to do the acquisition:
         buf_handler = mp.Process(target = _handle_buffers,
