@@ -12,6 +12,8 @@ def do_acquire():
 
 	b.setup_one_trigger()
 
-    dproc = proc.BufferProcessor()
+    raw_proc = proc.Raw()
 
-	return b.acquire(dproc,4096,65536,512,timeout=1000,buffer_count = 128)
+	b.acquire(raw_proc,4096,65536,512,timeout=1000)
+
+    return raw_proc
