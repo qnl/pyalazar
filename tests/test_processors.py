@@ -7,7 +7,7 @@ from nose.tools import raises
 import numpy as np
 
 # some fake but realistic acquisition parameters
-def params():
+def acq_params():
 
     dtype = np.uint8
 
@@ -18,9 +18,10 @@ def params():
                       dtype=dtype)
 
 # make a bunch of test buffers with the same value
-def test_buffers_same_val(params, value):
-    bufs = [[np.empty((params.records_per_buffer, params.samples_per_record),
-                     dtype=params.dtype,).fill(value)
+def buffers_same_val(params, value):
+    bufs = [[np.full((params.records_per_buffer, params.samples_per_record),
+                     value,
+                     dtype=params.dtype,)
              for _ in range(params.channel_count)]
             for _ in range(params.buffers_per_acquisition)]
     return bufs
@@ -39,10 +40,10 @@ class TestAverage(object):
 
     def test_process(self):
         ave = proc.Average()
-        params = params()
+        params = acq_params()
         ave.initialize(params)
 
-        bufs = test_buffers_same_val(params,1)
+        bufs = buffers_same_val(params,1)
 
         for (buf, buf_num) in zip(bufs,
                                   range(params.buffers_per_acquisition)):
@@ -52,8 +53,8 @@ class TestAverage(object):
 
         dat = ave.get_result()
 
-        assert bufs[0][0] == dat[0]
-        assert bufs[0][0] == dat[1]
+        assert bufs[0][0].all() == dat[0].all()
+        assert bufs[0][0].all() == dat[1].all()
 
 
 
