@@ -26,17 +26,30 @@ def buffers_same_val(params, value):
             for _ in range(params.buffers_per_acquisition)]
     return bufs
 
+class TestProcessors(object):
+    # test class to automatically test some standard functions of all processors
 
-class TestAverage(object):
+    def setup(self):
+        # make a list of all the types of processors
+        processors = []
+        processors.append(proc.BufferProcessor())
+        processors.append(proc.Average())
+        processors.append(proc.Raw())
+
+        self.processors = processors
+
+    def test_abort(self):
+        for proc in self.processors:
+            yield (check_abort, proc)
 
     @raises(ProcessorException)
-    def test_abort(self):
-
-        ave = proc.Average()
+    def check_abort(self, proc):
         e = Exception()
+        proc.abort(e)
+        proc.get_result()
 
-        ave.abort(e)
-        ave.get_result()
+
+class TestAverage(object):
 
     def test_process(self):
         ave = proc.Average()
