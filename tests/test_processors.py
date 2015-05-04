@@ -76,8 +76,8 @@ class TestAverage(object):
 
         dat = ave.get_result()
 
-        assert bufs[0][0].all() == dat[0].all()
-        assert bufs[0][0].all() == dat[1].all()
+        for chan in range(params.channel_count):
+            assert (bufs[chan][0] == dat[chan]).all()
 
         # test re-use of same processor with re-initializtion
 
@@ -105,6 +105,8 @@ class TestAverage(object):
 
         dat = ave.get_result()
 
-        assert chan_aves.all() == dat.all()
+        for chan in range(params.channel_count):
+
+            assert (chan_aves[chan] == dat[chan]).all()
 
 
