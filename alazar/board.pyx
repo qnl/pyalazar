@@ -3,15 +3,9 @@ cimport c_alazar_api
 import numpy as np
 cimport numpy as np
 
-from cpython cimport PyObject
-
 import multiprocessing as mp
 
-import worker
-
-import time
-
-from processor import BufferProcessor, ProcessorException
+from processor import BufferProcessor
 
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
