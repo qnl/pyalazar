@@ -41,12 +41,6 @@ cdef class Alazar(object):
         self.systemID = systemID
         self.boardID = boardID
 
-    # add pickle support
-    def __reduce__(self):
-        # to pickle, we just store system and board ID and reconstitute in a new thread
-        # this will get a fresh handle to the board
-        return(Alazar, (self.systemID, self.boardID) )
-
     # need a getter to access this from python
     def get_board_type(self):
         return self.board_type
