@@ -117,7 +117,7 @@ class TestRaw(object):
     def test_process(self):
         raw = proc.Raw()
         params = acq_params()
-        raw.initialize()
+        raw.initialize(params)
 
         bufs = buffers_random(params, 0, 255)
 
