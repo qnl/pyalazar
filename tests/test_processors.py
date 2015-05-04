@@ -137,7 +137,7 @@ class TestRaw(object):
         dat = raw.get_result()
 
         for chan in range(params.channel_count):
-            assert (raw[chan] == dat[chan]).all()
+            assert (raw_dat[chan] == dat[chan]).all()
 
 
 
