@@ -26,27 +26,37 @@ def buffers_same_val(params, value):
             for _ in range(params.buffers_per_acquisition)]
     return bufs
 
-class TestProcessors(object):
-    # test class to automatically test some standard functions of all processors
+def buffers_random(params, min_val, max_val, seed=0):
+    # seed the random number generator with a constant value
+    np.random.seed(seed)
+    bufs = [[(np.random.rand(params.records_per_buffer,
+                             params.samples_per_record)*(max_val-min_val)+min_val
+             ).astype(params.dtype)
+             for _ in range(params.channel_count)]
+            for _ in range(params.buffers_per_acquisition)]
+    return bufs
 
-    def setup(self):
+# --- Automatic tests for various basic functions of all processors ---
+
+class TestAllProcessors(object):
+
+    def _setup_all_procs(self):
         # make a list of all the types of processors
         processors = []
         processors.append(proc.BufferProcessor())
         processors.append(proc.Average())
         processors.append(proc.Raw())
 
-        self.processors = processors
+        return processors
 
     def test_abort(self):
-        for proc in self.processors:
-            yield (check_abort, proc)
+        for processor in self._setup_all_procs():
+            yield (self.check_abort, processor)
 
     @raises(ProcessorException)
-    def check_abort(self, proc):
-        e = Exception()
-        proc.abort(e)
-        proc.get_result()
+    def check_abort(self, processor):
+        processor.abort(Exception())
+        processor.get_result()
 
 
 class TestAverage(object):
@@ -56,7 +66,7 @@ class TestAverage(object):
         params = acq_params()
         ave.initialize(params)
 
-        bufs = buffers_same_val(params,1)
+        bufs = buffers_same_val(params, 1)
 
         for (buf, buf_num) in zip(bufs,
                                   range(params.buffers_per_acquisition)):
@@ -69,6 +79,32 @@ class TestAverage(object):
         assert bufs[0][0].all() == dat[0].all()
         assert bufs[0][0].all() == dat[1].all()
 
+        # test re-use of same processor with re-initializtion
 
+        ave.initialize(params)
+
+        # use randomized buffers this time
+        bufs = buffers_random(params, 0, 255)
+
+        chan_aves = [None for _ in range(params.channel_count)]
+
+        for (buf, buf_num) in zip(bufs,
+                                  range(params.buffers_per_acquisition)):
+            ave.process(buf, buf_num)
+
+            for chan in range(params.channel_count):
+                chan_mean = np.mean(buf[chan],axis=0)
+                if chan_aves[chan] is None:
+                    chan_aves[chan] = chan_mean
+                else:
+                    chan_aves[chan] += chan_mean
+
+        chan_aves = [accum / params.buffers_per_acquisition for accum in chan_aves]
+
+        ave.post_process()
+
+        dat = ave.get_result()
+
+        assert chan_aves.all() == dat.all()
 
 
