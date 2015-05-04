@@ -58,6 +58,7 @@ class TestAllProcessors(object):
         processor.abort(Exception())
         processor.get_result()
 
+# --- tests for Average processor
 
 class TestAverage(object):
 
@@ -108,5 +109,36 @@ class TestAverage(object):
         for chan in range(params.channel_count):
 
             assert (chan_aves[chan] == dat[chan]).all()
+
+# --- tests for Raw processor
+
+class TestRaw(object):
+
+    def test_process(self):
+        raw = proc.Raw()
+        params = acq_params()
+        raw.initialize()
+
+        bufs = buffers_random(params, 0, 255)
+
+        raw_dat = [np.empty((params.records_per_acquisition, params.samples_per_record),
+                            dtype=params.dtype) for _ in range(params.channel_count)]
+
+        for (buf, buf_num) in zip(bufs,
+                                  range(params.buffers_per_acquisition)):
+            raw.process(buf, buf_num)
+
+            for chan in range(params.channel_count):
+                rec_p_buf = params.records_per_buffer
+                raw_dat[chan][buf_num*rec_p_buf:(buf_num+1)*rec_p_buf][:] = buf[chan]
+
+        raw.post_process()
+
+        dat = raw.get_result()
+
+        for chan in range(params.channel_count):
+            assert (raw[chan] == dat[chan]).all()
+
+
 
 
