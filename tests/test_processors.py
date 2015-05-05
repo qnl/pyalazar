@@ -46,6 +46,7 @@ class TestAllProcessors(object):
         processors.append(proc.BufferProcessor())
         processors.append(proc.Average())
         processors.append(proc.Raw())
+        processors.append(proc.AverageN())
 
         return processors
 
@@ -139,6 +140,32 @@ class TestRaw(object):
         for chan in range(params.channel_count):
             assert (raw_dat[chan] == dat[chan]).all()
 
+# --- tests for AverageN processor
+
+class TestAverageN(object):
+
+    @raises(ProcessorException)
+    def test_total_records_not_divisible_by_n(self):
+
+        params = acq_params()
+        assert params.records_per_acquisition % 3 != 0
+
+        ave_N = proc.AverageN(3)
+        ave_N.initialize(params)
+
+        bufs = buffers_same_val(params, 1)
+
+        for (buf, buf_num) in zip(bufs,
+                                  range(params.buffers_per_acquisition)):
+            ave_N.process(buf, buf_num)
+
+        ave_N.post_process()
+        ave_N.get_result()
+
+
+    def test_process(self):
+        pass
+        # ave_2 = proc.AverageN(2)
 
 
 
