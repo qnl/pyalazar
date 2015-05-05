@@ -201,7 +201,7 @@ class AverageN(BufferProcessor):
 
         # normalize by the total number of each record type collected
         for ave_buf in self.ave_bufs:
-            ave_buf /= (self.params.records_per_acquisition / self.n_rec_types
+            ave_buf /= self.params.records_per_acquisition / self.n_rec_types
 
     def get_result(self):
         """Return the averages.
