@@ -126,6 +126,92 @@ class Average(BufferProcessor):
         self.check_error()
         return self.ave_bufs
 
+class AverageN(BufferProcessor):
+    """Processor to average all buffers, with N types of records.
+
+    This processor expects each consecutive chunk of N records
+        to contain one of each of the N types, in order.
+    """
+
+    def __init__(self, n_rec_types):
+        """Create a new AverageN processor.
+
+        Args:
+            n_rec_types (int): The number of record types to average into.  Must
+                be a positive non-zero integer.  The number of records in the
+                acquisition must be a multiple of this or this processor will
+                return an error condition.
+        """
+        super(AverageN, self).__init__()
+
+        input_type = type(n_rec_types)
+
+        if input_type is not int:
+            raise ProcessorException("n_rec_types must be an integer."
+                                     " Provided: {}".format(input_type))
+        if n_rec_types < 1:
+            raise ProcessorException("n_rec_types must be greater than 0."
+                                     " Provided: {}".format(n_rec_types))
+
+        self.ave_bufs = None
+        self.n_rec_types = n_rec_types
+
+    def initialize(self, params):
+        """Initialize the averaging buffers."""
+        super(AverageN, self).initialize(params)
+
+        if params.records_per_acquisition % self.n_rec_types != 0:
+            self.error = ProcessorException("Records per acquisition ({}) must be a"
+                                            " multiple of n_rec_types ({})"
+                                            .format(params.records_per_acquisition,
+                                                    self.n_rec_types))
+            return
+
+        # create list of channel buffers to sum the results
+        self.ave_bufs = [np.zeros((self.n_rec_types,params.samples_per_record,), np.float)
+                         for _ in range(params.channel_count)]
+
+    def process(self, chan_bufs, buf_num):
+        """Average the channel records together and add them to the averaging buffers."""
+
+        if self.error is not None:
+            return
+
+        # figure out what the type of the first record in the buffer is
+        first_rec_type = (buf_num*self.params.records_per_buffer) % self.n_rec_types
+
+        for (chan_buf, ave_buf) in zip(chan_bufs, self.ave_bufs):
+            for rec_type in range(self.n_rec_types):
+
+                # calculate the offset needed to index the channel buffer into this record type
+                offset = (rec_type + first_rec_type) % self.n_rec_types
+
+                # if records_per_buffer is less than n_rec_types this record may lack this type
+                if offset < self.params.records_per_buffer:
+
+                    sum_of_this_rec_type = np.sum(chan_buf[offset::n_rec_types])
+
+                    ave_buf[rec_type] += sum_of_this_rec_type
+
+    def post_process(self):
+        """Normalize the averages."""
+
+        if self.error is not None:
+            return
+
+        # normalize by the total number of each record type collected
+        for ave_buf in self.ave_bufs:
+            ave_buf /= (self.params.records_per_acquisition / self.n_rec_types
+
+    def get_result(self):
+        """Return the averages.
+
+        Raises a ProcessorException if an error occurred."""
+        self.check_error()
+        return self.ave_bufs
+
+
+
 
 
 # --- error handling
