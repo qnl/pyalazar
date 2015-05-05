@@ -46,7 +46,7 @@ class TestAllProcessors(object):
         processors.append(proc.BufferProcessor())
         processors.append(proc.Average())
         processors.append(proc.Raw())
-        processors.append(proc.AverageN())
+        processors.append(proc.AverageN(1))
 
         return processors
 
