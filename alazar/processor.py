@@ -51,10 +51,13 @@ class BufferProcessor(object):
 
     def abort(self, error):
         """If the acquisition failed, clean up."""
-        self.error = error
+        # If this processor already failed, do not overwrite the internal error
+        # with the acquisition error.
+        if not self.error:
+            self.error = error
 
     def check_error(self):
-        if self.error is not None:
+        if self.error:
             raise ProcessorException("Acquisition failed: " + str(self.error))
 
 class Raw(BufferProcessor):
