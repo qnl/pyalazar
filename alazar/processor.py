@@ -206,13 +206,110 @@ class AverageN(BufferProcessor):
             array of shape (n_rec_types, samples_per_record).
 
         Raises:
-            ProcessorException if an error occurred."""
+            ProcessorException if an error occurred.
+        """
         self.check_error()
         return self.ave_bufs
 
+class Chunk(BufferProcessor):
+    """Processor to collect a chunk of N record types."""
+    def __init__(self, n_rec_types, chunk_params):
+        """Create a new Chunk processor.
+
+        Args:
+            n_rec_types (int): The number of record types.  Must
+                be a positive non-zero integer.  The number of records in the
+                acquisition must be a multiple of this or this processor will
+                return an error.
+
+            chunk_params (ChunkParam): A ChunkParam object defining
+                the start and stop sample of the chunk.  If these parameters are
+                incompatible with the acquisition parameters, this processor will
+                return an error.
+        """
+        super(Chunk, self).__init__()
+
+        if n_rec_types < 1:
+            raise ProcessorException("n_rec_types must be greater than 0."
+                                     " Provided: {}".format(n_rec_types))
+
+        self.chunk = chunk_params
+
+    def initialize(self, params):
+        """Initialize the data array."""
+        super(Chunk, self).initialize(params)
+
+        if params.records_per_acquisition % self.n_rec_types != 0:
+            self.error = ProcessorException("Records per acquisition ({}) must be a"
+                                            " multiple of n_rec_types ({})"
+                                            .format(params.records_per_acquisition,
+                                                    self.n_rec_types))
+            return
+
+        if self.chunk.stop > params.samples_per_record:
+            self.error = ProcessorException("Chunk stop ({}) is greater than "
+                                            "samples per record ({})"
+                                            .format(self.chunk.stop,
+                                                    params.samples_per_record))
+
+        self.chunk_bufs = [np.empty((params.records_per_acquisition,), dtype=np.float)
+                           for _ in range(params.channel_count)]
+
+    def process(self, chan_bufs, buf_num):
+        """Collect all of the chunks."""
+
+        if self.error is not None:
+            return
+
+        recs_per_buf = self.params.records_per_buffer
+
+        rec_offset = buf_num*recs_per_buf
 
 
+        for (chan_buf, chunk_buf) in zip(chan_bufs, self.chunk_bufs):
 
+                chunk_buf_view = chunk_buf[rec_offset:rec_offset+recs_per_buf]
+
+                # integrate this chunk and put result into the data array
+                chunk_buf_view = np.mean(chan_buf[:,self.chunk.start:self.chunk.stop], axis=1)
+
+    def post_process(self):
+        """Reshape the data into record types."""
+
+        if self.error is not None:
+            return
+
+        # reshape the linear buffer into (rec type, records) in place
+        for chunk_buf in self.chunk_bufs:
+            chunk_buf.shape = (params.records_per_acquisition / self.n_rec_types,
+                               self.n_rec_types)
+
+            chunk_buf = np.swapaxes(chunk_buf,0,1)
+
+    def get_result(self):
+        """Return the chunked records.
+
+        Returns:
+            List of channel chunks for the acquisition; each entry is a numpy array
+            of shape (n_rec_types, n_recs_per_rec_type).
+
+        Raises:
+            ProcessorException if an error occurred.
+        """
+        self.check_error()
+        return self.chunk_bufs
+
+class ChunkParam(object):
+    """Helper class for holding Chunk parameters."""
+    def __init__(self, start, stop):
+        """Create a Chunk parameter holder.
+
+        Args:
+            start (int): sample number to start average
+            stop (int): sample number to stop average (exclusive)
+        """
+        self.start = start
+        self.stop = stop
 
 # --- error handling
 
