@@ -213,7 +213,7 @@ class AverageN(BufferProcessor):
 
 class Chunk(BufferProcessor):
     """Processor to collect a chunk of N record types."""
-    def __init__(self, n_rec_types, chunk_params):
+    def __init__(self, n_rec_types, start, stop):
         """Create a new Chunk processor.
 
         Args:
@@ -222,10 +222,8 @@ class Chunk(BufferProcessor):
                 acquisition must be a multiple of this or this processor will
                 return an error.
 
-            chunk_params (ChunkParam): A ChunkParam object defining
-                the start and stop sample of the chunk.  If these parameters are
-                incompatible with the acquisition parameters, this processor will
-                return an error.
+            start (int): The sample number at the start of the chunk (inclusive)
+            stop (int): The sample number at the end of the chunk (exclusive)
         """
         super(Chunk, self).__init__()
 
@@ -233,7 +231,8 @@ class Chunk(BufferProcessor):
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
 
-        self.chunk = chunk_params
+        self.start = start
+        self.stop = stop
 
     def initialize(self, params):
         """Initialize the data array."""
@@ -246,10 +245,10 @@ class Chunk(BufferProcessor):
                                                     self.n_rec_types))
             return
 
-        if self.chunk.stop > params.samples_per_record:
+        if self.stop > params.samples_per_record:
             self.error = ProcessorException("Chunk stop ({}) is greater than "
                                             "samples per record ({})"
-                                            .format(self.chunk.stop,
+                                            .format(self.stop,
                                                     params.samples_per_record))
 
         self.chunk_bufs = [np.empty((params.records_per_acquisition,), dtype=np.float)
@@ -271,7 +270,7 @@ class Chunk(BufferProcessor):
                 chunk_buf_view = chunk_buf[rec_offset:rec_offset+recs_per_buf]
 
                 # integrate this chunk and put result into the data array
-                chunk_buf_view = np.mean(chan_buf[:,self.chunk.start:self.chunk.stop], axis=1)
+                chunk_buf_view = np.mean(chan_buf[:,self.start:self.stop], axis=1)
 
     def post_process(self):
         """Reshape the data into record types."""
@@ -298,18 +297,6 @@ class Chunk(BufferProcessor):
         """
         self.check_error()
         return self.chunk_bufs
-
-class ChunkParam(object):
-    """Helper class for holding Chunk parameters."""
-    def __init__(self, start, stop):
-        """Create a Chunk parameter holder.
-
-        Args:
-            start (int): sample number to start average
-            stop (int): sample number to stop average (exclusive)
-        """
-        self.start = start
-        self.stop = stop
 
 # --- error handling
 
