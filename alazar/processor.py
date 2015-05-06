@@ -144,11 +144,6 @@ class AverageN(BufferProcessor):
         """
         super(AverageN, self).__init__()
 
-        input_type = type(n_rec_types)
-
-        if input_type is not int:
-            raise ProcessorException("n_rec_types must be an integer."
-                                     " Provided: {}".format(input_type))
         if n_rec_types < 1:
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
@@ -206,7 +201,12 @@ class AverageN(BufferProcessor):
     def get_result(self):
         """Return the averages.
 
-        Raises a ProcessorException if an error occurred."""
+        Returns:
+            List of channel results for the acquisition; each entry is a numpy
+            array of shape (n_rec_types, samples_per_record).
+
+        Raises:
+            ProcessorException if an error occurred."""
         self.check_error()
         return self.ave_bufs
 
