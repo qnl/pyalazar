@@ -70,9 +70,7 @@ class TestAverage(object):
 
         bufs = buffers_same_val(params, 1)
 
-        for (buf, buf_num) in zip(bufs,
-                                  range(params.buffers_per_acquisition)):
-            ave.process(buf, buf_num)
+        run_process(bufs, ave)
 
         ave.post_process()
 
@@ -88,20 +86,11 @@ class TestAverage(object):
         # use randomized buffers this time
         bufs = buffers_random(params, 0, 255)
 
-        chan_aves = [None for _ in range(params.channel_count)]
+        raw_dat = bufs_to_raw_array(bufs, params)
 
-        for (buf, buf_num) in zip(bufs,
-                                  range(params.buffers_per_acquisition)):
-            ave.process(buf, buf_num)
+        chan_aves = [np.mean(chan_dat,axis=0) for chan_dat in raw_dat]
 
-            for chan in range(params.channel_count):
-                chan_mean = np.mean(buf[chan],axis=0)
-                if chan_aves[chan] is None:
-                    chan_aves[chan] = chan_mean
-                else:
-                    chan_aves[chan] += chan_mean
-
-        chan_aves = [accum / params.buffers_per_acquisition for accum in chan_aves]
+        run_process(bufs, ave)
 
         ave.post_process()
 
@@ -122,16 +111,9 @@ class TestRaw(object):
 
         bufs = buffers_random(params, 0, 255)
 
-        raw_dat = [np.empty((params.records_per_acquisition, params.samples_per_record),
-                            dtype=params.dtype) for _ in range(params.channel_count)]
+        raw_dat = bufs_to_raw_array(bufs, params)
 
-        for (buf, buf_num) in zip(bufs,
-                                  range(params.buffers_per_acquisition)):
-            raw.process(buf, buf_num)
-
-            for chan in range(params.channel_count):
-                rec_p_buf = params.records_per_buffer
-                raw_dat[chan][buf_num*rec_p_buf:(buf_num+1)*rec_p_buf][:] = buf[chan]
+        run_process(bufs, raw)
 
         raw.post_process()
 
@@ -155,17 +137,92 @@ class TestAverageN(object):
 
         bufs = buffers_same_val(params, 1)
 
-        for (buf, buf_num) in zip(bufs,
-                                  range(params.buffers_per_acquisition)):
-            ave_N.process(buf, buf_num)
+        run_process(bufs, ave_N)
 
         ave_N.post_process()
         ave_N.get_result()
 
+    @raises(ProcessorException)
+    def test_zero_n(self):
+        ave_N = proc.AverageN(0)
+
+    @raises(ProcessorException)
+    def test_negative_n(self):
+        ave_N = proc.AverageN(-1)
 
     def test_process(self):
-        pass
-        # ave_2 = proc.AverageN(2)
+        n_vals = [1,2,16]
+
+        for val in n_vals:
+            yield self.check_process_for_n_val, val
+
+    def check_process_for_n_val(self, n_val):
+
+        ave_n = proc.AverageN(n_val)
+
+        params = acq_params()
+
+        ave_n.initialize(params)
+
+        bufs = buffers_random(params, 0, 255)
+
+        raw_dat = bufs_to_raw_array(bufs, params)
+
+        correct_results = [np.empty((n, params.samples_per_record), np.float)
+                           for _ in params.channel_count]
+
+        # make the correct averaged data
+        for rec_type in range(n_val):
+            for result, chan_dat in zip(correct_results, raw_dat):
+                result[rec_type] = np.mean(raw_dat[rec_type::n_val],axis=0)
+
+        run_process(bufs, ave_n)
+
+        ave_n.post_process()
+
+        result = ave_n.get_result()
+
+        for (correct, returned) in zip(correct_results, result):
+            assert (correct == returned).all()
+
+
+
+
+
+# --- Helper functions
+
+def bufs_to_raw_array(bufs, params):
+
+    raw_dat = [np.empty((params.records_per_acquisition, params.samples_per_record),
+                        dtype=params.dtype) for _ in range(params.channel_count)]
+
+    for (buf, buf_num) in zip(bufs,
+                              range(params.buffers_per_acquisition)):
+
+        for chan in range(params.channel_count):
+            rec_p_buf = params.records_per_buffer
+            raw_dat[chan][buf_num*rec_p_buf:(buf_num+1)*rec_p_buf][:] = buf[chan]
+
+    return raw_dat
+
+def run_process(bufs, procs):
+    """Run this processor on all of these buffers.
+
+    procs can be a single processor or a list of processors.
+    """
+    for (buf, buf_num) in zip(bufs,
+                              range(len(bufs))):
+        if type(procs) is list:
+            for processor in procs:
+                processor.process(buf, buf_num)
+        else:
+            procs.process(buf, buf_num)
+
+
+
+
+
+
 
 
 
