@@ -47,7 +47,7 @@ class TestAllProcessors(object):
         processors.append(proc.Average())
         processors.append(proc.Raw())
         processors.append(proc.AverageN(1))
-        processors.append(proc.Chunk(proc.ChunkParam(0,1)))
+        processors.append(proc.Chunk(1,0,1))
 
         return processors
 
@@ -195,12 +195,12 @@ class TestChunk(object):
         params = acq_params()
         assert params.records_per_acquisition % 3 != 0
 
-        chunk = proc.Chunk(0,1)
+        chunk = proc.Chunk(3,0,1)
         chunk.initialize(params)
 
         bufs = buffers_same_val(params, 1)
 
-        run_process(bufs, ave_N)
+        run_process(bufs, chunk)
 
         chunk.post_process()
         chunk.get_result()
