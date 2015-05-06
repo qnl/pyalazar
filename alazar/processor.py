@@ -232,6 +232,8 @@ class Chunk(BufferProcessor):
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
 
+        self.n_rec_types = n_rec_types
+
         self.start = start
         self.stop = stop
 
