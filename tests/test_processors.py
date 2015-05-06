@@ -47,6 +47,7 @@ class TestAllProcessors(object):
         processors.append(proc.Average())
         processors.append(proc.Raw())
         processors.append(proc.AverageN(1))
+        processors.append(proc.Chunk(proc.ChunkParam(0,1)))
 
         return processors
 
@@ -185,7 +186,22 @@ class TestAverageN(object):
         for (correct, returned) in zip(correct_results, result):
             assert (correct == returned).all()
 
+class TestChunk(object):
 
+    @raises(ProcessorException)
+    def test_total_records_not_divisible_by_n(self):
+        params = acq_params()
+        assert params.records_per_acquisition % 3 != 0
+
+        chunk = proc.Chunk(0,1)
+        chunk.initialize(params)
+
+        bufs = buffers_same_val(params, 1)
+
+        run_process(bufs, ave_N)
+
+        chunk.post_process()
+        chunk.get_result()
 
 
 
