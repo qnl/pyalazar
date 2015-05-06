@@ -169,13 +169,13 @@ class TestAverageN(object):
 
         raw_dat = bufs_to_raw_array(bufs, params)
 
-        correct_results = [np.empty((n, params.samples_per_record), np.float)
-                           for _ in params.channel_count]
+        correct_results = [np.empty((n_val, params.samples_per_record), np.float)
+                           for _ in range(params.channel_count)]
 
         # make the correct averaged data
         for rec_type in range(n_val):
             for result, chan_dat in zip(correct_results, raw_dat):
-                result[rec_type] = np.mean(raw_dat[rec_type::n_val],axis=0)
+                result[rec_type] = np.mean(chan_dat[rec_type::n_val],axis=0)
 
         run_process(bufs, ave_n)
 
@@ -184,6 +184,8 @@ class TestAverageN(object):
         result = ave_n.get_result()
 
         for (correct, returned) in zip(correct_results, result):
+            print correct[0,0]
+            print returned[0,0]
             assert (correct == returned).all()
 
 class TestChunk(object):
