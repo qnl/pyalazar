@@ -112,7 +112,7 @@ class Average(BufferProcessor):
         """Average the channel records together and add them to the averaging buffer."""
 
         for (chan_buf, ave_buf) in zip(chan_bufs, self.ave_bufs):
-            ave_buf += np.sum(chan_buf,axis=0)
+            ave_buf += np.sum(chan_buf,axis=0, dtype=np.int64)
 
     def post_process(self):
         """Normalize the averages."""
@@ -184,9 +184,7 @@ class AverageN(BufferProcessor):
                 # if records_per_buffer is less than n_rec_types this record may lack this type
                 if offset < self.params.records_per_buffer:
 
-                    sum_of_this_rec_type = np.sum(chan_buf[offset::n_rec_types])
-
-                    ave_buf[rec_type] += sum_of_this_rec_type
+                    ave_buf[rec_type] += np.sum(chan_buf[offset::self.n_rec_types], axis=0, dtype=np.int64)
 
     def post_process(self):
         """Normalize the averages."""
@@ -196,7 +194,7 @@ class AverageN(BufferProcessor):
 
         # normalize by the total number of each record type collected
         for ave_buf in self.ave_bufs:
-            ave_buf /= self.params.records_per_acquisition / self.n_rec_types
+            ave_buf /= (self.params.records_per_acquisition / self.n_rec_types)
 
     def get_result(self):
         """Return the averages.
