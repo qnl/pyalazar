@@ -295,11 +295,11 @@ class Chunk(BufferProcessor):
             return
 
         # reshape the linear buffer into (rec type, records) in place
-        for chunk_buf in self.chunk_bufs:
+        for chan, chunk_buf in enumerate(self.chunk_bufs):
             chunk_buf.shape = (self.params.records_per_acquisition / self.n_rec_types,
                                self.n_rec_types)
 
-            chunk_buf = np.swapaxes(chunk_buf,0,1)
+            self.chunk_bufs[chan] = np.swapaxes(chunk_buf,0,1)
 
     def get_result(self):
         """Return the chunked records.
