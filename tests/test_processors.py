@@ -180,13 +180,12 @@ class TestChunk(object):
         assert params.records_per_acquisition % 3 != 0
 
         chunk = proc.Chunk(3,0,1)
-        chunk.initialize(params)
+
 
         bufs = buffers_same_val(params, 1)
 
-        run_process(bufs, chunk)
+        emulate_acq(params, bufs, chunk)
 
-        chunk.post_process()
         chunk.get_result()
 
 
