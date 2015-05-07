@@ -172,8 +172,7 @@ class TestAverageN(object):
         result = ave_n.get_result()
 
         for (correct, returned) in zip(correct_results, result):
-            print correct[0,0]
-            print returned[0,0]
+
             assert (correct == returned).all()
 
 class TestChunk(object):
@@ -183,7 +182,7 @@ class TestChunk(object):
         params = acq_params()
         assert params.records_per_acquisition % 3 != 0
 
-        chunk = proc.Chunk(3,0,1)
+        chunk = proc.Chunk(3, 0, 1)
 
         bufs = buffers_same_val(params, 1)
 
@@ -195,13 +194,45 @@ class TestChunk(object):
     def test_chunk_stop_larger_than_rec_size(self):
         params = acq_params()
 
-        chunk = proc.Chunk(1,0,params.samples_per_record + 1)
+        chunk = proc.Chunk(1, 0, params.samples_per_record + 1)
 
         bufs = buffers_same_val(params, 1)
 
         emulate_acq(params, bufs, chunk)
 
         chunk.get_result()
+
+    def test_process(self):
+        n_rec_types = [1, 2, 4, 16]
+
+        for n_rec_type in n_rec_types:
+            yield self.check_process_for_n_rec_types, n_rec_type, 0, 10, acq_params()
+
+    def check_process_for_n_rec_types_start_stop(self, n_rec_types, start, stop, params):
+
+        chunk = proc.Chunk(n_rec_types, start, stop)
+
+        bufs = buffers_random(params, 0, 255)
+
+        raw_dat = bufs_to_raw_array(bufs, params)
+
+        chunked_dat = [np.mean(chan_dat[:,start:stop], axis=1) for chan_dat in raw_dat]
+
+        records_per_rec_type = params.records_per_acquisition / n_rec_types
+
+        correct_result = [np.empty((n_rec_types, records_per_rec_type), dtype=np.float) for _ in raw_dat]
+        for (chan_dat, result_buf) in zip(chunked_dat, correct_result):
+            for rec_type in range(n_rec_types):
+                result_buf[rec_type] = chan_dat[rec_type::n_rec_types]
+
+        emulate_acq(params, bufs, chunk)
+
+        result = chunk.get_result()
+
+        for (result_chan, correct_result_chan) in zip(result, correct_result):
+            assert (result_chan == correct_result_chan).all()
+
+
 
 
 # --- Helper functions
