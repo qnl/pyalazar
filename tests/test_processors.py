@@ -206,7 +206,7 @@ class TestChunk(object):
         n_rec_types = [1, 2, 4, 16]
 
         for n_rec_type in n_rec_types:
-            yield self.check_process_for_n_rec_types, n_rec_type, 0, 10, acq_params()
+            yield self.check_process_for_n_rec_types_start_stop, n_rec_type, 0, 10, acq_params()
 
     def check_process_for_n_rec_types_start_stop(self, n_rec_types, start, stop, params):
 
@@ -217,6 +217,7 @@ class TestChunk(object):
         raw_dat = bufs_to_raw_array(bufs, params)
 
         chunked_dat = [np.mean(chan_dat[:,start:stop], axis=1) for chan_dat in raw_dat]
+
 
         records_per_rec_type = params.records_per_acquisition / n_rec_types
 
@@ -230,6 +231,7 @@ class TestChunk(object):
         result = chunk.get_result()
 
         for (result_chan, correct_result_chan) in zip(result, correct_result):
+
             assert (result_chan == correct_result_chan).all()
 
 
