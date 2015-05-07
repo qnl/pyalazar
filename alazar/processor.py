@@ -12,18 +12,20 @@ class BufferProcessor(object):
 
     This class demonstrates the methods necessary to define a processor.
 
-    Processors should NOT raise exceptions; if a processing task fails,
-        processor should store the error internally and ignore further input,
-        ensuring that processors running in parallel are not interrupted.
-        If an error does occur, the processor should re-raise the error when it
-        is queried for it's result.
+    Processors should NOT raise exceptions; if a processing task fails, the
+    processor should store the error internally and ignore further input,
+    ensuring that processors running in parallel are not interrupted.
+    If an error does occur, the processor should re-raise the error when it
+    is queried for it's result.
 
-    initialize is called by the worker at the start of the acquisition.
+    initialize is called at the start of the acquisition.
     process is the function called with each individual buffer.
-    post_process is called by the worker when the acquisition is finished. The
-        result of the acquisition should be sent back to the client here.
-    abort is called by the worker if the acquisition failed; the processor
-        should safely clean up if this happens.
+    post_process is called when the acquisition is finished; do any work that
+        requires all of the data here, or post-processing tasks like reshaping
+        data buffers, writing arrays to disk, etc.
+    abort is called if the acquisition failed; the processor should safely clean
+        up if this happens, and store and re-raise the acquisition error if it
+        is later queried for its result.
     """
     def __init__(self):
         self.params = None
@@ -114,11 +116,18 @@ class Average(BufferProcessor):
     def process(self, chan_bufs, buf_num):
         """Average the channel records together and add them to the averaging buffer."""
 
+        if self.error:
+            return
+
         for (chan_buf, ave_buf) in zip(chan_bufs, self.ave_bufs):
             ave_buf += np.sum(chan_buf,axis=0, dtype=np.int64)
 
     def post_process(self):
         """Normalize the averages."""
+
+        if self.error:
+            return
+
         for ave_buf in self.ave_bufs:
             ave_buf /= self.params.records_per_acquisition
 
@@ -130,9 +139,9 @@ class Average(BufferProcessor):
         return self.ave_bufs
 
 class AverageN(BufferProcessor):
-    """Processor to average all buffers, with N types of records.
+    """Processor to average all buffers into N types of records.
 
-    This processor expects each consecutive chunk of N records
+    This processor expects each consecutive set of N records
         to contain one of each of the N types, in order.
     """
 
@@ -172,7 +181,7 @@ class AverageN(BufferProcessor):
     def process(self, chan_bufs, buf_num):
         """Average the channel records together and add them to the averaging buffers."""
 
-        if self.error is not None:
+        if self.error:
             return
 
         # figure out what the type of the first record in the buffer is
@@ -192,7 +201,7 @@ class AverageN(BufferProcessor):
     def post_process(self):
         """Normalize the averages."""
 
-        if self.error is not None:
+        if self.error:
             return
 
         # normalize by the total number of each record type collected
@@ -260,7 +269,7 @@ class Chunk(BufferProcessor):
     def process(self, chan_bufs, buf_num):
         """Collect all of the chunks."""
 
-        if self.error is not None:
+        if self.error:
             return
 
         recs_per_buf = self.params.records_per_buffer
@@ -278,7 +287,7 @@ class Chunk(BufferProcessor):
     def post_process(self):
         """Reshape the data into record types."""
 
-        if self.error is not None:
+        if self.error:
             return
 
         # reshape the linear buffer into (rec type, records) in place
