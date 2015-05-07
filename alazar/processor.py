@@ -232,14 +232,18 @@ class Chunk(BufferProcessor):
                 acquisition must be a multiple of this or this processor will
                 return an error.
 
-            start (int): The sample number at the start of the chunk (inclusive)
-            stop (int): The sample number at the end of the chunk (exclusive)
+            start (int): The sample number at the start of the chunk (inclusive).
+            stop (int): The sample number at the end of the chunk (exclusive).
         """
         super(Chunk, self).__init__()
 
         if n_rec_types < 1:
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
+
+        if start < 0 or start >= stop:
+            raise ProcessorException("Invalid start ({}) and stop ({}) parameters."
+                                     .format(start, stop))
 
         self.n_rec_types = n_rec_types
 
