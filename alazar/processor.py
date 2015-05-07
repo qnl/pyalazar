@@ -283,7 +283,7 @@ class Chunk(BufferProcessor):
 
         # reshape the linear buffer into (rec type, records) in place
         for chunk_buf in self.chunk_bufs:
-            chunk_buf.shape = (params.records_per_acquisition / self.n_rec_types,
+            chunk_buf.shape = (self.params.records_per_acquisition / self.n_rec_types,
                                self.n_rec_types)
 
             chunk_buf = np.swapaxes(chunk_buf,0,1)
