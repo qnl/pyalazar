@@ -145,13 +145,11 @@ class TestAverageN(object):
         proc.AverageN(-1)
 
     def test_process(self):
-        yield self.check_process, acq_params()
 
-    def check_process(self, params):
         n_vals = [1, 2, 16]
 
         for val in n_vals:
-            yield self.check_process_for_n_val, val, params
+            yield self.check_process_for_n_val, val, acq_params()
 
     def check_process_for_n_val(self, n_val, params):
 
