@@ -286,7 +286,7 @@ class Chunk(BufferProcessor):
                 chunk_buf_view = chunk_buf[rec_offset:rec_offset+recs_per_buf]
 
                 # integrate this chunk and put result into the data array
-                chunk_buf_view = np.mean(chan_buf[:,self.start:self.stop], axis=1)
+                chunk_buf_view[:] = np.mean(chan_buf[:,self.start:self.stop], axis=1)
 
     def post_process(self):
         """Reshape the data into record types."""
@@ -295,11 +295,11 @@ class Chunk(BufferProcessor):
             return
 
         # reshape the linear buffer into (rec type, records) in place
-        for chunk_buf in self.chunk_bufs:
+        for chan, chunk_buf in enumerate(self.chunk_bufs):
             chunk_buf.shape = (self.params.records_per_acquisition / self.n_rec_types,
                                self.n_rec_types)
 
-            chunk_buf = np.swapaxes(chunk_buf,0,1)
+            self.chunk_bufs[chan] = np.swapaxes(chunk_buf,0,1)
 
     def get_result(self):
         """Return the chunked records.
