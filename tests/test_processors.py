@@ -242,8 +242,7 @@ def bufs_to_raw_array(bufs, params):
     raw_dat = [np.empty((params.records_per_acquisition, params.samples_per_record),
                         dtype=params.dtype) for _ in range(params.channel_count)]
 
-    for (buf, buf_num) in zip(bufs,
-                              range(params.buffers_per_acquisition)):
+    for (buf_num, buf) in enumerate(bufs):
 
         for chan in range(params.channel_count):
             rec_p_buf = params.records_per_buffer
@@ -256,8 +255,7 @@ def run_process(bufs, procs):
 
     procs can be a single processor or a list of processors.
     """
-    for (buf, buf_num) in zip(bufs,
-                              range(len(bufs))):
+    for (buf_num, buf) in enumerate(bufs):
         if type(procs) is list:
             for processor in procs:
                 processor.process(buf, buf_num)
