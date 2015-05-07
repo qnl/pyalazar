@@ -195,7 +195,7 @@ class TestChunk(object):
 
         bufs = buffers_same_val(params, 1)
 
-        emulate_acq(params, bugs, chunk)
+        emulate_acq(params, bufs, chunk)
 
         chunk.get_result()
 
