@@ -286,7 +286,7 @@ class Chunk(BufferProcessor):
                 chunk_buf_view = chunk_buf[rec_offset:rec_offset+recs_per_buf]
 
                 # integrate this chunk and put result into the data array
-                chunk_buf_view = np.mean(chan_buf[:,self.start:self.stop], axis=1)
+                chunk_buf_view[:] = np.mean(chan_buf[:,self.start:self.stop], axis=1)
 
     def post_process(self):
         """Reshape the data into record types."""
