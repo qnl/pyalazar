@@ -67,13 +67,10 @@ class TestAverage(object):
     def test_process(self):
         ave = proc.Average()
         params = acq_params()
-        ave.initialize(params)
 
         bufs = buffers_same_val(params, 1)
 
-        run_process(bufs, ave)
-
-        ave.post_process()
+        emulate_acq(params, bufs, ave)
 
         dat = ave.get_result()
 
@@ -82,8 +79,6 @@ class TestAverage(object):
 
         # test re-use of same processor with re-initializtion
 
-        ave.initialize(params)
-
         # use randomized buffers this time
         bufs = buffers_random(params, 0, 255)
 
@@ -91,9 +86,7 @@ class TestAverage(object):
 
         chan_aves = [np.mean(chan_dat,axis=0) for chan_dat in raw_dat]
 
-        run_process(bufs, ave)
-
-        ave.post_process()
+        emulate_acq(params, bufs, ave)
 
         dat = ave.get_result()
 
@@ -108,15 +101,12 @@ class TestRaw(object):
     def test_process(self):
         raw = proc.Raw()
         params = acq_params()
-        raw.initialize(params)
 
         bufs = buffers_random(params, 0, 255)
 
         raw_dat = bufs_to_raw_array(bufs, params)
 
-        run_process(bufs, raw)
-
-        raw.post_process()
+        emulate_acq(params, bufs, raw)
 
         dat = raw.get_result()
 
@@ -133,23 +123,21 @@ class TestAverageN(object):
         params = acq_params()
         assert params.records_per_acquisition % 3 != 0
 
-        ave_N = proc.AverageN(3)
-        ave_N.initialize(params)
+        ave_n = proc.AverageN(3)
 
         bufs = buffers_same_val(params, 1)
 
-        run_process(bufs, ave_N)
+        emulate_acq(params, bufs, ave_n)
 
-        ave_N.post_process()
-        ave_N.get_result()
+        ave_n.get_result()
 
     @raises(ProcessorException)
     def test_zero_n(self):
-        ave_N = proc.AverageN(0)
+        proc.AverageN(0)
 
     @raises(ProcessorException)
     def test_negative_n(self):
-        ave_N = proc.AverageN(-1)
+        proc.AverageN(-1)
 
     def test_process(self):
         n_vals = [1,2,16]
@@ -163,8 +151,6 @@ class TestAverageN(object):
 
         params = acq_params()
 
-        ave_n.initialize(params)
-
         bufs = buffers_random(params, 0, 255)
 
         raw_dat = bufs_to_raw_array(bufs, params)
@@ -177,9 +163,7 @@ class TestAverageN(object):
             for result, chan_dat in zip(correct_results, raw_dat):
                 result[rec_type] = np.mean(chan_dat[rec_type::n_val],axis=0)
 
-        run_process(bufs, ave_n)
-
-        ave_n.post_process()
+        emulate_acq(params, bufs, ave_n)
 
         result = ave_n.get_result()
 
@@ -235,6 +219,24 @@ def run_process(bufs, procs):
                 processor.process(buf, buf_num)
         else:
             procs.process(buf, buf_num)
+
+def emulate_acq(params, bufs, procs):
+    """Emulate the action of the acquire() function."""
+    is_list = type(procs) is list
+
+    if is_list:
+        for processor in procs:
+            processor.initialize(params)
+    else:
+        procs.initialize(params)
+
+    run_process(bufs, procs)
+
+    if is_list:
+        for processor in procs:
+            processor.post_process()
+    else:
+        procs.post_process()
 
 
 
