@@ -181,13 +181,23 @@ class TestChunk(object):
 
         chunk = proc.Chunk(3,0,1)
 
-
         bufs = buffers_same_val(params, 1)
 
         emulate_acq(params, bufs, chunk)
 
         chunk.get_result()
 
+    @raises(ProcessorException)
+    def test_chunk_stop_larger_than_rec_size(self):
+        params = acq_params()
+
+        chunk = proc.Chunk(1,0,params.samples_per_record - 1)
+
+        bufs = buffers_same_val(params, 1)
+
+        emulate_acq(params, bugs, chunk)
+
+        chunk.get_result()
 
 
 # --- Helper functions
