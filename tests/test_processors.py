@@ -191,7 +191,7 @@ class TestChunk(object):
     def test_chunk_stop_larger_than_rec_size(self):
         params = acq_params()
 
-        chunk = proc.Chunk(1,0,params.samples_per_record - 1)
+        chunk = proc.Chunk(1,0,params.samples_per_record + 1)
 
         bufs = buffers_same_val(params, 1)
 
