@@ -65,8 +65,11 @@ class TestAllProcessors(object):
 class TestAverage(object):
 
     def test_process(self):
+        yield self.check_process, acq_params()
+
+    def check_process(self, params):
+
         ave = proc.Average()
-        params = acq_params()
 
         bufs = buffers_same_val(params, 1)
 
@@ -99,8 +102,10 @@ class TestAverage(object):
 class TestRaw(object):
 
     def test_process(self):
+        yield self.check_process, acq_params()
+
+    def check_process(self, params):
         raw = proc.Raw()
-        params = acq_params()
 
         bufs = buffers_random(params, 0, 255)
 
@@ -140,16 +145,17 @@ class TestAverageN(object):
         proc.AverageN(-1)
 
     def test_process(self):
-        n_vals = [1,2,16]
+        yield self.check_process, acq_params()
+
+    def check_process(self, params):
+        n_vals = [1, 2, 16]
 
         for val in n_vals:
-            yield self.check_process_for_n_val, val
+            yield self.check_process_for_n_val, val, params
 
-    def check_process_for_n_val(self, n_val):
+    def check_process_for_n_val(self, n_val, params):
 
         ave_n = proc.AverageN(n_val)
-
-        params = acq_params()
 
         bufs = buffers_random(params, 0, 255)
 
