@@ -5,6 +5,8 @@ cimport numpy as np
 
 import multiprocessing as mp
 
+import params
+
 from processor import BufferProcessor
 
 # C wrapper class to represent an Alazar digitizer
@@ -501,6 +503,8 @@ cdef class Alazar(object):
         ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)
         _check_return_code(ret_code,"Failed to abort acquisition:")
 
+# end of Alazar() class definition
+
 # helper function for processing
 def _reshape_buffer(buf, chan, acq_params):
     """Reshape a buffer from linear into n_records x m_samples."""
@@ -510,7 +514,7 @@ def _reshape_buffer(buf, chan, acq_params):
                       acq_params.samples_per_record)
     return chan_dat
 
-# end of Alazar() class definition
+
 
 def _process_buffers(buf_queue,
                     comm,
@@ -627,7 +631,7 @@ def channels(board_type):
     board_type can be the numerical ID or the string "ATS####"
     """
     if is_9870(board_type) or is_9360(board_type):
-        return {"A":1,"B":2}
+        return params.channels
     else:
         AlazarException("Could not get channels for board type " + str(board_type))
 
@@ -637,9 +641,7 @@ def trigger_sources(board_type):
     board_type can be the numerical ID or the string "ATS####"
     """
     if is_9870(board_type) or is_9360(board_type):
-        return {"A":0x0,
-                "B":0x1,
-                "ext":0x2}
+        return params.trig_sources
     else:
         AlazarException("Could not get trigger sources for board type " + str(board_type))
 
@@ -649,12 +651,8 @@ def clock_sources(board_type):
     board_type can be the numerical ID or the string "ATS####"
     At present, only the ATS9870 and ATS9360 are supported.
     """
-    if (board_type == 13 or board_type == "ATS9870" or
-        board_type == 25 or board_type == "ATS9360"):
-        return {"internal":1,
-                "external slow":4,
-                "external fast":5,
-                "external 10 MHz ref":7}
+    if is_9870(board_type) or is_9360(board_type):
+        return params.clock_sources
     else:
         raise AlazarException("Could not get clock sources for board type " + str(board_type))
 
@@ -666,52 +664,9 @@ def sample_rates(board_type):
     At present, only the ATS9870 and ATS9360 are supported.
     """
     if is_9870(board_type):
-        return {"1 kS/s": 0x1,
-                "2 kS/s": 0x2,
-                "5 kS/s": 0x4,
-                "10 kS/s": 0x8,
-                "20 kS/s": 0xA,
-                "50 kS/s": 0xC,
-                "100 kS/s": 0xE,
-                "200 kS/s": 0x10,
-                "500 kS/s": 0x12,
-                "1 MS/s": 0x14,
-                "2 MS/s": 0x18,
-                "5 MS/s": 0x1A,
-                "10 MS/s": 0x1C,
-                "20 MS/s": 0x1E,
-                "50 MS/s": 0x22,
-                "100 MS/s": 0x24,
-                "250 MS/s": 0x2B,
-                "500 MS/s": 0x30,
-                "1 GS/s": 0x35,
-                "user-defined": 0x40,
-                "10 MHz ref": 1000000000}
+        return params.sample_rates_9870
     elif is_9360(board_type):
-        return {"1 kS/s": 0x1,
-                "2 kS/s": 0x2,
-                "5 kS/s": 0x4,
-                "10 kS/s": 0x8,
-                "20 kS/s": 0xA,
-                "50 kS/s": 0xC,
-                "100 kS/s": 0xE,
-                "200 kS/s": 0x10,
-                "500 kS/s": 0x12,
-                "1 MS/s": 0x14,
-                "2 MS/s": 0x18,
-                "5 MS/s": 0x1A,
-                "10 MS/s": 0x1C,
-                "20 MS/s": 0x1E,
-                "50 MS/s": 0x22,
-                "100 MS/s": 0x24,
-                "200 MS/s": 0x28,
-                "500 MS/s": 0x30,
-                "800 MS/s": 0x32,
-                "1 GS/s": 0x35,
-                "1.2 GS/s": 0x37,
-                "1.5 GS/s": 0x3A,
-                "1.8 GS/s": 0x3D,
-                "user-defined": 0x40}
+        return params.sample_rates_9360
     else:
         raise AlazarException("Could not get sample rates for board type " + str(board_type))
 
@@ -723,14 +678,9 @@ def ranges(board_type):
     At present, only the ATS9870 and ATS9360 are supported.
     """
     if is_9870(board_type):
-        return {"40 mV": 0x2,
-                "100 mV": 0x5,
-                "200 mV": 0x6,
-                "400 mV": 0x7,
-                "1 V": 0xA,
-                "2 V": 0xB}
+        return params.ranges_9870
     elif is_9360(board_type):
-        return {"400 mV": 0x7}
+        return params.ranges_9360
     else:
         raise AlazarException("Could not get input ranges for board type " + str(board_type))
 
@@ -741,10 +691,9 @@ def input_couplings(board_type):
     At present, only the ATS9870 and ATS9360 are supported.
     """
     if is_9870(board_type):
-        return {"ac": 1,
-                "dc": 2}
+        return params.couplings_9870
     elif is_9360(board_type):
-        return {"dc": 2}
+        return params.couplings_9360
     else:
         raise AlazarException("Could not get input couplings for board type " + str(board_type))
 
@@ -756,10 +705,10 @@ def ext_trig_range(board_type):
     The SDK guide does specify which ranges are valid for which board.
     """
     if is_9870(board_type):
-        return {"5 V": 0,}
+        return params.trig_ranges_9870
     elif is_9360(board_type):
-        return {"2.5 V": 0x3,
-                "TTL": 0x2}
+        return params.trig_ranges_9360
+
     else:
         raise AlazarException("Could not get trigger input ranges for board type " + str(board_type))
 
