@@ -66,4 +66,4 @@ Specifically, when we define the Extension that we pass to cythonize(),
 the library name (the first parameter passed to Extension) MUST be the same as the .pyx file or something goes horribly wrong with linking.
 
 To compile, from the directory alazar/ run the command
-python.exe setup.py build_ext --inplace --compiler=msvc
+```python.exe setup.py build_ext --inplace --compiler=msvc```
