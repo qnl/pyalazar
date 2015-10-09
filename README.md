@@ -1,6 +1,6 @@
 # pyalazar
 
-Native Python api for Alazar Technologies fast digitizer modules.
+Native Python api for Alazar Technologies GS/s digitizer modules.
 
 This package currently supports the ATS-9870 and the ATS-9360.
 
