@@ -57,13 +57,14 @@ There were a couple of very particular details in setup.py that turn out to be c
 
 Specifically, when we define the Extension that we pass to cythonize(),
 
-        hello = Extension('alazar_hello_world',
-                          sources = ['alazar_hello_world.pyx'],
-                          include_dirs = ['C:\\AlazarTech\\ATS-SDK\\6.2.0\\Samples\\Include'],
-                          libraries = ['ATSApi'],
-                          library_dirs = ['C:\\AlazarTech\\ATS-SDK\\6.2.0\\Samples\\Library\\x64'],)
+    hello = Extension('alazar_hello_world',
+                      sources = ['alazar_hello_world.pyx'],
+                      include_dirs = ['C:\\AlazarTech\\ATS-SDK\\6.2.0\\Samples\\Include'],
+                      libraries = ['ATSApi'],
+                      library_dirs = ['C:\\AlazarTech\\ATS-SDK\\6.2.0\\Samples\\Library\\x64'],)
 
 the library name (the first parameter passed to Extension) MUST be the same as the .pyx file or something goes horribly wrong with linking.
 
-To compile, from the directory alazar/ run the command
+To compile, from the directory ```alazar/``` run the command
+
 ```python.exe setup.py build_ext --inplace --compiler=msvc```
