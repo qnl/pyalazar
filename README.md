@@ -8,6 +8,10 @@ This package currently supports the ATS-9870 and the ATS-9360.
 
 The core of the package is board.pyx, defining the Python api which will be compiled by Cython.
 
+The actual Cython wrapping of the C API is specified in c_alazar_api.pxd
+
+Data processing modules which interpret the raw digitizer data are defined in processor.py
+
 To enable data processing to keep up with the very high data acquisition rates achieved by these digitizers, the tasks of draining the digitizer memory buffers and actually processing the data are handled in two separate processes using the multiprocessing module.  Board buffers are emptied into a processing queue which is drained by the data processing process, passing each buffer to the set of data processing objects.  At the end of the acquisition, these processors are passed back to the main process and returned to the caller.
 
 ##Tests
