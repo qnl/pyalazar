@@ -18,7 +18,6 @@ This module defines various buffer processors for Alazar acquisitions,
 as well as their companion future object to get their result."""
 
 import numpy as np
-import h5py as h5
 
 # base class for buffer processors
 class BufferProcessor(object):
