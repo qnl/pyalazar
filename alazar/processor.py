@@ -16,7 +16,7 @@ class BufferProcessor(object):
     processor should store the error internally and ignore further input,
     ensuring that processors running in parallel are not interrupted.
     If an error does occur, the processor should re-raise the error when it
-    is queried for it's result.
+    is queried for its result.
 
     initialize is called at the start of the acquisition.
     process is the function called with each individual buffer.
