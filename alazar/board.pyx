@@ -615,7 +615,7 @@ def channels(board_type):
     if is_9870(board_type) or is_9360(board_type):
         return params.channels
     else:
-        AlazarException("Could not get channels for board type " + str(board_type))
+        raise AlazarException("Could not get channels for board type " + str(board_type))
 
 def trigger_sources(board_type):
     """Get the dictionary of trigger sources.
@@ -625,7 +625,7 @@ def trigger_sources(board_type):
     if is_9870(board_type) or is_9360(board_type):
         return params.trig_sources
     else:
-        AlazarException("Could not get trigger sources for board type " + str(board_type))
+        raise AlazarException("Could not get trigger sources for board type " + str(board_type))
 
 def clock_sources(board_type):
     """Get the dictionary of valid clock sources for this board type.
