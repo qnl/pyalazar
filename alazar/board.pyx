@@ -22,9 +22,13 @@ cdef class Alazar(object):
     def __cinit__(self, systemID, boardID):
         """Initialize a new Alazar digitizer wrapper.
 
-        systemID and boardID identify which board to wrap.
-        raises an AlazarException if the board cannot be connected to or identified.
-        Ideally, do not construct more than one wrapper to a board simultaneously.
+        Constructing more than one wrapper to a board at once is not recommended.
+
+        Args:
+            systemID, boardID: numeric IDs for board and system to wrap.
+
+        Raises:
+            AlazarException if the board cannot be connected to or identified.
         """
         self.board = c_alazar_api.AlazarGetBoardBySystemID(systemID,boardID)
         if self.board is NULL:
@@ -45,23 +49,25 @@ cdef class Alazar(object):
     def setup_capture_clock(self, clock_source, sample_rate, decimation=0, edge="rising"):
         """Set the capture clock for this alazar board.
 
-        clock_source is the name of a valid clock source for this board
-        sample_rate is the name of a valid sample rate for this board, or the numeric sample
-            rate in MHz for the case of 9360 10 MHz PLL clock
-        for 9870, if clock_source is not "internal", sample_rate is ignored
-        for clock_source = "external 10 MHz ref":
-            for 9870: decimation determines the sample clock as 1 GHz / decimation,
-                with decimination equal to 1, 2, 4, or a multiple of 10.
-            for 9360: decimation is ignored, sample_rate determines the sample clock
-        edge = "rising" or "falling" determines whether the alazar sample clock
-            triggers on the rising or falling edge of the reference clock
-
-        Raises an AlazarException for invalid parameters, or if the set clock call fails.
-
         The logic of this function is presently hardwired for the ATS9870 and ATS9360.
         Extending to other models will require modifying this function.
-        """
 
+        Args:
+            clock_source (str): the name of a valid clock source for this board
+            sample_rate (str): the name of a valid sample rate for this board, or the numeric sample
+                rate in MHz for the case of 9360 10 MHz PLL clock
+                For the 9870, if clock_source is not "internal", sample_rate is ignored
+            decimation:
+                for clock_source = "external 10 MHz ref":
+                for 9870: decimation determines the sample clock as 1 GHz / decimation,
+                    with decimination equal to 1, 2, 4, or a multiple of 10.
+                for 9360: decimation is ignored, sample_rate determines the sample clock
+            edge = {"rising", "falling"} determines whether the alazar sample clock
+                triggers on the rising or falling edge of the reference clock
+
+        Raises:
+            AlazarException for invalid parameters, or if the set clock call fails.
+        """
         # validate edge
         if edge == "rising":
             edge_code = 0
@@ -70,14 +76,11 @@ cdef class Alazar(object):
         else:
             raise AlazarException("Edge must be either 'rising' or 'falling'; supplied: '{}'".format(edge))
 
-
-
         # validate clock_source and get code
         try:
             source_code = clock_sources(self.board_type)[clock_source]
         except KeyError:
             raise AlazarException("Clock source '{}' is not valid.".format(clock_source))
-
 
         # validate sample_rate, decimation, and set the board
         if clock_source == "internal":
@@ -126,12 +129,15 @@ cdef class Alazar(object):
     def setup_input_channels(self, input_range, channel="all", coupling="dc", impedance="50ohm", bw="open"):
         """Set the input parameters for a digitizer channel.
 
-        If channel = "all", all available channels are set to the given parameters.
-        Otherwise, channel should be 'A', 'B', 'C', etc.  Defaults to "all".
-        couling is either "ac" or "dc", defaults to "dc"; 9360 only supports DC
-        range is a valid range string
-        impedance is optional as the ATS9870/ATS9360 are not switchable
-        bw is either "open" or "limit" to engage 20 MHz filter, default is "open"
+        Args:
+            input_range: a valid range string for this board
+            channel (str in {'all', 'A', 'B', 'C', etc.}): which channel to configure.
+                If channel = 'all', all available channels are set to the given parameters.
+                Otherwise, channel should be 'A', 'B', 'C', etc.  Defaults to 'all'.
+            couling (str in {'ac', 'dc'}): input coupling mode; 9360 only supports dc
+
+            impedance: presently optional as the ATS9870/ATS9360 are not switchable
+            bw (str in {'open', 'limit'}: 'limit' to engage 20 MHz filter, default is 'open'
         """
 
         # validate coupling
@@ -208,6 +214,7 @@ cdef class Alazar(object):
             trigger.
         This default is not compatible with the 9360; 9360 users must specify a range if
             using an external trigger.
+
         Args:
             source_channel (str): A named channel 'A', 'B', or 'ext' to use the external input
             slope (str): "rising" or "falling"
@@ -220,7 +227,7 @@ cdef class Alazar(object):
                 or a multiple of 8 for a 2-channel acquisition.
 
         Raises:
-            AlazarException
+            AlazarException for invalid inputs or a board error.
         """
 
         # validate source channel
@@ -325,7 +332,7 @@ cdef class Alazar(object):
                 for their result.
 
         Raises:
-            AlazarException is an acquisition error occurred.
+            AlazarException if an acquisition error occurred.
         """
 
         # validate inputs
@@ -502,7 +509,6 @@ cdef class Alazar(object):
         gotten stuck in DmaInProgress."""
         ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)
         _check_return_code(ret_code,"Failed to abort acquisition:")
-
 # end of Alazar() class definition
 
 # helper function for processing
@@ -513,8 +519,6 @@ def _reshape_buffer(buf, chan, acq_params):
     chan_dat.shape = (acq_params.records_per_buffer,
                       acq_params.samples_per_record)
     return chan_dat
-
-
 
 def _process_buffers(buf_queue,
                     comm,
@@ -561,7 +565,6 @@ def _process_buffers(buf_queue,
     # done with buffer processing
 
 
-
 class _AcqParams(object):
     """Helper object to pass around acquisition parameters to workers and processors."""
     def __init__(self,
@@ -580,7 +583,6 @@ class _AcqParams(object):
 
         self.dtype = dtype
 
-
 def get_systems_and_boards():
     """Return a dict of the number of boards in each Alazar system detected.
 
@@ -594,8 +596,11 @@ def get_systems_and_boards():
 
 
 # --- Exception and error handling for Alazar boards
+
+
 class AlazarException(Exception):
     pass
+
 
 def _check_return_code(return_code, msg):
     """Check an Alazar return code for success.
@@ -606,7 +611,6 @@ def _check_return_code(return_code, msg):
     if return_code != 512:
         raise AlazarException(msg + " " + _return_code_to_string(return_code))
 
-
 def _check_return_code_processing(return_code, msg, buf_queue):
     """Check an Alazar return code for success and send error to processor."""
     try:
@@ -614,7 +618,6 @@ def _check_return_code_processing(return_code, msg, buf_queue):
     except AlazarException as err:
         buf_queue.put(None, err)
         raise err
-
 
 def _return_code_to_string(return_code):
     """Convert a Alazar return code to a string.
@@ -656,7 +659,6 @@ def clock_sources(board_type):
     else:
         raise AlazarException("Could not get clock sources for board type " + str(board_type))
 
-
 def sample_rates(board_type):
     """Get the dictionary of valid sample rates for this board type.
 
@@ -669,7 +671,6 @@ def sample_rates(board_type):
         return params.sample_rates_9360
     else:
         raise AlazarException("Could not get sample rates for board type " + str(board_type))
-
 
 def ranges(board_type):
     """Get the dictionary of valid range names.
@@ -735,8 +736,6 @@ def _check_decimation(board_type, decimation):
     else:
         return False
 
-
-#
 def _check_buffer_alignment(board_type, n_samples):
     """Check the record length for minimum length and buffer alignment.
 
@@ -758,7 +757,6 @@ def _check_buffer_alignment(board_type, n_samples):
         raise AlazarException("Minimum record length is {}. Provided: {}".format(min_record_size,n_samples))
     elif n_samples % buffer_alignment != 0:
         raise AlazarException("Sample size must be a multiple of {}. Provided: {}".format(buffer_alignment, n_samples))
-
 
 # build the channel mask
 # channels interface will require refactoring to support boards with
