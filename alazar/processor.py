@@ -64,7 +64,6 @@ class BufferProcessor(object):
 
 class Raw(BufferProcessor):
     """Simple processor to return the raw acquisition data."""
-
     def __init__(self):
         super(Raw, self).__init__()
         self.dat_bufs = None
@@ -72,7 +71,6 @@ class Raw(BufferProcessor):
     def initialize(self, params):
         """Initialize the data buffer."""
         super(Raw, self).initialize(params)
-
         # create list of channel buffers to store the data
         # initial shape is 1D for simplicity
         self.dat_bufs = [np.empty((params.records_per_acquisition, params.samples_per_record,),
@@ -100,7 +98,6 @@ class Raw(BufferProcessor):
 
 class Average(BufferProcessor):
     """Simple processor to average all buffers together."""
-
     def __init__(self):
         super(Average, self).__init__()
         self.ave_bufs = None
@@ -108,26 +105,21 @@ class Average(BufferProcessor):
     def initialize(self, params):
         """Initialize the averaging buffer."""
         super(Average, self).initialize(params)
-
         # create list of channel buffers to sum the results
         self.ave_bufs = [np.zeros((params.samples_per_record,), np.float)
                          for _ in range(params.channel_count)]
 
     def process(self, chan_bufs, buf_num):
         """Average the channel records together and add them to the averaging buffer."""
-
         if self.error:
             return
-
         for (chan_buf, ave_buf) in zip(chan_bufs, self.ave_bufs):
             ave_buf += np.sum(chan_buf,axis=0, dtype=np.int64)
 
     def post_process(self):
         """Normalize the averages."""
-
         if self.error:
             return
-
         for ave_buf in self.ave_bufs:
             ave_buf /= self.params.records_per_acquisition
 
@@ -155,55 +147,44 @@ class AverageN(BufferProcessor):
                 return an error condition.
         """
         super(AverageN, self).__init__()
-
         if n_rec_types < 1:
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
-
         self.ave_bufs = None
         self.n_rec_types = n_rec_types
 
     def initialize(self, params):
         """Initialize the averaging buffers."""
         super(AverageN, self).initialize(params)
-
         if params.records_per_acquisition % self.n_rec_types != 0:
             self.error = ProcessorException("Records per acquisition ({}) must be a"
                                             " multiple of n_rec_types ({})"
                                             .format(params.records_per_acquisition,
                                                     self.n_rec_types))
             return
-
         # create list of channel buffers to sum the results
         self.ave_bufs = [np.zeros((self.n_rec_types,params.samples_per_record,), np.float)
                          for _ in range(params.channel_count)]
 
     def process(self, chan_bufs, buf_num):
         """Average the channel records together and add them to the averaging buffers."""
-
         if self.error:
             return
-
         # figure out what the type of the first record in the buffer is
         first_rec_type = (buf_num*self.params.records_per_buffer) % self.n_rec_types
 
         for (chan_buf, ave_buf) in zip(chan_bufs, self.ave_bufs):
             for rec_type in range(self.n_rec_types):
-
                 # calculate the offset needed to index the channel buffer into this record type
                 offset = (rec_type + first_rec_type) % self.n_rec_types
-
                 # if records_per_buffer is less than n_rec_types this record may lack this type
                 if offset < self.params.records_per_buffer:
-
                     ave_buf[rec_type] += np.sum(chan_buf[offset::self.n_rec_types], axis=0, dtype=np.int64)
 
     def post_process(self):
         """Normalize the averages."""
-
         if self.error:
             return
-
         # normalize by the total number of each record type collected
         for ave_buf in self.ave_bufs:
             ave_buf /= (self.params.records_per_acquisition / self.n_rec_types)
@@ -236,69 +217,52 @@ class Chunk(BufferProcessor):
             stop (int): The sample number at the end of the chunk (exclusive).
         """
         super(Chunk, self).__init__()
-
         if n_rec_types < 1:
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
-
         if start < 0 or start >= stop:
             raise ProcessorException("Invalid start ({}) and stop ({}) parameters."
                                      .format(start, stop))
-
         self.n_rec_types = n_rec_types
-
         self.start = start
         self.stop = stop
 
     def initialize(self, params):
         """Initialize the data array."""
         super(Chunk, self).initialize(params)
-
         if params.records_per_acquisition % self.n_rec_types != 0:
             self.error = ProcessorException("Records per acquisition ({}) must be a"
                                             " multiple of n_rec_types ({})"
                                             .format(params.records_per_acquisition,
                                                     self.n_rec_types))
             return
-
         if self.stop > params.samples_per_record:
             self.error = ProcessorException("Chunk stop ({}) is greater than "
                                             "samples per record ({})"
                                             .format(self.stop,
                                                     params.samples_per_record))
-
         self.chunk_bufs = [np.empty((params.records_per_acquisition,), dtype=np.float)
                            for _ in range(params.channel_count)]
 
     def process(self, chan_bufs, buf_num):
         """Collect all of the chunks."""
-
         if self.error:
             return
-
         recs_per_buf = self.params.records_per_buffer
-
         rec_offset = buf_num*recs_per_buf
-
-
         for (chan_buf, chunk_buf) in zip(chan_bufs, self.chunk_bufs):
-
                 chunk_buf_view = chunk_buf[rec_offset:rec_offset+recs_per_buf]
-
                 # integrate this chunk and put result into the data array
                 chunk_buf_view[:] = np.mean(chan_buf[:,self.start:self.stop], axis=1)
 
     def post_process(self):
         """Reshape the data into record types."""
-
         if self.error:
             return
-
         # reshape the linear buffer into (rec type, records) in place
         for chan, chunk_buf in enumerate(self.chunk_bufs):
             chunk_buf.shape = (self.params.records_per_acquisition / self.n_rec_types,
                                self.n_rec_types)
-
             self.chunk_bufs[chan] = np.swapaxes(chunk_buf,0,1)
 
     def get_result(self):
