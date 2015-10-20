@@ -688,7 +688,6 @@ def ext_trig_range(board_type):
         return params.trig_ranges_9870
     elif is_9360(board_type):
         return params.trig_ranges_9360
-
     else:
         raise AlazarException("Could not get trigger input ranges for board type " + str(board_type))
 
@@ -702,7 +701,6 @@ def _check_decimation(board_type, decimation):
     This function does not raise an exception.
     This function currently only supports the ATS9870.
     """
-
     if decimation >= max_decimation:
         return False
 
@@ -724,7 +722,6 @@ def _check_buffer_alignment(board_type, n_samples):
         # ATS9870: min record size is 256, n_samples must be a multiple of 64.
         min_record_size = 256
         buffer_alignment = 64
-
     elif is_9360(board_type):
         # ATS9360: min record size is 256, n_samples must be a multiple of 128.
         min_record_size = 256
@@ -755,7 +752,6 @@ def _make_channel_mask(board_type, channels):
     Returns a tuple with the channel mask and channel count.
     """
     if is_9870(board_type) or is_9360(board_type):
-
         if channels == "all":
             return (3,2)
         else:
@@ -764,7 +760,6 @@ def _make_channel_mask(board_type, channels):
             except KeyError:
                 raise AlazarException("Invalid channel selection: '{}'".format(channels))
             return (channel_mask,1)
-
     else:
         raise AlazarException("Could not make channel mask for board type {}.".format(board_type))
 
