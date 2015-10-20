@@ -32,11 +32,13 @@ cdef class Alazar(object):
         """
         self.board = c_alazar_api.AlazarGetBoardBySystemID(systemID,boardID)
         if self.board is NULL:
-            raise AlazarException("Could not connect to an Alazar board with system ID {}, board ID {}.".format(systemID,boardID))
+            raise AlazarException("Could not connect to an Alazar board with system ID {}"
+                                  ", board ID {}.".format(systemID,boardID))
 
         self.board_type = c_alazar_api.AlazarGetBoardKind(self.board)
         if self.board_type == 0:
-            raise AlazarException("Connected to board with system ID {}, board ID {}, but could not identify board!".format(systemID,boardID))
+            raise AlazarException("Connected to board with system ID {}, board ID {}, "
+                                  "but could not identify board!".format(systemID,boardID))
 
         self.systemID = systemID
         self.boardID = boardID
@@ -54,8 +56,8 @@ cdef class Alazar(object):
 
         Args:
             clock_source (str): the name of a valid clock source for this board
-            sample_rate (str): the name of a valid sample rate for this board, or the numeric sample
-                rate in MHz for the case of 9360 10 MHz PLL clock
+            sample_rate (str): the name of a valid sample rate for this board, or the
+                numeric sample rate in MHz for the case of 9360 10 MHz PLL clock
                 For the 9870, if clock_source is not "internal", sample_rate is ignored
             decimation:
                 for clock_source = "external 10 MHz ref":
@@ -74,7 +76,8 @@ cdef class Alazar(object):
         elif edge == "falling":
             edge_code = 1
         else:
-            raise AlazarException("Edge must be either 'rising' or 'falling'; supplied: '{}'".format(edge))
+            raise AlazarException("Edge must be either 'rising' or 'falling'; supplied: '{}'"
+                                  .format(edge))
 
         # validate clock_source and get code
         try:
@@ -92,41 +95,47 @@ cdef class Alazar(object):
                 raise AlazarException("Sample rate '{}' is not valid.".format(sample_rate))
 
             if sample_rate == "user-defined" or sample_rate == "10 MHz ref":
-                raise AlazarException("Internal clock requires an explicit sample rate; supplied: '{}'".format(sample_rate))
-
-            ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, 0)
+                raise AlazarException("Internal clock requires an explicit sample rate; "
+                                      "supplied: '{}'".format(sample_rate))
+            ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code,
+                                                          rate_code, edge_code, 0)
 
         elif clock_source == "external 10 MHz ref": # 10 MHz PLL
-
             if is_9870(self.board_type):
                 # validate the decimation parameter
                 if not _check_decimation(self.board_type, decimation):
-                    raise AlazarException("Invalid decimation '{}' for clock source '{}'.".format(decimation,clock_source))
+                    raise AlazarException("Invalid decimation '{}' for clock source '{}'."
+                                          .format(decimation,clock_source))
 
                 rate_code = sample_rates(self.board_type)["10 MHz ref"]
-                ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, decimation)
-
-
+                ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code,
+                                                              rate_code, edge_code, decimation)
             elif is_9360(self.board_type):
                 # validate sample rate
                 if sample_rate < 300 or sample_rate > 1800:
-                    raise AlazarException("Sample rate for 10 MHz ref must be between 300 MHz and 1800 MHz; supplied: {}".format(sample_rate))
+                    raise AlazarException("Sample rate for 10 MHz ref must be between 300 MHz and "
+                                          "1800 MHz; supplied: {}".format(sample_rate))
 
                 rate_code = sample_rate * 1000000
-                ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, 1)
-
+                ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code,
+                                                              rate_code, edge_code, 1)
             else:
-                raise AlazarException("Could not set clock source for board type {}".format(self.board_type))
-
+                raise AlazarException("Could not set clock source for board type {}"
+                                      .format(self.board_type))
         else: # external sample clock
             rate_code = sample_rates(self.board_type)["user-defined"]
-            ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code, rate_code, edge_code, 0)
+            ret_code = c_alazar_api.AlazarSetCaptureClock(self.board, source_code,
+                                                          rate_code, edge_code, 0)
 
         # raise exception if ret_code was an error
         _check_return_code(ret_code, "Set capture clock failed with code {}:".format(ret_code))
 
-
-    def setup_input_channels(self, input_range, channel="all", coupling="dc", impedance="50ohm", bw="open"):
+    def setup_input_channels(self,
+                             input_range,
+                             channel="all",
+                             coupling="dc",
+                             impedance="50ohm",
+                             bw="open"):
         """Set the input parameters for a digitizer channel.
 
         Args:
@@ -139,7 +148,6 @@ cdef class Alazar(object):
             impedance: presently optional as the ATS9870/ATS9360 are not switchable
             bw (str in {'open', 'limit'}: 'limit' to engage 20 MHz filter, default is 'open'
         """
-
         # validate coupling
         try:
             coupling_code = input_couplings(self.board_type)[coupling]
@@ -183,7 +191,6 @@ cdef class Alazar(object):
                 chan_code = channels(self.board_type)[channel]
             except KeyError:
                 raise AlazarException("Invalid channel: '{}'".format(channel))
-
             # impedance hard-coded to 50 ohm code
             ret_code = c_alazar_api.AlazarInputControl(self.board,
                                                        chan_code,
@@ -229,7 +236,6 @@ cdef class Alazar(object):
         Raises:
             AlazarException for invalid inputs or a board error.
         """
-
         # validate source channel
         try:
             source_code = trigger_sources(self.board_type)[source_channel]
@@ -242,7 +248,8 @@ cdef class Alazar(object):
         elif slope == "falling":
             slope_code = 2
         else:
-            raise AlazarException("Slope must be 'rising' or 'falling'; provided: '{}'".format(slope))
+            raise AlazarException("Slope must be 'rising' or 'falling'; "
+                                  "provided: '{}'".format(slope))
 
         # validate level
         if level < -1.0 or level > 1.0:
@@ -257,7 +264,8 @@ cdef class Alazar(object):
         elif ext_coupling == "dc":
             coupling_code = 2
         else:
-            raise AlazarException("External coupling must be 'ac' or 'dc'; provided: '{}'".format(ext_coupling))
+            raise AlazarException("External coupling must be 'ac' or 'dc'; provided: '{}'"
+                                  .format(ext_coupling))
 
         # validate external range
         try:
@@ -286,7 +294,6 @@ cdef class Alazar(object):
 
         # configure external trigger if using
         if source_channel == "ext":
-
             ret_code = c_alazar_api.AlazarSetExternalTrigger(self.board, coupling_code, range_code)
             _check_return_code(ret_code, "Error setting external trigger:")
 
@@ -334,20 +341,16 @@ cdef class Alazar(object):
         Raises:
             AlazarException if an acquisition error occurred.
         """
-
         # validate inputs
         if records_per_acquisition < 1:
             raise AlazarException("Records per acquisition must be at least 1.")
-
         if records_per_buffer < 1:
             raise AlazarException("Records per buffer must be at least 1.")
-
         if records_per_acquisition % records_per_buffer != 0:
             raise AlazarException("Records per acquisition must be a multiple of"
                                   "records per buffer. Provided: {} records, {} "
                                   "records per buffer.".format(records_per_acquisition,
                                                                records_per_buffer))
-
         # raises an exception if invalid number of samples
         _check_buffer_alignment(self.board_type, samples_per_record)
 
@@ -362,7 +365,6 @@ cdef class Alazar(object):
         # all input has been validated
 
         cdef int buffers_per_acquisition = records_per_acquisition / records_per_buffer
-
         cdef c_alazar_api.U8 bits_per_sample
         cdef c_alazar_api.U32 max_samples_per_channel
 
@@ -376,17 +378,14 @@ cdef class Alazar(object):
         bytes_per_record = bytes_per_sample * samples_per_record
         bytes_per_buffer = bytes_per_record * records_per_buffer * channel_count
 
-
         # set the record size
         ret_code = c_alazar_api.AlazarSetRecordSize(self.board, 0, samples_per_record)
         _check_return_code(ret_code,
                            "Set record size failed for {} samples:".format(samples_per_record))
-
         if bytes_per_sample <= 8:
             sample_type = np.uint8
         else:
             sample_type = np.uint16
-
         params = _AcqParams(samples_per_record,
                             records_per_acquisition,
                             records_per_buffer,
@@ -402,8 +401,8 @@ cdef class Alazar(object):
             autoDMA_flags = 0x00000001 | 0x00000200 | 0x00000800
             # third flag is ADMA_FIFO_ONLY_STREAMING
         else:
-            raise AlazarException("Could not make autoDMA flag for board type {}".format(self.board_type))
-
+            raise AlazarException("Could not make autoDMA flag for board type {}"
+                                  .format(self.board_type))
         ret_code = c_alazar_api.AlazarBeforeAsyncRead(self.board,
                                                       channel_mask,
                                                       0,
@@ -412,14 +411,10 @@ cdef class Alazar(object):
                                                       records_per_acquisition,
                                                       autoDMA_flags)
         _check_return_code(ret_code,"Setup NPT AutoDMA acquisition failed:")
-
-
         # get a queue to send buffers to the buffer processor
         buf_queue = mp.Queue()
-
         # get a queue to receive messages back from the processors
         comm = mp.Queue()
-
         # start a buffer processor to do the acquisition:
         buf_processor = mp.Process(target = _process_buffers,
                                    args = (buf_queue,
@@ -427,7 +422,6 @@ cdef class Alazar(object):
                                            processors,
                                            params,))
         buf_processor.start()
-
         # enure that from this point on, if we throw any exceptions we send them
         # to the processor or it will never return
 
@@ -435,17 +429,14 @@ cdef class Alazar(object):
         # indexing this will cost a Python overhead, but this probably isn't important
         # these are refcounted so we don't need to manually manage their memory
         cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type) for n in range(buffer_count)]
-
         # make a list of the address of each buffer to pass to the digitizer
         cdef list buffer_addresses = []
-
         # make a Cython memoryview of each buffer and add it to the list
         # get a C pointer to the buffer with the syntax &buf_vew[0]
         cdef unsigned char[:] buf_view
         for buf in buffers:
             buf_view = buf
             buffer_addresses.append(buf_view)
-
         # preallocate all of the c variables
         cdef int buf_num
         cdef int buffer_index
@@ -457,48 +448,41 @@ cdef class Alazar(object):
                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
                                                               &buf_view[0],
                                                               bytes_per_buffer)
-
                 _check_return_code_processing(ret_code,
                                               "Failed to send buffer address to board:",
                                               buf_queue)
-
-
             # arm the board
             ret_code = c_alazar_api.AlazarStartCapture(self.board)
             _check_return_code_processing(ret_code,
                                           "Failed to start capture:",
                                           buf_queue)
-
             # handle each buffer
             for buf_num in range(buffers_per_acquisition):
                 buffer_index = buf_num % buffer_count
-
                 buf_view = buffer_addresses[buffer_index]
-
-                ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board, &buf_view[0], timeout)
+                ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+                                                                      &buf_view[0],
+                                                                      timeout)
                 _check_return_code_processing(ret_code,
                                               "Wait for buffer complete failed on buffer {}:"
                                               .format(buf_num),
                                               buf_queue)
-
                 # pickles the buffer and sends to the worker
                 buf_queue.put( (buffers[buffer_index], None) )
-
                 # hand the buffer back to the board
-                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board, &buf_view[0], bytes_per_buffer)
+                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+                                                              &buf_view[0],
+                                                              bytes_per_buffer)
                 _check_return_code_processing(ret_code,
-                                              "Failed to send buffer address back to board during acquisition:",
+                                              "Failed to send buffer address back "
+                                              "to board during acquisition:",
                                               buf_queue)
             # done with acquisition
         finally:
             # make sure we abort the acquisition so the board doesn't get stuck
             self._abort_acquisition()
-
         # get the processors and return them
         return comm.get()
-
-
-
 
     def _abort_acquisition(self):
         """Command the board to abort a running acquisition.
@@ -553,15 +537,12 @@ def _process_buffers(buf_queue,
         for proc in processors:
             proc.process(chan_bufs, buf_num)
             # TODO: exception handling for processor failure?
-
     # acquisition was successful, do post-processing
     if not failure:
         for proc in processors:
             proc.post_process()
-
     # send the finished processors back
     comm.put(processors)
-
     # done with buffer processing
 
 
@@ -580,7 +561,6 @@ class _AcqParams(object):
         self.samples_per_buffer = samples_per_record * records_per_buffer * channel_count
         self.channel_chunk_size = samples_per_record * records_per_buffer
         self.buffers_per_acquisition = records_per_acquisition / records_per_buffer
-
         self.dtype = dtype
 
 def get_systems_and_boards():
@@ -591,7 +571,6 @@ def get_systems_and_boards():
     n_b = {}
     for s in range(n_sys):
         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)
-
     return n_b
 
 
@@ -751,12 +730,15 @@ def _check_buffer_alignment(board_type, n_samples):
         min_record_size = 256
         buffer_alignment = 128
     else:
-        raise AlazarException("Could not validate record length for board type {}.".format(board_type))
+        raise AlazarException("Could not validate record length for board type {}."
+                              .format(board_type))
 
     if n_samples < min_record_size:
-        raise AlazarException("Minimum record length is {}. Provided: {}".format(min_record_size,n_samples))
+        raise AlazarException("Minimum record length is {}. Provided: {}"
+                              .format(min_record_size,n_samples))
     elif n_samples % buffer_alignment != 0:
-        raise AlazarException("Sample size must be a multiple of {}. Provided: {}".format(buffer_alignment, n_samples))
+        raise AlazarException("Sample size must be a multiple of {}. Provided: {}"
+                              .format(buffer_alignment, n_samples))
 
 # build the channel mask
 # channels interface will require refactoring to support boards with
