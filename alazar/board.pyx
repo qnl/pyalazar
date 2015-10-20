@@ -493,6 +493,8 @@ cdef class Alazar(object):
         gotten stuck in DmaInProgress."""
         ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)
         _check_return_code(ret_code,"Failed to abort acquisition:")
+
+
 # end of Alazar() class definition
 
 # helper function for processing
@@ -509,18 +511,15 @@ def _process_buffers(buf_queue,
                     processors,
                     acq_params,):
     """Process buffers from the board."""
-
     # initialize the buffer processors
     for processor in processors:
         processor.initialize(acq_params)
-
     failure = False
 
     # loop over all the buffers we expect to receive
     for buf_num in range(acq_params.buffers_per_acquisition):
         # get the next buffer from the queue
         (buf, err) = buf_queue.get()
-
         # check for error condition
         if err is not None:
             # tell the data processors to abort
@@ -529,11 +528,9 @@ def _process_buffers(buf_queue,
             failure = True
             # end processing
             break
-
         # reshape the buffer
         chan_bufs = [_reshape_buffer(buf, chan, acq_params)
                      for chan in range(acq_params.channel_count)]
-
         for proc in processors:
             proc.process(chan_bufs, buf_num)
             # TODO: exception handling for processor failure?
