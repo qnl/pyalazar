@@ -86,13 +86,13 @@ class Raw(BufferProcessor):
         super(Raw, self).__init__()
         self.dat_bufs = None
 
-    def initialize(self, params):
+    def initialize_proc(self, params):
         """Initialize the data buffer."""
         # create list of channel buffers to store the data
         # initial shape is 1D for simplicity
         self.dat_bufs = [np.empty((params["records_per_acquisition"], params["samples_per_record"]),
-                                  params"dtype"],)
-                         for _ in range(params["channel_count"])
+                                  params["dtype"],)
+                         for _ in range(params["channel_count"])]
 
     def process(self, chan_bufs, buf_num):
         """Dump the buffer into the data buffer."""
@@ -119,7 +119,7 @@ class Average(BufferProcessor):
         super(Average, self).__init__()
         self.ave_bufs = None
 
-    def initialize(self, params):
+    def initialize_proc(self, params):
         """Initialize the averaging buffer."""
         # create list of channel buffers to sum the results
         self.ave_bufs = [np.zeros((params["samples_per_record"],), np.float)
@@ -169,7 +169,7 @@ class AverageN(BufferProcessor):
         self.ave_bufs = None
         self.n_rec_types = n_rec_types
 
-    def initialize(self, params):
+    def initialize_proc(self, params):
         """Initialize the averaging buffers."""
         if params["records_per_acquisition"] % self.n_rec_types != 0:
             self.error = ProcessorException("Records per acquisition ({}) must be a"
@@ -242,7 +242,7 @@ class Chunk(BufferProcessor):
         self.start = start
         self.stop = stop
 
-    def initialize(self, params):
+    def initialize_proc(self, params):
         """Initialize the data array."""
         if params["records_per_acquisition"] % self.n_rec_types != 0:
             self.error = ProcessorException("Records per acquisition ({}) must be a"
