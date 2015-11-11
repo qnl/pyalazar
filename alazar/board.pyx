@@ -400,7 +400,7 @@ cdef class Alazar(object):
             sample_type = np.uint8
         else:
             sample_type = np.uint16
-        params = _AcqParams(samples_per_record,
+        params = acq_params(samples_per_record,
                             records_per_acquisition,
                             records_per_buffer,
                             channel_count,
@@ -514,10 +514,10 @@ cdef class Alazar(object):
 # helper function for processing
 def _reshape_buffer(buf, chan, acq_params):
     """Reshape a buffer from linear into n_records x m_samples."""
-    chunk_size = acq_params.channel_chunk_size
+    chunk_size = acq_params["channel_chunk_size"]
     chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
-    chan_dat.shape = (acq_params.records_per_buffer,
-                      acq_params.samples_per_record)
+    chan_dat.shape = (acq_params["records_per_buffer"],
+                      acq_params["samples_per_record"])
     return chan_dat
 
 def _process_buffers(buf_queue,
@@ -531,7 +531,7 @@ def _process_buffers(buf_queue,
     failure = False
 
     # loop over all the buffers we expect to receive
-    for buf_num in range(acq_params.buffers_per_acquisition):
+    for buf_num in range(acq_params["buffers_per_acquisition"]):
         # get the next buffer from the queue
         (buf, err) = buf_queue.get()
         # check for error condition
@@ -544,7 +544,7 @@ def _process_buffers(buf_queue,
             break
         # reshape the buffer
         chan_bufs = [_reshape_buffer(buf, chan, acq_params)
-                     for chan in range(acq_params.channel_count)]
+                     for chan in range(acq_params["channel_count"])
         for proc in processors:
             proc.process(chan_bufs, buf_num)
             # TODO: exception handling for processor failure?
@@ -556,23 +556,20 @@ def _process_buffers(buf_queue,
     comm.put(processors)
     # done with buffer processing
 
-
-class _AcqParams(object):
-    """Helper object to pass around acquisition parameters to workers and processors."""
-    def __init__(self,
-                 samples_per_record,
-                 records_per_acquisition,
-                 records_per_buffer,
-                 channel_count,
-                 dtype):
-        self.samples_per_record = samples_per_record
-        self.records_per_acquisition = records_per_acquisition
-        self.records_per_buffer = records_per_buffer
-        self.channel_count = channel_count
-        self.samples_per_buffer = samples_per_record * records_per_buffer * channel_count
-        self.channel_chunk_size = samples_per_record * records_per_buffer
-        self.buffers_per_acquisition = records_per_acquisition / records_per_buffer
-        self.dtype = dtype
+def acq_params(samples_per_record,
+               records_per_acquisition,
+               records_per_buffer,
+               channel_count,
+               dtype):
+    """Return a dictionary containing useful acquisition parameters."""
+    return dict(samples_per_record=samples_per_record,
+                records_per_acquisition = records_per_acquisition,
+                records_per_buffer = records_per_buffer,
+                channel_count = channel_count,
+                samples_per_buffer = samples_per_record * records_per_buffer * channel_count,
+                channel_chunk_size = samples_per_record * records_per_buffer,
+                buffers_per_acquisition = records_per_acquisition / records_per_buffer,
+                dtype = dtype)
 
 def get_systems_and_boards():
     """Return a dict of the number of boards in each Alazar system detected.

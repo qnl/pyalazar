@@ -14,18 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import alazar.processor as proc
 from alazar.processor import ProcessorException
-from alazar.board import _AcqParams
+from alazar.board import acq_params
 
 from nose.tools import raises
 
 import numpy as np
 
 # some fake but realistic acquisition parameters
-def acq_params():
+def mock_acq_params():
 
     dtype = np.uint8
 
-    return _AcqParams(samples_per_record=1024,
+    return acq_params(samples_per_record=1024,
                       records_per_acquisition=128,
                       records_per_buffer=64,
                       channel_count=2,
@@ -33,21 +33,21 @@ def acq_params():
 
 # make a bunch of test buffers with the same value
 def buffers_same_val(params, value):
-    bufs = [[np.full((params.records_per_buffer, params.samples_per_record),
+    bufs = [[np.full((params["records_per_buffer"], params["samples_per_record"]),
                      value,
-                     dtype=params.dtype,)
-             for _ in range(params.channel_count)]
-            for _ in range(params.buffers_per_acquisition)]
+                     dtype=params["dtype"],)
+             for _ in range(params["channel_count"])]
+            for _ in range(params["buffers_per_acquisition"])]
     return bufs
 
 def buffers_random(params, min_val, max_val, seed=0):
     # seed the random number generator with a constant value
     np.random.seed(seed)
-    bufs = [[(np.random.rand(params.records_per_buffer,
-                             params.samples_per_record)*(max_val-min_val)+min_val
-             ).astype(params.dtype)
-             for _ in range(params.channel_count)]
-            for _ in range(params.buffers_per_acquisition)]
+    bufs = [[(np.random.rand(params["records_per_buffer"],
+                             params["samples_per_record"])*(max_val-min_val)+min_val
+             ).astype(params["dtype"])
+             for _ in range(params["channel_count"])]
+            for _ in range(params["buffers_per_acquisition"])]
     return bufs
 
 # --- Automatic tests for various basic functions of all processors ---
@@ -79,7 +79,7 @@ class TestAllProcessors(object):
 class TestAverage(object):
 
     def test_process(self):
-        yield self.check_process, acq_params()
+        yield self.check_process, mock_acq_params()
 
     def check_process(self, params):
 
@@ -91,7 +91,7 @@ class TestAverage(object):
 
         dat = ave.get_result()
 
-        for chan in range(params.channel_count):
+        for chan in range(params["channel_count"]):
             assert (bufs[chan][0] == dat[chan]).all()
 
         # test re-use of same processor with re-initializtion
@@ -107,7 +107,7 @@ class TestAverage(object):
 
         dat = ave.get_result()
 
-        for chan in range(params.channel_count):
+        for chan in range(params["channel_count"]):
 
             assert (chan_aves[chan] == dat[chan]).all()
 
@@ -116,7 +116,7 @@ class TestAverage(object):
 class TestRaw(object):
 
     def test_process(self):
-        yield self.check_process, acq_params()
+        yield self.check_process, mock_acq_params()
 
     def check_process(self, params):
         raw = proc.Raw()
@@ -129,7 +129,7 @@ class TestRaw(object):
 
         dat = raw.get_result()
 
-        for chan in range(params.channel_count):
+        for chan in range(params["channel_count"]):
             assert (raw_dat[chan] == dat[chan]).all()
 
 # --- tests for AverageN processor
@@ -139,8 +139,8 @@ class TestAverageN(object):
     @raises(ProcessorException)
     def test_total_records_not_divisible_by_n(self):
 
-        params = acq_params()
-        assert params.records_per_acquisition % 3 != 0
+        params = mock_acq_params()
+        assert params["records_per_acquisition"] % 3 != 0
 
         ave_n = proc.AverageN(3)
 
@@ -163,7 +163,7 @@ class TestAverageN(object):
         n_vals = [1, 2, 16]
 
         for val in n_vals:
-            yield self.check_process_for_n_val, val, acq_params()
+            yield self.check_process_for_n_val, val, mock_acq_params()
 
     def check_process_for_n_val(self, n_val, params):
 
@@ -173,8 +173,8 @@ class TestAverageN(object):
 
         raw_dat = bufs_to_raw_array(bufs, params)
 
-        correct_results = [np.empty((n_val, params.samples_per_record), np.float)
-                           for _ in range(params.channel_count)]
+        correct_results = [np.empty((n_val, params["samples_per_record"]), np.float)
+                           for _ in range(params["channel_count"])]
 
         # make the correct averaged data
         for rec_type in range(n_val):
@@ -193,8 +193,8 @@ class TestChunk(object):
 
     @raises(ProcessorException)
     def test_total_records_not_divisible_by_n(self):
-        params = acq_params()
-        assert params.records_per_acquisition % 3 != 0
+        params = mock_acq_params()
+        assert params["records_per_acquisition"] % 3 != 0
 
         chunk = proc.Chunk(3, 0, 1)
 
@@ -206,9 +206,9 @@ class TestChunk(object):
 
     @raises(ProcessorException)
     def test_chunk_stop_larger_than_rec_size(self):
-        params = acq_params()
+        params = mock_acq_params()
 
-        chunk = proc.Chunk(1, 0, params.samples_per_record + 1)
+        chunk = proc.Chunk(1, 0, params["samples_per_record"] + 1)
 
         bufs = buffers_same_val(params, 1)
 
@@ -220,7 +220,8 @@ class TestChunk(object):
         n_rec_types = [1, 2, 4, 16]
 
         for n_rec_type in n_rec_types:
-            yield self.check_process_for_n_rec_types_start_stop, n_rec_type, 0, 10, acq_params()
+            yield (self.check_process_for_n_rec_types_start_stop,
+                   n_rec_type, 0, 10, mock_acq_params())
 
     def check_process_for_n_rec_types_start_stop(self, n_rec_types, start, stop, params):
 
@@ -233,7 +234,7 @@ class TestChunk(object):
         chunked_dat = [np.mean(chan_dat[:,start:stop], axis=1) for chan_dat in raw_dat]
 
 
-        records_per_rec_type = params.records_per_acquisition / n_rec_types
+        records_per_rec_type = params["records_per_acquisition"] / n_rec_types
 
         correct_result = [np.empty((n_rec_types, records_per_rec_type), dtype=np.float) for _ in raw_dat]
         for (chan_dat, result_buf) in zip(chunked_dat, correct_result):
@@ -255,13 +256,13 @@ class TestChunk(object):
 
 def bufs_to_raw_array(bufs, params):
 
-    raw_dat = [np.empty((params.records_per_acquisition, params.samples_per_record),
-                        dtype=params.dtype) for _ in range(params.channel_count)]
+    raw_dat = [np.empty((params["records_per_acquisition"], params["samples_per_record"]),
+                        dtype=params["dtype"]) for _ in range(params["channel_count"])]
 
     for (buf_num, buf) in enumerate(bufs):
 
-        for chan in range(params.channel_count):
-            rec_p_buf = params.records_per_buffer
+        for chan in range(params["channel_count"]):
+            rec_p_buf = params["records_per_buffer"]
             raw_dat[chan][buf_num*rec_p_buf:(buf_num+1)*rec_p_buf][:] = buf[chan]
 
     return raw_dat
