@@ -273,7 +273,7 @@ def run_process(bufs, procs):
     procs can be a single processor or a list of processors.
     """
     for (buf_num, buf) in enumerate(bufs):
-        if type(procs) is list:
+        if isinstance(procs, list):
             for processor in procs:
                 processor.process(buf, buf_num)
         else:
@@ -281,7 +281,7 @@ def run_process(bufs, procs):
 
 def emulate_acq(params, bufs, procs):
     """Emulate the action of the acquire() function."""
-    is_list = type(procs) is list
+    is_list = isinstance(procs, list)
 
     if is_list:
         for processor in procs:
