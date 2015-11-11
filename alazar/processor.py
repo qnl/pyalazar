@@ -40,7 +40,8 @@ class BufferProcessor(object):
         up if this happens, and store and re-raise the acquisition error if it
         is later queried for its result.
     """
-    def __init__(self):
+    def __init__(self, name=None):
+        self.name = name
         self.params = None
         self.error = None
 
@@ -82,8 +83,8 @@ class BufferProcessor(object):
 
 class Raw(BufferProcessor):
     """Simple processor to return the raw acquisition data."""
-    def __init__(self):
-        super(Raw, self).__init__()
+    def __init__(self, name=None):
+        super(Raw, self).__init__(name)
         self.dat_bufs = None
 
     def initialize_proc(self, params):
@@ -115,8 +116,8 @@ class Raw(BufferProcessor):
 
 class Average(BufferProcessor):
     """Simple processor to average all buffers together."""
-    def __init__(self):
-        super(Average, self).__init__()
+    def __init__(self, name=None):
+        super(Average, self).__init__(name)
         self.ave_bufs = None
 
     def initialize_proc(self, params):
@@ -153,7 +154,7 @@ class AverageN(BufferProcessor):
         to contain one of each of the N types, in order.
     """
 
-    def __init__(self, n_rec_types):
+    def __init__(self, n_rec_types, name=None):
         """Create a new AverageN processor.
 
         Args:
@@ -162,7 +163,7 @@ class AverageN(BufferProcessor):
                 acquisition must be a multiple of this or this processor will
                 return an error condition.
         """
-        super(AverageN, self).__init__()
+        super(AverageN, self).__init__(name)
         if n_rec_types < 1:
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
@@ -219,7 +220,7 @@ class AverageN(BufferProcessor):
 
 class Chunk(BufferProcessor):
     """Processor to collect a chunk of N record types."""
-    def __init__(self, n_rec_types, start, stop):
+    def __init__(self, n_rec_types, start, stop, name=None):
         """Create a new Chunk processor.
 
         Args:
@@ -231,7 +232,7 @@ class Chunk(BufferProcessor):
             start (int): The sample number at the start of the chunk (inclusive).
             stop (int): The sample number at the end of the chunk (exclusive).
         """
-        super(Chunk, self).__init__()
+        super(Chunk, self).__init__(name)
         if n_rec_types < 1:
             raise ProcessorException("n_rec_types must be greater than 0."
                                      " Provided: {}".format(n_rec_types))
