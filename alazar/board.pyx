@@ -400,11 +400,11 @@ cdef class Alazar(object):
             sample_type = np.uint8
         else:
             sample_type = np.uint16
-        params = acq_params(samples_per_record,
-                            records_per_acquisition,
-                            records_per_buffer,
-                            channel_count,
-                            sample_type)
+        acq_params = acq_params(samples_per_record,
+                                records_per_acquisition,
+                                records_per_buffer,
+                                channel_count,
+                                sample_type)
 
         # configure the board to make an NPT AutoDMA acquisition
         # first flag is the value of ADMA_EXTERNAL_STARTCAPTURE
@@ -434,7 +434,7 @@ cdef class Alazar(object):
                                    args = (buf_queue,
                                            comm,
                                            processors,
-                                           params,))
+                                           acq_params,))
         buf_processor.start()
         # enure that from this point on, if we throw any exceptions we send them
         # to the processor or it will never return
