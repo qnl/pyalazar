@@ -544,7 +544,7 @@ def _process_buffers(buf_queue,
             break
         # reshape the buffer
         chan_bufs = [_reshape_buffer(buf, chan, acq_params)
-                     for chan in range(acq_params["channel_count"])
+                     for chan in range(acq_params["channel_count"])]
         for proc in processors:
             proc.process(chan_bufs, buf_num)
             # TODO: exception handling for processor failure?
