@@ -69,8 +69,6 @@ Specifically, when we define the Extension that we pass to cythonize(),
 
 the library name (the first parameter passed to Extension) MUST be the same as the .pyx file or something goes horribly wrong with linking.
 
-To compile, from the directory ```alazar/``` run the command
-
-```python.exe setup.py build_ext --inplace --compiler=msvc```
+Install the package as normal by running ```python setup.py install``` which will either re-compile the Cython code or default to using the already-Cython-compiled c code if Cython is not available.
 
 This assumes you have installed the Alazar SDK.  You may need to slightly modify the path to the library depending on which version of the SDK you installed and whether you are compiling for 32-bit or 64-bit python.
