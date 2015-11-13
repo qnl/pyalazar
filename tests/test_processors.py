@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import alazar.processor as proc
 from alazar.processor import ProcessorException
-from alazar.board import acq_params
+from alazar.board import def_acq_params
 
 from nose.tools import raises
 
@@ -25,11 +25,11 @@ def mock_acq_params():
 
     dtype = np.uint8
 
-    return acq_params(samples_per_record=1024,
-                      records_per_acquisition=128,
-                      records_per_buffer=64,
-                      channel_count=2,
-                      dtype=dtype)
+    return def_acq_params(samples_per_record=1024,
+                          records_per_acquisition=128,
+                          records_per_buffer=64,
+                          channel_count=2,
+                          dtype=dtype)
 
 # make a bunch of test buffers with the same value
 def buffers_same_val(params, value):

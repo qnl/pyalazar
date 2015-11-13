@@ -400,11 +400,11 @@ cdef class Alazar(object):
             sample_type = np.uint8
         else:
             sample_type = np.uint16
-        acq_params = acq_params(samples_per_record,
-                                records_per_acquisition,
-                                records_per_buffer,
-                                channel_count,
-                                sample_type)
+        acq_params = def_acq_params(samples_per_record,
+                                    records_per_acquisition,
+                                    records_per_buffer,
+                                    channel_count,
+                                    sample_type)
 
         # configure the board to make an NPT AutoDMA acquisition
         # first flag is the value of ADMA_EXTERNAL_STARTCAPTURE
@@ -556,11 +556,11 @@ def _process_buffers(buf_queue,
     comm.put(processors)
     # done with buffer processing
 
-def acq_params(samples_per_record,
-               records_per_acquisition,
-               records_per_buffer,
-               channel_count,
-               dtype):
+def def_acq_params(samples_per_record,
+                   records_per_acquisition,
+                   records_per_buffer,
+                   channel_count,
+                   dtype):
     """Return a dictionary containing useful acquisition parameters."""
     return dict(samples_per_record=samples_per_record,
                 records_per_acquisition = records_per_acquisition,
