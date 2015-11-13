@@ -19,9 +19,9 @@ cimport numpy as np
 
 import multiprocessing as mp
 
-import params
+from alazar import params
 
-from processor import BufferProcessor
+from alazar.processor import BufferProcessor
 
 # C wrapper class to represent an Alazar digitizer
 cdef class Alazar(object):
