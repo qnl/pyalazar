@@ -61,6 +61,8 @@ cdef class Alazar(object):
     def get_board_type(self):
         return self.board_type
 
+    def get_board_model(self):
+        return params.board_types[self.board_type]
 
     def setup_capture_clock(self, clock_source, sample_rate, decimation=0, edge="rising"):
         """Set the capture clock for this alazar board.

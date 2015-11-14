@@ -112,3 +112,8 @@ trig_ranges_9870 = {"5 V": 0}
 trig_ranges_9360 = OrderedDict()
 trig_ranges_9360.update({"2.5 V": 0x3,})
 trig_ranges_9360.update({"TTL": 0x2})
+
+# --- numeric board type keys ---
+
+board_types = {13: 'ATS9870',
+			   25: 'ATS9360',}
