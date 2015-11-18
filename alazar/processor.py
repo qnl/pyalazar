@@ -19,6 +19,8 @@ as well as their companion future object to get their result."""
 
 import numpy as np
 
+from itertools import izip
+
 # base class for buffer processors
 class BufferProcessor(object):
     """Example class for alazar buffer processors.
@@ -93,14 +95,14 @@ class Raw(BufferProcessor):
         # initial shape is 1D for simplicity
         self.dat_bufs = [np.empty((params["records_per_acquisition"], params["samples_per_record"]),
                                   params["dtype"],)
-                         for _ in range(params["channel_count"])]
+                         for _ in xrange(params["channel_count"])]
 
     def process(self, chan_bufs, buf_num):
         """Dump the buffer into the data buffer."""
         recs_per_buf = self.params["records_per_buffer"]
 
         # copy each channel into the appropriate buffer
-        for (chan_buf, dat_buf) in zip(chan_bufs, self.dat_bufs):
+        for (chan_buf, dat_buf) in izip(chan_bufs, self.dat_bufs):
             dat_buf[buf_num*recs_per_buf: (buf_num+1)*recs_per_buf,:] = chan_buf
 
     def post_process(self):
@@ -124,13 +126,13 @@ class Average(BufferProcessor):
         """Initialize the averaging buffer."""
         # create list of channel buffers to sum the results
         self.ave_bufs = [np.zeros((params["samples_per_record"],), np.float)
-                         for _ in range(params["channel_count"])]
+                         for _ in xrange(params["channel_count"])]
 
     def process(self, chan_bufs, buf_num):
         """Average the channel records together and add them to the averaging buffer."""
         if self.error:
             return
-        for (chan_buf, ave_buf) in zip(chan_bufs, self.ave_bufs):
+        for (chan_buf, ave_buf) in izip(chan_bufs, self.ave_bufs):
             ave_buf += np.sum(chan_buf,axis=0, dtype=np.int64)
 
     def post_process(self):
@@ -180,7 +182,7 @@ class AverageN(BufferProcessor):
             return
         # create list of channel buffers to sum the results
         self.ave_bufs = [np.zeros((self.n_rec_types,params["samples_per_record"],), np.float)
-                         for _ in range(params["channel_count"])]
+                         for _ in xrange(params["channel_count"])]
 
     def process(self, chan_bufs, buf_num):
         """Average the channel records together and add them to the averaging buffers."""
@@ -189,8 +191,8 @@ class AverageN(BufferProcessor):
         # figure out what the type of the first record in the buffer is
         first_rec_type = (buf_num*self.params["records_per_buffer"]) % self.n_rec_types
 
-        for (chan_buf, ave_buf) in zip(chan_bufs, self.ave_bufs):
-            for rec_type in range(self.n_rec_types):
+        for (chan_buf, ave_buf) in izip(chan_bufs, self.ave_bufs):
+            for rec_type in xrange(self.n_rec_types):
                 # calculate the offset needed to index the channel buffer into this record type
                 offset = (rec_type + first_rec_type) % self.n_rec_types
                 # if records_per_buffer is less than n_rec_types this record may lack this type
@@ -257,7 +259,7 @@ class Chunk(BufferProcessor):
                                             .format(self.stop,
                                                     params["samples_per_record"]))
         self.chunk_bufs = [np.empty((params["records_per_acquisition"],), dtype=np.float)
-                           for _ in range(params["channel_count"])]
+                           for _ in xrange(params["channel_count"])]
 
     def process(self, chan_bufs, buf_num):
         """Collect all of the chunks."""
@@ -265,7 +267,7 @@ class Chunk(BufferProcessor):
             return
         recs_per_buf = self.params["records_per_buffer"]
         rec_offset = buf_num*recs_per_buf
-        for (chan_buf, chunk_buf) in zip(chan_bufs, self.chunk_bufs):
+        for (chan_buf, chunk_buf) in izip(chan_bufs, self.chunk_bufs):
                 chunk_buf_view = chunk_buf[rec_offset:rec_offset+recs_per_buf]
                 # integrate this chunk and put result into the data array
                 chunk_buf_view[:] = np.mean(chan_buf[:,self.start:self.stop], axis=1)
