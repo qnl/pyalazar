@@ -444,7 +444,8 @@ cdef class Alazar(object):
         # allocate list of NumPy arrays as data buffers
         # indexing this will cost a Python overhead, but this probably isn't important
         # these are refcounted so we don't need to manually manage their memory
-        cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type) for n in range(buffer_count)]
+        cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type)
+                             for n in xrange(buffer_count)]
         # make a list of the address of each buffer to pass to the digitizer
         cdef list buffer_addresses = []
         # make a Cython memoryview of each buffer and add it to the list
@@ -459,7 +460,7 @@ cdef class Alazar(object):
 
         try:
             # add the buffers to the list of buffers available to the board
-            for b in range(buffer_count):
+            for b in xrange(buffer_count):
                 buf_view = buffer_addresses[b]
                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
                                                               &buf_view[0],
@@ -473,7 +474,7 @@ cdef class Alazar(object):
                                           "Failed to start capture:",
                                           buf_queue)
             # handle each buffer
-            for buf_num in range(buffers_per_acquisition):
+            for buf_num in xrange(buffers_per_acquisition):
                 buffer_index = buf_num % buffer_count
                 buf_view = buffer_addresses[buffer_index]
                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
@@ -533,7 +534,7 @@ def _process_buffers(buf_queue,
     failure = False
 
     # loop over all the buffers we expect to receive
-    for buf_num in range(acq_params["buffers_per_acquisition"]):
+    for buf_num in xrange(acq_params["buffers_per_acquisition"]):
         # get the next buffer from the queue
         (buf, err) = buf_queue.get()
         # check for error condition
@@ -546,7 +547,7 @@ def _process_buffers(buf_queue,
             break
         # reshape the buffer
         chan_bufs = [_reshape_buffer(buf, chan, acq_params)
-                     for chan in range(acq_params["channel_count"])]
+                     for chan in xrange(acq_params["channel_count"])]
         for proc in processors:
             proc.process(chan_bufs, buf_num)
             # TODO: exception handling for processor failure?
@@ -579,7 +580,7 @@ def get_systems_and_boards():
     Obnoxiously, Alazar indexes the systems and boards from 1 rather than 0."""
     n_sys = c_alazar_api.AlazarNumOfSystems()
     n_b = {}
-    for s in range(n_sys):
+    for s in xrange(n_sys):
         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)
     return n_b
 
