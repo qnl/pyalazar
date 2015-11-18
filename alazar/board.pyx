@@ -398,7 +398,7 @@ cdef class Alazar(object):
         ret_code = c_alazar_api.AlazarSetRecordSize(self.board, 0, samples_per_record)
         _check_return_code(ret_code,
                            "Set record size failed for {} samples:".format(samples_per_record))
-        if bytes_per_sample <= 8:
+        if bytes_per_sample <= 1:
             sample_type = np.uint8
         else:
             sample_type = np.uint16
