@@ -20,7 +20,7 @@ cimport numpy as np
 import multiprocessing as mp
 
 from alazar import params
-
+from alazar.process import _process_buffers
 from alazar.processor import BufferProcessor
 
 # C wrapper class to represent an Alazar digitizer
@@ -526,42 +526,6 @@ def _reshape_buffer(buf, chan, acq_params):
     chan_dat.shape = (acq_params["records_per_buffer"],
                       acq_params["samples_per_record"])
     return chan_dat
-
-def _process_buffers(buf_queue,
-                    comm,
-                    processors,
-                    acq_params,):
-    """Process buffers from the board."""
-    # initialize the buffer processors
-    for processor in processors:
-        processor.initialize(acq_params)
-    failure = False
-
-    # loop over all the buffers we expect to receive
-    for buf_num in xrange(acq_params["buffers_per_acquisition"]):
-        # get the next buffer from the queue
-        (buf, err) = buf_queue.get()
-        # check for error condition
-        if err is not None:
-            # tell the data processors to abort
-            for proc in processors:
-                proc.abort(err)
-            failure = True
-            # end processing
-            break
-        # reshape the buffer
-        chan_bufs = [_reshape_buffer(buf, chan, acq_params)
-                     for chan in xrange(acq_params["channel_count"])]
-        for proc in processors:
-            proc.process(chan_bufs, buf_num)
-            # TODO: exception handling for processor failure?
-    # acquisition was successful, do post-processing
-    if not failure:
-        for proc in processors:
-            proc.post_process()
-    # send the finished processors back
-    comm.put(processors)
-    # done with buffer processing
 
 def def_acq_params(samples_per_record,
                    records_per_acquisition,
