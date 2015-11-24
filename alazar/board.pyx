@@ -200,8 +200,10 @@ cdef class Alazar(object):
                 # check for API success
                 _check_return_code(ret_code, "Error setting channel {} input:".format(chan))
 
-                ret_code = c_alazar_api.AlazarSetBWLimit(self.board, chan_code, bw_code)
-                _check_return_code(ret_code, "Error setting channel {} BW limit:".format(chan))
+                # 9360 doesn't support setting bandwidth limit
+                if not is_9360(self.board_type):
+                    ret_code = c_alazar_api.AlazarSetBWLimit(self.board, chan_code, bw_code)
+                    _check_return_code(ret_code, "Error setting channel {} BW limit:".format(chan))
         else:
             try:
                 chan_code = channels(self.board_type)[channel]
@@ -216,8 +218,10 @@ cdef class Alazar(object):
             # check for API success
             _check_return_code(ret_code, "Error setting channel {} input:".format(channel))
 
-            ret_code = c_alazar_api.AlazarSetBWLimit(self.board, chan_code, bw_code)
-            _check_return_code(ret_code, "Error setting channel {} BW limit:".format(channel))
+            # 9360 doesn't support setting bandwidth limit
+            if not is_9360(self.board_type):
+                ret_code = c_alazar_api.AlazarSetBWLimit(self.board, chan_code, bw_code)
+                _check_return_code(ret_code, "Error setting channel {} BW limit:".format(channel))
 
     def setup_one_trigger(self,
                           source_channel="ext",
