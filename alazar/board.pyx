@@ -637,7 +637,7 @@ def _check_return_code_processing(return_code, msg, buf_queue):
     try:
         _check_return_code(return_code, msg)
     except AlazarException as err:
-        buf_queue.put(None, err)
+        buf_queue.put((None, err))
         raise err
 
 def _return_code_to_string(return_code):

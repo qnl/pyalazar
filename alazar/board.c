@@ -1409,6 +1409,13 @@ static CYTHON_INLINE unsigned char __Pyx_PyInt_As_unsigned_char(PyObject *);
 static PyObject *__pyx_memview_get_unsigned_char(const char *itemp);
 static int __pyx_memview_set_unsigned_char(const char *itemp, PyObject *obj);
 
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_short(unsigned short value);
+
+static CYTHON_INLINE unsigned short __Pyx_PyInt_As_unsigned_short(PyObject *);
+
+static PyObject *__pyx_memview_get_unsigned_short(const char *itemp);
+static int __pyx_memview_set_unsigned_short(const char *itemp, PyObject *obj);
+
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_U32(U32 value);
 
 static CYTHON_INLINE enum _RETURN_CODE __Pyx_PyInt_As_enum___RETURN_CODE(PyObject *);
@@ -1546,6 +1553,8 @@ static int __Pyx_ValidateAndInit_memviewslice(
 
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(PyObject *);
 
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_short(PyObject *);
+
 static int __Pyx_check_binary_version(void);
 
 #if !defined(__Pyx_PyIdentifier_FromString)
@@ -1647,6 +1656,7 @@ static void __pyx_memoryview_refcount_objects_in_slice(char *, Py_ssize_t *, Py_
 static void __pyx_memoryview_slice_assign_scalar(__Pyx_memviewslice *, int, size_t, void *, int); /*proto*/
 static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize_t *, int, size_t, void *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_unsigned_char = { "unsigned char", NULL, sizeof(unsigned char), { 0 }, 0, IS_UNSIGNED(unsigned char) ? 'U' : 'I', IS_UNSIGNED(unsigned char), 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo_unsigned_short = { "unsigned short", NULL, sizeof(unsigned short), { 0 }, 0, IS_UNSIGNED(unsigned short) ? 'U' : 'I', IS_UNSIGNED(unsigned short), 0 };
 #define __Pyx_MODULE_NAME "alazar.board"
 int __pyx_module_is_main_alazar__board = 0;
 
@@ -7244,10 +7254,11 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
   PyObject *__pyx_v_buf_processor = NULL;
   PyObject *__pyx_v_buffers = 0;
   PyObject *__pyx_v_buffer_addresses = 0;
-  __Pyx_memviewslice __pyx_v_buf_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  PyObject *__pyx_v_buf = NULL;
+  __Pyx_memviewslice __pyx_v_buf_view_char = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_buf_view_short = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_buf_num;
   int __pyx_v_buffer_index;
+  PyObject *__pyx_v_buf = NULL;
   PyObject *__pyx_v_b = NULL;
   CYTHON_UNUSED PyObject *__pyx_v_n = NULL;
   PyObject *__pyx_r = NULL;
@@ -7284,6 +7295,11 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
   PyObject *__pyx_t_30 = NULL;
   PyObject *__pyx_t_31 = NULL;
   PyObject *__pyx_t_32 = NULL;
+  __Pyx_memviewslice __pyx_t_33 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  Py_ssize_t __pyx_t_34;
+  Py_ssize_t __pyx_t_35;
+  Py_ssize_t __pyx_t_36;
+  char const *__pyx_t_37;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -8480,446 +8496,1043 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
  *                              for n in xrange(buffer_count)]
  *         # make a list of the address of each buffer to pass to the digitizer
  *         cdef list buffer_addresses = []             # <<<<<<<<<<<<<<
- *         # make a Cython memoryview of each buffer and add it to the list
- *         # get a C pointer to the buffer with the syntax &buf_vew[0]
+ * 
+ *         # because Cython has no support for polymorphism, we have to branch
  */
   __pyx_t_12 = PyList_New(0); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_12);
   __pyx_v_buffer_addresses = ((PyObject*)__pyx_t_12);
   __pyx_t_12 = 0;
 
-  /* "alazar\board.pyx":458
- *         # get a C pointer to the buffer with the syntax &buf_vew[0]
- *         cdef unsigned char[:] buf_view
- *         for buf in buffers:             # <<<<<<<<<<<<<<
- *             buf_view = buf
- *             buffer_addresses.append(buf_view)
- */
-  __pyx_t_12 = __pyx_v_buffers; __Pyx_INCREF(__pyx_t_12); __pyx_t_7 = 0;
-  for (;;) {
-    if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_12)) break;
-    #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_4 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 458; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    #else
-    __pyx_t_4 = PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 458; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_GOTREF(__pyx_t_4);
-    #endif
-    __Pyx_XDECREF_SET(__pyx_v_buf, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "alazar\board.pyx":459
- *         cdef unsigned char[:] buf_view
- *         for buf in buffers:
- *             buf_view = buf             # <<<<<<<<<<<<<<
- *             buffer_addresses.append(buf_view)
- *         # preallocate all of the c variables
- */
-    __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(__pyx_v_buf);
-    if (unlikely(!__pyx_t_17.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view, 1);
-    __pyx_v_buf_view = __pyx_t_17;
-    __pyx_t_17.memview = NULL;
-    __pyx_t_17.data = NULL;
-
-    /* "alazar\board.pyx":460
- *         for buf in buffers:
- *             buf_view = buf
- *             buffer_addresses.append(buf_view)             # <<<<<<<<<<<<<<
- *         # preallocate all of the c variables
- *         cdef int buf_num
- */
-    __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_buf_view, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char, (int (*)(char *, PyObject *)) __pyx_memview_set_unsigned_char, 0);; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_buffer_addresses, __pyx_t_4); if (unlikely(__pyx_t_18 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-    /* "alazar\board.pyx":458
- *         # get a C pointer to the buffer with the syntax &buf_vew[0]
- *         cdef unsigned char[:] buf_view
- *         for buf in buffers:             # <<<<<<<<<<<<<<
- *             buf_view = buf
- *             buffer_addresses.append(buf_view)
- */
-  }
-  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-
-  /* "alazar\board.pyx":465
+  /* "alazar\board.pyx":469
  *         cdef int buffer_index
  * 
- *         try:             # <<<<<<<<<<<<<<
- *             # add the buffers to the list of buffers available to the board
- *             for b in xrange(buffer_count):
+ *         if sample_type == np.uint8:             # <<<<<<<<<<<<<<
+ *             # 8-bit buffer branch
+ *             try:
  */
-  /*try:*/ {
+  __pyx_t_12 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_12);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_uint8); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+  __pyx_t_12 = PyObject_RichCompare(__pyx_v_sample_type, __pyx_t_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_12); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_12); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+  if (__pyx_t_2) {
 
-    /* "alazar\board.pyx":467
- *         try:
- *             # add the buffers to the list of buffers available to the board
- *             for b in xrange(buffer_count):             # <<<<<<<<<<<<<<
- *                 buf_view = buffer_addresses[b]
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+    /* "alazar\board.pyx":471
+ *         if sample_type == np.uint8:
+ *             # 8-bit buffer branch
+ *             try:             # <<<<<<<<<<<<<<
+ *                 # make a Cython memoryview of each buffer and add it to the list
+ *                 # get a C pointer to the buffer with the syntax &buf_vew[0]
  */
-    __pyx_t_12 = PyTuple_New(1); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_INCREF(__pyx_v_buffer_count);
-    __Pyx_GIVEREF(__pyx_v_buffer_count);
-    PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_v_buffer_count);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_xrange, __pyx_t_12, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    if (likely(PyList_CheckExact(__pyx_t_4)) || PyTuple_CheckExact(__pyx_t_4)) {
-      __pyx_t_12 = __pyx_t_4; __Pyx_INCREF(__pyx_t_12); __pyx_t_7 = 0;
-      __pyx_t_16 = NULL;
-    } else {
-      __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_16 = Py_TYPE(__pyx_t_12)->tp_iternext; if (unlikely(!__pyx_t_16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-    }
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    for (;;) {
-      if (likely(!__pyx_t_16)) {
-        if (likely(PyList_CheckExact(__pyx_t_12))) {
-          if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_12)) break;
-          #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_4 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-          #else
-          __pyx_t_4 = PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-          __Pyx_GOTREF(__pyx_t_4);
-          #endif
-        } else {
-          if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_12)) break;
-          #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-          #else
-          __pyx_t_4 = PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-          __Pyx_GOTREF(__pyx_t_4);
-          #endif
-        }
-      } else {
-        __pyx_t_4 = __pyx_t_16(__pyx_t_12);
-        if (unlikely(!__pyx_t_4)) {
-          PyObject* exc_type = PyErr_Occurred();
-          if (exc_type) {
-            if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-          }
-          break;
-        }
+    /*try:*/ {
+
+      /* "alazar\board.pyx":475
+ *                 # get a C pointer to the buffer with the syntax &buf_vew[0]
+ * 
+ *                 for buf in buffers:             # <<<<<<<<<<<<<<
+ *                     buf_view_char = buf
+ *                     buffer_addresses.append(buf_view_char)
+ */
+      __pyx_t_12 = __pyx_v_buffers; __Pyx_INCREF(__pyx_t_12); __pyx_t_7 = 0;
+      for (;;) {
+        if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_12)) break;
+        #if CYTHON_COMPILING_IN_CPYTHON
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 475; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        #else
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 475; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
         __Pyx_GOTREF(__pyx_t_4);
+        #endif
+        __Pyx_XDECREF_SET(__pyx_v_buf, __pyx_t_4);
+        __pyx_t_4 = 0;
+
+        /* "alazar\board.pyx":476
+ * 
+ *                 for buf in buffers:
+ *                     buf_view_char = buf             # <<<<<<<<<<<<<<
+ *                     buffer_addresses.append(buf_view_char)
+ *                 # add the buffers to the list of buffers available to the board
+ */
+        __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(__pyx_v_buf);
+        if (unlikely(!__pyx_t_17.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 476; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_char, 1);
+        __pyx_v_buf_view_char = __pyx_t_17;
+        __pyx_t_17.memview = NULL;
+        __pyx_t_17.data = NULL;
+
+        /* "alazar\board.pyx":477
+ *                 for buf in buffers:
+ *                     buf_view_char = buf
+ *                     buffer_addresses.append(buf_view_char)             # <<<<<<<<<<<<<<
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):
+ */
+        __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_buf_view_char, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_char, (int (*)(char *, PyObject *)) __pyx_memview_set_unsigned_char, 0);; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_buffer_addresses, __pyx_t_4); if (unlikely(__pyx_t_18 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+        /* "alazar\board.pyx":475
+ *                 # get a C pointer to the buffer with the syntax &buf_vew[0]
+ * 
+ *                 for buf in buffers:             # <<<<<<<<<<<<<<
+ *                     buf_view_char = buf
+ *                     buffer_addresses.append(buf_view_char)
+ */
       }
-      __Pyx_XDECREF_SET(__pyx_v_b, __pyx_t_4);
-      __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "alazar\board.pyx":468
- *             # add the buffers to the list of buffers available to the board
- *             for b in xrange(buffer_count):
- *                 buf_view = buffer_addresses[b]             # <<<<<<<<<<<<<<
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
- *                                                               &buf_view[0],
+      /* "alazar\board.pyx":479
+ *                     buffer_addresses.append(buf_view_char)
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):             # <<<<<<<<<<<<<<
+ *                     buf_view_char = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
  */
-      __pyx_t_4 = PyObject_GetItem(__pyx_v_buffer_addresses, __pyx_v_b); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L15_error;};
-      __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(__pyx_t_4);
-      if (unlikely(!__pyx_t_17.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view, 1);
-      __pyx_v_buf_view = __pyx_t_17;
-      __pyx_t_17.memview = NULL;
-      __pyx_t_17.data = NULL;
-
-      /* "alazar\board.pyx":470
- *                 buf_view = buffer_addresses[b]
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
- *                                                               &buf_view[0],             # <<<<<<<<<<<<<<
- *                                                               bytes_per_buffer)
- *                 _check_return_code_processing(ret_code,
- */
-      __pyx_t_19 = 0;
-      __pyx_t_10 = -1;
-      if (__pyx_t_19 < 0) {
-        __pyx_t_19 += __pyx_v_buf_view.shape[0];
-        if (unlikely(__pyx_t_19 < 0)) __pyx_t_10 = 0;
-      } else if (unlikely(__pyx_t_19 >= __pyx_v_buf_view.shape[0])) __pyx_t_10 = 0;
-      if (unlikely(__pyx_t_10 != -1)) {
-        __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 470; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      }
-
-      /* "alazar\board.pyx":471
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
- *                                                               &buf_view[0],
- *                                                               bytes_per_buffer)             # <<<<<<<<<<<<<<
- *                 _check_return_code_processing(ret_code,
- *                                               "Failed to send buffer address to board:",
- */
-      __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_bytes_per_buffer); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 471; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-
-      /* "alazar\board.pyx":469
- *             for b in xrange(buffer_count):
- *                 buf_view = buffer_addresses[b]
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,             # <<<<<<<<<<<<<<
- *                                                               &buf_view[0],
- *                                                               bytes_per_buffer)
- */
-      __pyx_v_ret_code = AlazarPostAsyncBuffer(__pyx_v_self->board, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_buf_view.data + __pyx_t_19 * __pyx_v_buf_view.strides[0]) )))), __pyx_t_15);
-
-      /* "alazar\board.pyx":472
- *                                                               &buf_view[0],
- *                                                               bytes_per_buffer)
- *                 _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
- *                                               "Failed to send buffer address to board:",
- *                                               buf_queue)
- */
-      __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_6);
-
-      /* "alazar\board.pyx":474
- *                 _check_return_code_processing(ret_code,
- *                                               "Failed to send buffer address to board:",
- *                                               buf_queue)             # <<<<<<<<<<<<<<
- *             # arm the board
- *             ret_code = c_alazar_api.AlazarStartCapture(self.board)
- */
-      __pyx_t_3 = NULL;
-      __pyx_t_20 = 0;
-      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
-        __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
-        if (likely(__pyx_t_3)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-          __Pyx_INCREF(__pyx_t_3);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_5, function);
-          __pyx_t_20 = 1;
-        }
-      }
-      __pyx_t_8 = PyTuple_New(3+__pyx_t_20); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_8);
-      if (__pyx_t_3) {
-        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_3); __pyx_t_3 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_20, __pyx_t_6);
-      __Pyx_INCREF(__pyx_kp_s_Failed_to_send_buffer_address_to);
-      __Pyx_GIVEREF(__pyx_kp_s_Failed_to_send_buffer_address_to);
-      PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_20, __pyx_kp_s_Failed_to_send_buffer_address_to);
-      __Pyx_INCREF(__pyx_v_buf_queue);
-      __Pyx_GIVEREF(__pyx_v_buf_queue);
-      PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_20, __pyx_v_buf_queue);
-      __pyx_t_6 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-      /* "alazar\board.pyx":467
- *         try:
- *             # add the buffers to the list of buffers available to the board
- *             for b in xrange(buffer_count):             # <<<<<<<<<<<<<<
- *                 buf_view = buffer_addresses[b]
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
- */
-    }
-    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-
-    /* "alazar\board.pyx":476
- *                                               buf_queue)
- *             # arm the board
- *             ret_code = c_alazar_api.AlazarStartCapture(self.board)             # <<<<<<<<<<<<<<
- *             _check_return_code_processing(ret_code,
- *                                           "Failed to start capture:",
- */
-    __pyx_v_ret_code = AlazarStartCapture(__pyx_v_self->board);
-
-    /* "alazar\board.pyx":477
- *             # arm the board
- *             ret_code = c_alazar_api.AlazarStartCapture(self.board)
- *             _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
- *                                           "Failed to start capture:",
- *                                           buf_queue)
- */
-    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-    __Pyx_GOTREF(__pyx_t_5);
-
-    /* "alazar\board.pyx":479
- *             _check_return_code_processing(ret_code,
- *                                           "Failed to start capture:",
- *                                           buf_queue)             # <<<<<<<<<<<<<<
- *             # handle each buffer
- *             for buf_num in xrange(buffers_per_acquisition):
- */
-    __pyx_t_8 = NULL;
-    __pyx_t_7 = 0;
-    if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_4);
-      if (likely(__pyx_t_8)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_8);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
-        __pyx_t_7 = 1;
-      }
-    }
-    __pyx_t_6 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__pyx_t_8) {
-      __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_8); __pyx_t_8 = NULL;
-    }
-    __Pyx_GIVEREF(__pyx_t_5);
-    PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_7, __pyx_t_5);
-    __Pyx_INCREF(__pyx_kp_s_Failed_to_start_capture);
-    __Pyx_GIVEREF(__pyx_kp_s_Failed_to_start_capture);
-    PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_7, __pyx_kp_s_Failed_to_start_capture);
-    __Pyx_INCREF(__pyx_v_buf_queue);
-    __Pyx_GIVEREF(__pyx_v_buf_queue);
-    PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_7, __pyx_v_buf_queue);
-    __pyx_t_5 = 0;
-    __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-
-    /* "alazar\board.pyx":481
- *                                           buf_queue)
- *             # handle each buffer
- *             for buf_num in xrange(buffers_per_acquisition):             # <<<<<<<<<<<<<<
- *                 buffer_index = buf_num % buffer_count
- *                 buf_view = buffer_addresses[buffer_index]
- */
-    __pyx_t_10 = __pyx_v_buffers_per_acquisition;
-    for (__pyx_t_21 = 0; __pyx_t_21 < __pyx_t_10; __pyx_t_21+=1) {
-      __pyx_v_buf_num = __pyx_t_21;
-
-      /* "alazar\board.pyx":482
- *             # handle each buffer
- *             for buf_num in xrange(buffers_per_acquisition):
- *                 buffer_index = buf_num % buffer_count             # <<<<<<<<<<<<<<
- *                 buf_view = buffer_addresses[buffer_index]
- *                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
- */
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_buf_num); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+      __pyx_t_12 = PyTuple_New(1); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_4 = PyNumber_Remainder(__pyx_t_12, __pyx_v_buffer_count); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+      __Pyx_INCREF(__pyx_v_buffer_count);
+      __Pyx_GIVEREF(__pyx_v_buffer_count);
+      PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_v_buffer_count);
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_xrange, __pyx_t_12, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __pyx_t_22 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_22 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_v_buffer_index = __pyx_t_22;
-
-      /* "alazar\board.pyx":483
- *             for buf_num in xrange(buffers_per_acquisition):
- *                 buffer_index = buf_num % buffer_count
- *                 buf_view = buffer_addresses[buffer_index]             # <<<<<<<<<<<<<<
- *                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
- *                                                                       &buf_view[0],
- */
-      __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_buffer_addresses, __pyx_v_buffer_index, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L15_error;};
-      __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(__pyx_t_4);
-      if (unlikely(!__pyx_t_17.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view, 1);
-      __pyx_v_buf_view = __pyx_t_17;
-      __pyx_t_17.memview = NULL;
-      __pyx_t_17.data = NULL;
-
-      /* "alazar\board.pyx":485
- *                 buf_view = buffer_addresses[buffer_index]
- *                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
- *                                                                       &buf_view[0],             # <<<<<<<<<<<<<<
- *                                                                       timeout)
- *                 _check_return_code_processing(ret_code,
- */
-      __pyx_t_23 = 0;
-      __pyx_t_22 = -1;
-      if (__pyx_t_23 < 0) {
-        __pyx_t_23 += __pyx_v_buf_view.shape[0];
-        if (unlikely(__pyx_t_23 < 0)) __pyx_t_22 = 0;
-      } else if (unlikely(__pyx_t_23 >= __pyx_v_buf_view.shape[0])) __pyx_t_22 = 0;
-      if (unlikely(__pyx_t_22 != -1)) {
-        __Pyx_RaiseBufferIndexError(__pyx_t_22);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 485; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+      if (likely(PyList_CheckExact(__pyx_t_4)) || PyTuple_CheckExact(__pyx_t_4)) {
+        __pyx_t_12 = __pyx_t_4; __Pyx_INCREF(__pyx_t_12); __pyx_t_7 = 0;
+        __pyx_t_16 = NULL;
+      } else {
+        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_16 = Py_TYPE(__pyx_t_12)->tp_iternext; if (unlikely(!__pyx_t_16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
       }
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      for (;;) {
+        if (likely(!__pyx_t_16)) {
+          if (likely(PyList_CheckExact(__pyx_t_12))) {
+            if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_12)) break;
+            #if CYTHON_COMPILING_IN_CPYTHON
+            __pyx_t_4 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+            #else
+            __pyx_t_4 = PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+            __Pyx_GOTREF(__pyx_t_4);
+            #endif
+          } else {
+            if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_12)) break;
+            #if CYTHON_COMPILING_IN_CPYTHON
+            __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+            #else
+            __pyx_t_4 = PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+            __Pyx_GOTREF(__pyx_t_4);
+            #endif
+          }
+        } else {
+          __pyx_t_4 = __pyx_t_16(__pyx_t_12);
+          if (unlikely(!__pyx_t_4)) {
+            PyObject* exc_type = PyErr_Occurred();
+            if (exc_type) {
+              if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+            }
+            break;
+          }
+          __Pyx_GOTREF(__pyx_t_4);
+        }
+        __Pyx_XDECREF_SET(__pyx_v_b, __pyx_t_4);
+        __pyx_t_4 = 0;
 
-      /* "alazar\board.pyx":486
- *                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
- *                                                                       &buf_view[0],
- *                                                                       timeout)             # <<<<<<<<<<<<<<
+        /* "alazar\board.pyx":480
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):
+ *                     buf_view_char = buffer_addresses[b]             # <<<<<<<<<<<<<<
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_char[0],
+ */
+        __pyx_t_4 = PyObject_GetItem(__pyx_v_buffer_addresses, __pyx_v_b); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L14_error;};
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(__pyx_t_4);
+        if (unlikely(!__pyx_t_17.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_char, 1);
+        __pyx_v_buf_view_char = __pyx_t_17;
+        __pyx_t_17.memview = NULL;
+        __pyx_t_17.data = NULL;
+
+        /* "alazar\board.pyx":482
+ *                     buf_view_char = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_char[0],             # <<<<<<<<<<<<<<
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,
+ */
+        __pyx_t_19 = 0;
+        __pyx_t_10 = -1;
+        if (__pyx_t_19 < 0) {
+          __pyx_t_19 += __pyx_v_buf_view_char.shape[0];
+          if (unlikely(__pyx_t_19 < 0)) __pyx_t_10 = 0;
+        } else if (unlikely(__pyx_t_19 >= __pyx_v_buf_view_char.shape[0])) __pyx_t_10 = 0;
+        if (unlikely(__pyx_t_10 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_10);
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        }
+
+        /* "alazar\board.pyx":483
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_char[0],
+ *                                                                   bytes_per_buffer)             # <<<<<<<<<<<<<<
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Failed to send buffer address to board:",
+ */
+        __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_bytes_per_buffer); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+
+        /* "alazar\board.pyx":481
+ *                 for b in xrange(buffer_count):
+ *                     buf_view_char = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,             # <<<<<<<<<<<<<<
+ *                                                                   &buf_view_char[0],
+ *                                                                   bytes_per_buffer)
+ */
+        __pyx_v_ret_code = AlazarPostAsyncBuffer(__pyx_v_self->board, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_buf_view_char.data + __pyx_t_19 * __pyx_v_buf_view_char.strides[0]) )))), __pyx_t_15);
+
+        /* "alazar\board.pyx":484
+ *                                                                   &buf_view_char[0],
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                                   "Failed to send buffer address to board:",
+ *                                                   buf_queue)
+ */
+        __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 484; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_5);
+        __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 484; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+
+        /* "alazar\board.pyx":486
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Failed to send buffer address to board:",
+ *                                                   buf_queue)             # <<<<<<<<<<<<<<
+ *                 # arm the board
+ *                 ret_code = c_alazar_api.AlazarStartCapture(self.board)
+ */
+        __pyx_t_3 = NULL;
+        __pyx_t_20 = 0;
+        if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
+          if (likely(__pyx_t_3)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+            __Pyx_INCREF(__pyx_t_3);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_5, function);
+            __pyx_t_20 = 1;
+          }
+        }
+        __pyx_t_8 = PyTuple_New(3+__pyx_t_20); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 484; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_8);
+        if (__pyx_t_3) {
+          __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_3); __pyx_t_3 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_6);
+        PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_20, __pyx_t_6);
+        __Pyx_INCREF(__pyx_kp_s_Failed_to_send_buffer_address_to);
+        __Pyx_GIVEREF(__pyx_kp_s_Failed_to_send_buffer_address_to);
+        PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_20, __pyx_kp_s_Failed_to_send_buffer_address_to);
+        __Pyx_INCREF(__pyx_v_buf_queue);
+        __Pyx_GIVEREF(__pyx_v_buf_queue);
+        PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_20, __pyx_v_buf_queue);
+        __pyx_t_6 = 0;
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 484; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+        /* "alazar\board.pyx":479
+ *                     buffer_addresses.append(buf_view_char)
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):             # <<<<<<<<<<<<<<
+ *                     buf_view_char = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ */
+      }
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+
+      /* "alazar\board.pyx":488
+ *                                                   buf_queue)
+ *                 # arm the board
+ *                 ret_code = c_alazar_api.AlazarStartCapture(self.board)             # <<<<<<<<<<<<<<
  *                 _check_return_code_processing(ret_code,
- *                                               "Wait for buffer complete failed on buffer {}:"
+ *                                               "Failed to start capture:",
  */
-      __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_timeout); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 486; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-
-      /* "alazar\board.pyx":484
- *                 buffer_index = buf_num % buffer_count
- *                 buf_view = buffer_addresses[buffer_index]
- *                 ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,             # <<<<<<<<<<<<<<
- *                                                                       &buf_view[0],
- *                                                                       timeout)
- */
-      __pyx_v_ret_code = AlazarWaitAsyncBufferComplete(__pyx_v_self->board, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_buf_view.data + __pyx_t_23 * __pyx_v_buf_view.strides[0]) )))), __pyx_t_15);
-
-      /* "alazar\board.pyx":487
- *                                                                       &buf_view[0],
- *                                                                       timeout)
- *                 _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
- *                                               "Wait for buffer complete failed on buffer {}:"
- *                                               .format(buf_num),
- */
-      __pyx_t_12 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_v_ret_code = AlazarStartCapture(__pyx_v_self->board);
 
       /* "alazar\board.pyx":489
- *                 _check_return_code_processing(ret_code,
- *                                               "Wait for buffer complete failed on buffer {}:"
- *                                               .format(buf_num),             # <<<<<<<<<<<<<<
+ *                 # arm the board
+ *                 ret_code = c_alazar_api.AlazarStartCapture(self.board)
+ *                 _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                               "Failed to start capture:",
  *                                               buf_queue)
- *                 # pickles the buffer and sends to the worker
  */
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Wait_for_buffer_complete_failed, __pyx_n_s_format); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_buf_num); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = NULL;
-      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_8))) {
-        __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_8);
-        if (likely(__pyx_t_1)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
-          __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_5 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+      __Pyx_GOTREF(__pyx_t_5);
+
+      /* "alazar\board.pyx":491
+ *                 _check_return_code_processing(ret_code,
+ *                                               "Failed to start capture:",
+ *                                               buf_queue)             # <<<<<<<<<<<<<<
+ *                 # handle each buffer
+ *                 for buf_num in xrange(buffers_per_acquisition):
+ */
+      __pyx_t_8 = NULL;
+      __pyx_t_7 = 0;
+      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+        __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_4);
+        if (likely(__pyx_t_8)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_8);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_8, function);
+          __Pyx_DECREF_SET(__pyx_t_4, function);
+          __pyx_t_7 = 1;
         }
       }
-      if (!__pyx_t_1) {
-        __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_3); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __Pyx_GOTREF(__pyx_t_5);
-      } else {
-        __pyx_t_24 = PyTuple_New(1+1); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-        __Pyx_GOTREF(__pyx_t_24);
-        __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_1); __pyx_t_1 = NULL;
-        __Pyx_GIVEREF(__pyx_t_3);
-        PyTuple_SET_ITEM(__pyx_t_24, 0+1, __pyx_t_3);
-        __pyx_t_3 = 0;
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_24, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-        __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+      __pyx_t_6 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+      __Pyx_GOTREF(__pyx_t_6);
+      if (__pyx_t_8) {
+        __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_8); __pyx_t_8 = NULL;
       }
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_7, __pyx_t_5);
+      __Pyx_INCREF(__pyx_kp_s_Failed_to_start_capture);
+      __Pyx_GIVEREF(__pyx_kp_s_Failed_to_start_capture);
+      PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_7, __pyx_kp_s_Failed_to_start_capture);
+      __Pyx_INCREF(__pyx_v_buf_queue);
+      __Pyx_GIVEREF(__pyx_v_buf_queue);
+      PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_7, __pyx_v_buf_queue);
+      __pyx_t_5 = 0;
+      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+      __Pyx_GOTREF(__pyx_t_12);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "alazar\board.pyx":490
- *                                               "Wait for buffer complete failed on buffer {}:"
- *                                               .format(buf_num),
+      /* "alazar\board.pyx":493
+ *                                               buf_queue)
+ *                 # handle each buffer
+ *                 for buf_num in xrange(buffers_per_acquisition):             # <<<<<<<<<<<<<<
+ *                     buffer_index = buf_num % buffer_count
+ *                     buf_view_char = buffer_addresses[buffer_index]
+ */
+      __pyx_t_10 = __pyx_v_buffers_per_acquisition;
+      for (__pyx_t_21 = 0; __pyx_t_21 < __pyx_t_10; __pyx_t_21+=1) {
+        __pyx_v_buf_num = __pyx_t_21;
+
+        /* "alazar\board.pyx":494
+ *                 # handle each buffer
+ *                 for buf_num in xrange(buffers_per_acquisition):
+ *                     buffer_index = buf_num % buffer_count             # <<<<<<<<<<<<<<
+ *                     buf_view_char = buffer_addresses[buffer_index]
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ */
+        __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_buf_num); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 494; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_4 = PyNumber_Remainder(__pyx_t_12, __pyx_v_buffer_count); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 494; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_t_22 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_22 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 494; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_v_buffer_index = __pyx_t_22;
+
+        /* "alazar\board.pyx":495
+ *                 for buf_num in xrange(buffers_per_acquisition):
+ *                     buffer_index = buf_num % buffer_count
+ *                     buf_view_char = buffer_addresses[buffer_index]             # <<<<<<<<<<<<<<
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ *                                                                           &buf_view_char[0],
+ */
+        __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_buffer_addresses, __pyx_v_buffer_index, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 495; __pyx_clineno = __LINE__; goto __pyx_L14_error;};
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_char(__pyx_t_4);
+        if (unlikely(!__pyx_t_17.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 495; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_char, 1);
+        __pyx_v_buf_view_char = __pyx_t_17;
+        __pyx_t_17.memview = NULL;
+        __pyx_t_17.data = NULL;
+
+        /* "alazar\board.pyx":497
+ *                     buf_view_char = buffer_addresses[buffer_index]
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ *                                                                           &buf_view_char[0],             # <<<<<<<<<<<<<<
+ *                                                                           timeout)
+ *                     _check_return_code_processing(ret_code,
+ */
+        __pyx_t_23 = 0;
+        __pyx_t_22 = -1;
+        if (__pyx_t_23 < 0) {
+          __pyx_t_23 += __pyx_v_buf_view_char.shape[0];
+          if (unlikely(__pyx_t_23 < 0)) __pyx_t_22 = 0;
+        } else if (unlikely(__pyx_t_23 >= __pyx_v_buf_view_char.shape[0])) __pyx_t_22 = 0;
+        if (unlikely(__pyx_t_22 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_22);
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        }
+
+        /* "alazar\board.pyx":498
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ *                                                                           &buf_view_char[0],
+ *                                                                           timeout)             # <<<<<<<<<<<<<<
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ */
+        __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_timeout); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 498; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+
+        /* "alazar\board.pyx":496
+ *                     buffer_index = buf_num % buffer_count
+ *                     buf_view_char = buffer_addresses[buffer_index]
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,             # <<<<<<<<<<<<<<
+ *                                                                           &buf_view_char[0],
+ *                                                                           timeout)
+ */
+        __pyx_v_ret_code = AlazarWaitAsyncBufferComplete(__pyx_v_self->board, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_buf_view_char.data + __pyx_t_23 * __pyx_v_buf_view_char.strides[0]) )))), __pyx_t_15);
+
+        /* "alazar\board.pyx":499
+ *                                                                           &buf_view_char[0],
+ *                                                                           timeout)
+ *                     _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ *                                                   .format(buf_num),
+ */
+        __pyx_t_12 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+
+        /* "alazar\board.pyx":501
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ *                                                   .format(buf_num),             # <<<<<<<<<<<<<<
+ *                                                   buf_queue)
+ *                     # pickles the buffer and sends to the worker
+ */
+        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Wait_for_buffer_complete_failed, __pyx_n_s_format); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 501; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_8);
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_buf_num); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 501; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_3);
+        __pyx_t_1 = NULL;
+        if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_8))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_8);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_8, function);
+          }
+        }
+        if (!__pyx_t_1) {
+          __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_3); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 501; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_GOTREF(__pyx_t_5);
+        } else {
+          __pyx_t_24 = PyTuple_New(1+1); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 501; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+          __Pyx_GOTREF(__pyx_t_24);
+          __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_1); __pyx_t_1 = NULL;
+          __Pyx_GIVEREF(__pyx_t_3);
+          PyTuple_SET_ITEM(__pyx_t_24, 0+1, __pyx_t_3);
+          __pyx_t_3 = 0;
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_24, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 501; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+        }
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+
+        /* "alazar\board.pyx":502
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ *                                                   .format(buf_num),
+ *                                                   buf_queue)             # <<<<<<<<<<<<<<
+ *                     # pickles the buffer and sends to the worker
+ *                     buf_queue.put( (buffers[buffer_index], None) )
+ */
+        __pyx_t_8 = NULL;
+        __pyx_t_7 = 0;
+        if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_12))) {
+          __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_12);
+          if (likely(__pyx_t_8)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+            __Pyx_INCREF(__pyx_t_8);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_12, function);
+            __pyx_t_7 = 1;
+          }
+        }
+        __pyx_t_24 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_24);
+        if (__pyx_t_8) {
+          __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_8); __pyx_t_8 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_6);
+        PyTuple_SET_ITEM(__pyx_t_24, 0+__pyx_t_7, __pyx_t_6);
+        __Pyx_GIVEREF(__pyx_t_5);
+        PyTuple_SET_ITEM(__pyx_t_24, 1+__pyx_t_7, __pyx_t_5);
+        __Pyx_INCREF(__pyx_v_buf_queue);
+        __Pyx_GIVEREF(__pyx_v_buf_queue);
+        PyTuple_SET_ITEM(__pyx_t_24, 2+__pyx_t_7, __pyx_v_buf_queue);
+        __pyx_t_6 = 0;
+        __pyx_t_5 = 0;
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_24, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+        /* "alazar\board.pyx":504
+ *                                                   buf_queue)
+ *                     # pickles the buffer and sends to the worker
+ *                     buf_queue.put( (buffers[buffer_index], None) )             # <<<<<<<<<<<<<<
+ *                     # hand the buffer back to the board
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ */
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_buf_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_24 = __Pyx_GetItemInt_List(__pyx_v_buffers, __pyx_v_buffer_index, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_24 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L14_error;};
+        __Pyx_GOTREF(__pyx_t_24);
+        __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_5);
+        __Pyx_GIVEREF(__pyx_t_24);
+        PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_24);
+        __Pyx_INCREF(Py_None);
+        __Pyx_GIVEREF(Py_None);
+        PyTuple_SET_ITEM(__pyx_t_5, 1, Py_None);
+        __pyx_t_24 = 0;
+        __pyx_t_24 = NULL;
+        if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
+          __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
+          if (likely(__pyx_t_24)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+            __Pyx_INCREF(__pyx_t_24);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_12, function);
+          }
+        }
+        if (!__pyx_t_24) {
+          __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_GOTREF(__pyx_t_4);
+        } else {
+          __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+          __Pyx_GOTREF(__pyx_t_6);
+          __Pyx_GIVEREF(__pyx_t_24); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_24); __pyx_t_24 = NULL;
+          __Pyx_GIVEREF(__pyx_t_5);
+          PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_5);
+          __pyx_t_5 = 0;
+          __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+          __Pyx_GOTREF(__pyx_t_4);
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        }
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+        /* "alazar\board.pyx":507
+ *                     # hand the buffer back to the board
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_char[0],             # <<<<<<<<<<<<<<
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,
+ */
+        __pyx_t_25 = 0;
+        __pyx_t_22 = -1;
+        if (__pyx_t_25 < 0) {
+          __pyx_t_25 += __pyx_v_buf_view_char.shape[0];
+          if (unlikely(__pyx_t_25 < 0)) __pyx_t_22 = 0;
+        } else if (unlikely(__pyx_t_25 >= __pyx_v_buf_view_char.shape[0])) __pyx_t_22 = 0;
+        if (unlikely(__pyx_t_22 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_22);
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 507; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        }
+
+        /* "alazar\board.pyx":508
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_char[0],
+ *                                                                   bytes_per_buffer)             # <<<<<<<<<<<<<<
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Failed to send buffer address back "
+ */
+        __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_bytes_per_buffer); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 508; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+
+        /* "alazar\board.pyx":506
+ *                     buf_queue.put( (buffers[buffer_index], None) )
+ *                     # hand the buffer back to the board
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,             # <<<<<<<<<<<<<<
+ *                                                                   &buf_view_char[0],
+ *                                                                   bytes_per_buffer)
+ */
+        __pyx_v_ret_code = AlazarPostAsyncBuffer(__pyx_v_self->board, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_buf_view_char.data + __pyx_t_25 * __pyx_v_buf_view_char.strides[0]) )))), __pyx_t_15);
+
+        /* "alazar\board.pyx":509
+ *                                                                   &buf_view_char[0],
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                                   "Failed to send buffer address back "
+ *                                                   "to board during acquisition:",
+ */
+        __pyx_t_12 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+
+        /* "alazar\board.pyx":512
+ *                                                   "Failed to send buffer address back "
+ *                                                   "to board during acquisition:",
+ *                                                   buf_queue)             # <<<<<<<<<<<<<<
+ *                 # done with acquisition
+ *             finally:
+ */
+        __pyx_t_5 = NULL;
+        __pyx_t_7 = 0;
+        if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_12))) {
+          __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_12);
+          if (likely(__pyx_t_5)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+            __Pyx_INCREF(__pyx_t_5);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_12, function);
+            __pyx_t_7 = 1;
+          }
+        }
+        __pyx_t_24 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_24);
+        if (__pyx_t_5) {
+          __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_5); __pyx_t_5 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_6);
+        PyTuple_SET_ITEM(__pyx_t_24, 0+__pyx_t_7, __pyx_t_6);
+        __Pyx_INCREF(__pyx_kp_s_Failed_to_send_buffer_address_ba);
+        __Pyx_GIVEREF(__pyx_kp_s_Failed_to_send_buffer_address_ba);
+        PyTuple_SET_ITEM(__pyx_t_24, 1+__pyx_t_7, __pyx_kp_s_Failed_to_send_buffer_address_ba);
+        __Pyx_INCREF(__pyx_v_buf_queue);
+        __Pyx_GIVEREF(__pyx_v_buf_queue);
+        PyTuple_SET_ITEM(__pyx_t_24, 2+__pyx_t_7, __pyx_v_buf_queue);
+        __pyx_t_6 = 0;
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_24, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      }
+    }
+
+    /* "alazar\board.pyx":516
+ *             finally:
+ *                 # make sure we abort the acquisition so the board doesn't get stuck
+ *                 self._abort_acquisition()             # <<<<<<<<<<<<<<
+ *             # get the processors and return them
+ *             return comm.get()
+ */
+    /*finally:*/ {
+      /*normal exit:*/{
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_abort_acquisition); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_24 = NULL;
+        if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
+          __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
+          if (likely(__pyx_t_24)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+            __Pyx_INCREF(__pyx_t_24);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_12, function);
+          }
+        }
+        if (__pyx_t_24) {
+          __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_24); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+        } else {
+          __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        }
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        goto __pyx_L15;
+      }
+      /*exception exit:*/{
+        __pyx_L14_error:;
+        __pyx_t_27 = 0; __pyx_t_28 = 0; __pyx_t_29 = 0; __pyx_t_30 = 0; __pyx_t_31 = 0; __pyx_t_32 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+        __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_XDECREF(__pyx_t_24); __pyx_t_24 = 0;
+        __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_30, &__pyx_t_31, &__pyx_t_32);
+        if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_27, &__pyx_t_28, &__pyx_t_29) < 0)) __Pyx_ErrFetch(&__pyx_t_27, &__pyx_t_28, &__pyx_t_29);
+        __Pyx_XGOTREF(__pyx_t_27);
+        __Pyx_XGOTREF(__pyx_t_28);
+        __Pyx_XGOTREF(__pyx_t_29);
+        __Pyx_XGOTREF(__pyx_t_30);
+        __Pyx_XGOTREF(__pyx_t_31);
+        __Pyx_XGOTREF(__pyx_t_32);
+        __pyx_t_10 = __pyx_lineno; __pyx_t_21 = __pyx_clineno; __pyx_t_26 = __pyx_filename;
+        {
+          __pyx_t_12 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_abort_acquisition); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L23_error;}
+          __Pyx_GOTREF(__pyx_t_12);
+          __pyx_t_24 = NULL;
+          if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
+            __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
+            if (likely(__pyx_t_24)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+              __Pyx_INCREF(__pyx_t_24);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_12, function);
+            }
+          }
+          if (__pyx_t_24) {
+            __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_24); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L23_error;}
+            __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+          } else {
+            __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L23_error;}
+          }
+          __Pyx_GOTREF(__pyx_t_4);
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        }
+        if (PY_MAJOR_VERSION >= 3) {
+          __Pyx_XGIVEREF(__pyx_t_30);
+          __Pyx_XGIVEREF(__pyx_t_31);
+          __Pyx_XGIVEREF(__pyx_t_32);
+          __Pyx_ExceptionReset(__pyx_t_30, __pyx_t_31, __pyx_t_32);
+        }
+        __Pyx_XGIVEREF(__pyx_t_27);
+        __Pyx_XGIVEREF(__pyx_t_28);
+        __Pyx_XGIVEREF(__pyx_t_29);
+        __Pyx_ErrRestore(__pyx_t_27, __pyx_t_28, __pyx_t_29);
+        __pyx_t_27 = 0; __pyx_t_28 = 0; __pyx_t_29 = 0; __pyx_t_30 = 0; __pyx_t_31 = 0; __pyx_t_32 = 0;
+        __pyx_lineno = __pyx_t_10; __pyx_clineno = __pyx_t_21; __pyx_filename = __pyx_t_26;
+        goto __pyx_L1_error;
+        __pyx_L23_error:;
+        if (PY_MAJOR_VERSION >= 3) {
+          __Pyx_XGIVEREF(__pyx_t_30);
+          __Pyx_XGIVEREF(__pyx_t_31);
+          __Pyx_XGIVEREF(__pyx_t_32);
+          __Pyx_ExceptionReset(__pyx_t_30, __pyx_t_31, __pyx_t_32);
+        }
+        __Pyx_XDECREF(__pyx_t_27); __pyx_t_27 = 0;
+        __Pyx_XDECREF(__pyx_t_28); __pyx_t_28 = 0;
+        __Pyx_XDECREF(__pyx_t_29); __pyx_t_29 = 0;
+        __pyx_t_30 = 0; __pyx_t_31 = 0; __pyx_t_32 = 0;
+        goto __pyx_L1_error;
+      }
+      __pyx_L15:;
+    }
+
+    /* "alazar\board.pyx":518
+ *                 self._abort_acquisition()
+ *             # get the processors and return them
+ *             return comm.get()             # <<<<<<<<<<<<<<
+ * 
+ *         else:
+ */
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_comm, __pyx_n_s_get); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_12);
+    __pyx_t_24 = NULL;
+    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
+      __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
+      if (likely(__pyx_t_24)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+        __Pyx_INCREF(__pyx_t_24);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_12, function);
+      }
+    }
+    if (__pyx_t_24) {
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_24); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+    } else {
+      __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __pyx_r = __pyx_t_4;
+    __pyx_t_4 = 0;
+    goto __pyx_L0;
+
+    /* "alazar\board.pyx":469
+ *         cdef int buffer_index
+ * 
+ *         if sample_type == np.uint8:             # <<<<<<<<<<<<<<
+ *             # 8-bit buffer branch
+ *             try:
+ */
+  }
+
+  /* "alazar\board.pyx":522
+ *         else:
+ *             # 16-bit buffer branch
+ *             try:             # <<<<<<<<<<<<<<
+ *                 # make a Cython memoryview of each buffer and add it to the list
+ *                 # get a C pointer to the buffer with the syntax &buf_vew[0]
+ */
+  /*else*/ {
+    /*try:*/ {
+
+      /* "alazar\board.pyx":526
+ *                 # get a C pointer to the buffer with the syntax &buf_vew[0]
+ * 
+ *                 for buf in buffers:             # <<<<<<<<<<<<<<
+ *                     buf_view_short = buf
+ *                     buffer_addresses.append(buf_view_short)
+ */
+      __pyx_t_4 = __pyx_v_buffers; __Pyx_INCREF(__pyx_t_4); __pyx_t_7 = 0;
+      for (;;) {
+        if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_4)) break;
+        #if CYTHON_COMPILING_IN_CPYTHON
+        __pyx_t_12 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_7); __Pyx_INCREF(__pyx_t_12); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        #else
+        __pyx_t_12 = PySequence_ITEM(__pyx_t_4, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        #endif
+        __Pyx_XDECREF_SET(__pyx_v_buf, __pyx_t_12);
+        __pyx_t_12 = 0;
+
+        /* "alazar\board.pyx":527
+ * 
+ *                 for buf in buffers:
+ *                     buf_view_short = buf             # <<<<<<<<<<<<<<
+ *                     buffer_addresses.append(buf_view_short)
+ *                 # add the buffers to the list of buffers available to the board
+ */
+        __pyx_t_33 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_short(__pyx_v_buf);
+        if (unlikely(!__pyx_t_33.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 527; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_short, 1);
+        __pyx_v_buf_view_short = __pyx_t_33;
+        __pyx_t_33.memview = NULL;
+        __pyx_t_33.data = NULL;
+
+        /* "alazar\board.pyx":528
+ *                 for buf in buffers:
+ *                     buf_view_short = buf
+ *                     buffer_addresses.append(buf_view_short)             # <<<<<<<<<<<<<<
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):
+ */
+        __pyx_t_12 = __pyx_memoryview_fromslice(__pyx_v_buf_view_short, 1, (PyObject *(*)(char *)) __pyx_memview_get_unsigned_short, (int (*)(char *, PyObject *)) __pyx_memview_set_unsigned_short, 0);; if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 528; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_buffer_addresses, __pyx_t_12); if (unlikely(__pyx_t_18 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 528; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+
+        /* "alazar\board.pyx":526
+ *                 # get a C pointer to the buffer with the syntax &buf_vew[0]
+ * 
+ *                 for buf in buffers:             # <<<<<<<<<<<<<<
+ *                     buf_view_short = buf
+ *                     buffer_addresses.append(buf_view_short)
+ */
+      }
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+      /* "alazar\board.pyx":530
+ *                     buffer_addresses.append(buf_view_short)
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):             # <<<<<<<<<<<<<<
+ *                     buf_view_short = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ */
+      __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_v_buffer_count);
+      __Pyx_GIVEREF(__pyx_v_buffer_count);
+      PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_buffer_count);
+      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_builtin_xrange, __pyx_t_4, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+      __Pyx_GOTREF(__pyx_t_12);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (likely(PyList_CheckExact(__pyx_t_12)) || PyTuple_CheckExact(__pyx_t_12)) {
+        __pyx_t_4 = __pyx_t_12; __Pyx_INCREF(__pyx_t_4); __pyx_t_7 = 0;
+        __pyx_t_16 = NULL;
+      } else {
+        __pyx_t_7 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_16 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+      }
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+      for (;;) {
+        if (likely(!__pyx_t_16)) {
+          if (likely(PyList_CheckExact(__pyx_t_4))) {
+            if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_4)) break;
+            #if CYTHON_COMPILING_IN_CPYTHON
+            __pyx_t_12 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_7); __Pyx_INCREF(__pyx_t_12); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+            #else
+            __pyx_t_12 = PySequence_ITEM(__pyx_t_4, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+            __Pyx_GOTREF(__pyx_t_12);
+            #endif
+          } else {
+            if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
+            #if CYTHON_COMPILING_IN_CPYTHON
+            __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_7); __Pyx_INCREF(__pyx_t_12); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+            #else
+            __pyx_t_12 = PySequence_ITEM(__pyx_t_4, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+            __Pyx_GOTREF(__pyx_t_12);
+            #endif
+          }
+        } else {
+          __pyx_t_12 = __pyx_t_16(__pyx_t_4);
+          if (unlikely(!__pyx_t_12)) {
+            PyObject* exc_type = PyErr_Occurred();
+            if (exc_type) {
+              if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+            }
+            break;
+          }
+          __Pyx_GOTREF(__pyx_t_12);
+        }
+        __Pyx_XDECREF_SET(__pyx_v_b, __pyx_t_12);
+        __pyx_t_12 = 0;
+
+        /* "alazar\board.pyx":531
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):
+ *                     buf_view_short = buffer_addresses[b]             # <<<<<<<<<<<<<<
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_short[0],
+ */
+        __pyx_t_12 = PyObject_GetItem(__pyx_v_buffer_addresses, __pyx_v_b); if (unlikely(__pyx_t_12 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 531; __pyx_clineno = __LINE__; goto __pyx_L25_error;};
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_33 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_short(__pyx_t_12);
+        if (unlikely(!__pyx_t_33.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 531; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_short, 1);
+        __pyx_v_buf_view_short = __pyx_t_33;
+        __pyx_t_33.memview = NULL;
+        __pyx_t_33.data = NULL;
+
+        /* "alazar\board.pyx":533
+ *                     buf_view_short = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_short[0],             # <<<<<<<<<<<<<<
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,
+ */
+        __pyx_t_34 = 0;
+        __pyx_t_21 = -1;
+        if (__pyx_t_34 < 0) {
+          __pyx_t_34 += __pyx_v_buf_view_short.shape[0];
+          if (unlikely(__pyx_t_34 < 0)) __pyx_t_21 = 0;
+        } else if (unlikely(__pyx_t_34 >= __pyx_v_buf_view_short.shape[0])) __pyx_t_21 = 0;
+        if (unlikely(__pyx_t_21 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_21);
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 533; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        }
+
+        /* "alazar\board.pyx":534
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_short[0],
+ *                                                                   bytes_per_buffer)             # <<<<<<<<<<<<<<
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Failed to send buffer address to board:",
+ */
+        __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_bytes_per_buffer); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+
+        /* "alazar\board.pyx":532
+ *                 for b in xrange(buffer_count):
+ *                     buf_view_short = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,             # <<<<<<<<<<<<<<
+ *                                                                   &buf_view_short[0],
+ *                                                                   bytes_per_buffer)
+ */
+        __pyx_v_ret_code = AlazarPostAsyncBuffer(__pyx_v_self->board, (&(*((unsigned short *) ( /* dim=0 */ (__pyx_v_buf_view_short.data + __pyx_t_34 * __pyx_v_buf_view_short.strides[0]) )))), __pyx_t_15);
+
+        /* "alazar\board.pyx":535
+ *                                                                   &buf_view_short[0],
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                                   "Failed to send buffer address to board:",
+ *                                                   buf_queue)
+ */
+        __pyx_t_24 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_24);
+        __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+
+        /* "alazar\board.pyx":537
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Failed to send buffer address to board:",
+ *                                                   buf_queue)             # <<<<<<<<<<<<<<
+ *                 # arm the board
+ *                 ret_code = c_alazar_api.AlazarStartCapture(self.board)
+ */
+        __pyx_t_5 = NULL;
+        __pyx_t_20 = 0;
+        if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_24))) {
+          __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_24);
+          if (likely(__pyx_t_5)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_24);
+            __Pyx_INCREF(__pyx_t_5);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_24, function);
+            __pyx_t_20 = 1;
+          }
+        }
+        __pyx_t_8 = PyTuple_New(3+__pyx_t_20); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_8);
+        if (__pyx_t_5) {
+          __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_5); __pyx_t_5 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_6);
+        PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_20, __pyx_t_6);
+        __Pyx_INCREF(__pyx_kp_s_Failed_to_send_buffer_address_to);
+        __Pyx_GIVEREF(__pyx_kp_s_Failed_to_send_buffer_address_to);
+        PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_20, __pyx_kp_s_Failed_to_send_buffer_address_to);
+        __Pyx_INCREF(__pyx_v_buf_queue);
+        __Pyx_GIVEREF(__pyx_v_buf_queue);
+        PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_20, __pyx_v_buf_queue);
+        __pyx_t_6 = 0;
+        __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_24, __pyx_t_8, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+        __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+
+        /* "alazar\board.pyx":530
+ *                     buffer_addresses.append(buf_view_short)
+ *                 # add the buffers to the list of buffers available to the board
+ *                 for b in xrange(buffer_count):             # <<<<<<<<<<<<<<
+ *                     buf_view_short = buffer_addresses[b]
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ */
+      }
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+      /* "alazar\board.pyx":539
+ *                                                   buf_queue)
+ *                 # arm the board
+ *                 ret_code = c_alazar_api.AlazarStartCapture(self.board)             # <<<<<<<<<<<<<<
+ *                 _check_return_code_processing(ret_code,
+ *                                               "Failed to start capture:",
+ */
+      __pyx_v_ret_code = AlazarStartCapture(__pyx_v_self->board);
+
+      /* "alazar\board.pyx":540
+ *                 # arm the board
+ *                 ret_code = c_alazar_api.AlazarStartCapture(self.board)
+ *                 _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                               "Failed to start capture:",
+ *                                               buf_queue)
+ */
+      __pyx_t_12 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 540; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+      __Pyx_GOTREF(__pyx_t_12);
+      __pyx_t_24 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 540; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+      __Pyx_GOTREF(__pyx_t_24);
+
+      /* "alazar\board.pyx":542
+ *                 _check_return_code_processing(ret_code,
+ *                                               "Failed to start capture:",
  *                                               buf_queue)             # <<<<<<<<<<<<<<
- *                 # pickles the buffer and sends to the worker
- *                 buf_queue.put( (buffers[buffer_index], None) )
+ *                 # handle each buffer
+ *                 for buf_num in xrange(buffers_per_acquisition):
  */
       __pyx_t_8 = NULL;
       __pyx_t_7 = 0;
@@ -8933,298 +9546,469 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
           __pyx_t_7 = 1;
         }
       }
-      __pyx_t_24 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_24);
-      if (__pyx_t_8) {
-        __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_8); __pyx_t_8 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_24, 0+__pyx_t_7, __pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_5);
-      PyTuple_SET_ITEM(__pyx_t_24, 1+__pyx_t_7, __pyx_t_5);
-      __Pyx_INCREF(__pyx_v_buf_queue);
-      __Pyx_GIVEREF(__pyx_v_buf_queue);
-      PyTuple_SET_ITEM(__pyx_t_24, 2+__pyx_t_7, __pyx_v_buf_queue);
-      __pyx_t_6 = 0;
-      __pyx_t_5 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_24, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-      /* "alazar\board.pyx":492
- *                                               buf_queue)
- *                 # pickles the buffer and sends to the worker
- *                 buf_queue.put( (buffers[buffer_index], None) )             # <<<<<<<<<<<<<<
- *                 # hand the buffer back to the board
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
- */
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_buf_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_24 = __Pyx_GetItemInt_List(__pyx_v_buffers, __pyx_v_buffer_index, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_24 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L15_error;};
-      __Pyx_GOTREF(__pyx_t_24);
-      __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_GIVEREF(__pyx_t_24);
-      PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_24);
-      __Pyx_INCREF(Py_None);
-      __Pyx_GIVEREF(Py_None);
-      PyTuple_SET_ITEM(__pyx_t_5, 1, Py_None);
-      __pyx_t_24 = 0;
-      __pyx_t_24 = NULL;
-      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
-        __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
-        if (likely(__pyx_t_24)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-          __Pyx_INCREF(__pyx_t_24);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_12, function);
-        }
-      }
-      if (!__pyx_t_24) {
-        __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __Pyx_GOTREF(__pyx_t_4);
-      } else {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-        __Pyx_GOTREF(__pyx_t_6);
-        __Pyx_GIVEREF(__pyx_t_24); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_24); __pyx_t_24 = NULL;
-        __Pyx_GIVEREF(__pyx_t_5);
-        PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_5);
-        __pyx_t_5 = 0;
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-        __Pyx_GOTREF(__pyx_t_4);
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      }
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-      /* "alazar\board.pyx":495
- *                 # hand the buffer back to the board
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
- *                                                               &buf_view[0],             # <<<<<<<<<<<<<<
- *                                                               bytes_per_buffer)
- *                 _check_return_code_processing(ret_code,
- */
-      __pyx_t_25 = 0;
-      __pyx_t_22 = -1;
-      if (__pyx_t_25 < 0) {
-        __pyx_t_25 += __pyx_v_buf_view.shape[0];
-        if (unlikely(__pyx_t_25 < 0)) __pyx_t_22 = 0;
-      } else if (unlikely(__pyx_t_25 >= __pyx_v_buf_view.shape[0])) __pyx_t_22 = 0;
-      if (unlikely(__pyx_t_22 != -1)) {
-        __Pyx_RaiseBufferIndexError(__pyx_t_22);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 495; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      }
-
-      /* "alazar\board.pyx":496
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
- *                                                               &buf_view[0],
- *                                                               bytes_per_buffer)             # <<<<<<<<<<<<<<
- *                 _check_return_code_processing(ret_code,
- *                                               "Failed to send buffer address back "
- */
-      __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_bytes_per_buffer); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 496; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-
-      /* "alazar\board.pyx":494
- *                 buf_queue.put( (buffers[buffer_index], None) )
- *                 # hand the buffer back to the board
- *                 ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,             # <<<<<<<<<<<<<<
- *                                                               &buf_view[0],
- *                                                               bytes_per_buffer)
- */
-      __pyx_v_ret_code = AlazarPostAsyncBuffer(__pyx_v_self->board, (&(*((unsigned char *) ( /* dim=0 */ (__pyx_v_buf_view.data + __pyx_t_25 * __pyx_v_buf_view.strides[0]) )))), __pyx_t_15);
-
-      /* "alazar\board.pyx":497
- *                                                               &buf_view[0],
- *                                                               bytes_per_buffer)
- *                 _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
- *                                               "Failed to send buffer address back "
- *                                               "to board during acquisition:",
- */
-      __pyx_t_12 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+      __pyx_t_6 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 540; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
       __Pyx_GOTREF(__pyx_t_6);
-
-      /* "alazar\board.pyx":500
- *                                               "Failed to send buffer address back "
- *                                               "to board during acquisition:",
- *                                               buf_queue)             # <<<<<<<<<<<<<<
- *             # done with acquisition
- *         finally:
- */
-      __pyx_t_5 = NULL;
-      __pyx_t_7 = 0;
-      if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_12))) {
-        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_12);
-        if (likely(__pyx_t_5)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-          __Pyx_INCREF(__pyx_t_5);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_12, function);
-          __pyx_t_7 = 1;
-        }
+      if (__pyx_t_8) {
+        __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_8); __pyx_t_8 = NULL;
       }
-      __pyx_t_24 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
-      __Pyx_GOTREF(__pyx_t_24);
-      if (__pyx_t_5) {
-        __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_5); __pyx_t_5 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_24, 0+__pyx_t_7, __pyx_t_6);
-      __Pyx_INCREF(__pyx_kp_s_Failed_to_send_buffer_address_ba);
-      __Pyx_GIVEREF(__pyx_kp_s_Failed_to_send_buffer_address_ba);
-      PyTuple_SET_ITEM(__pyx_t_24, 1+__pyx_t_7, __pyx_kp_s_Failed_to_send_buffer_address_ba);
+      __Pyx_GIVEREF(__pyx_t_24);
+      PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_7, __pyx_t_24);
+      __Pyx_INCREF(__pyx_kp_s_Failed_to_start_capture);
+      __Pyx_GIVEREF(__pyx_kp_s_Failed_to_start_capture);
+      PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_7, __pyx_kp_s_Failed_to_start_capture);
       __Pyx_INCREF(__pyx_v_buf_queue);
       __Pyx_GIVEREF(__pyx_v_buf_queue);
-      PyTuple_SET_ITEM(__pyx_t_24, 2+__pyx_t_7, __pyx_v_buf_queue);
-      __pyx_t_6 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_24, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+      PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_7, __pyx_v_buf_queue);
+      __pyx_t_24 = 0;
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 540; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    }
-  }
 
-  /* "alazar\board.pyx":504
- *         finally:
- *             # make sure we abort the acquisition so the board doesn't get stuck
- *             self._abort_acquisition()             # <<<<<<<<<<<<<<
- *         # get the processors and return them
- *         return comm.get()
+      /* "alazar\board.pyx":544
+ *                                               buf_queue)
+ *                 # handle each buffer
+ *                 for buf_num in xrange(buffers_per_acquisition):             # <<<<<<<<<<<<<<
+ *                     buffer_index = buf_num % buffer_count
+ *                     buf_view_short = buffer_addresses[buffer_index]
  */
-  /*finally:*/ {
-    /*normal exit:*/{
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_abort_acquisition); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_24 = NULL;
-      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
-        __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
-        if (likely(__pyx_t_24)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-          __Pyx_INCREF(__pyx_t_24);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_12, function);
-        }
-      }
-      if (__pyx_t_24) {
-        __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_24); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-        __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-      } else {
-        __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      }
-      __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      goto __pyx_L16;
-    }
-    /*exception exit:*/{
-      __pyx_L15_error:;
-      __pyx_t_27 = 0; __pyx_t_28 = 0; __pyx_t_29 = 0; __pyx_t_30 = 0; __pyx_t_31 = 0; __pyx_t_32 = 0;
-      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_XDECREF(__pyx_t_24); __pyx_t_24 = 0;
-      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
-      if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_30, &__pyx_t_31, &__pyx_t_32);
-      if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_27, &__pyx_t_28, &__pyx_t_29) < 0)) __Pyx_ErrFetch(&__pyx_t_27, &__pyx_t_28, &__pyx_t_29);
-      __Pyx_XGOTREF(__pyx_t_27);
-      __Pyx_XGOTREF(__pyx_t_28);
-      __Pyx_XGOTREF(__pyx_t_29);
-      __Pyx_XGOTREF(__pyx_t_30);
-      __Pyx_XGOTREF(__pyx_t_31);
-      __Pyx_XGOTREF(__pyx_t_32);
-      __pyx_t_10 = __pyx_lineno; __pyx_t_21 = __pyx_clineno; __pyx_t_26 = __pyx_filename;
-      {
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_abort_acquisition); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+      __pyx_t_21 = __pyx_v_buffers_per_acquisition;
+      for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_21; __pyx_t_10+=1) {
+        __pyx_v_buf_num = __pyx_t_10;
+
+        /* "alazar\board.pyx":545
+ *                 # handle each buffer
+ *                 for buf_num in xrange(buffers_per_acquisition):
+ *                     buffer_index = buf_num % buffer_count             # <<<<<<<<<<<<<<
+ *                     buf_view_short = buffer_addresses[buffer_index]
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ */
+        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_buf_num); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_12 = PyNumber_Remainder(__pyx_t_4, __pyx_v_buffer_count); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_24 = NULL;
-        if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
-          __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
-          if (likely(__pyx_t_24)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-            __Pyx_INCREF(__pyx_t_24);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_22 = __Pyx_PyInt_As_int(__pyx_t_12); if (unlikely((__pyx_t_22 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_v_buffer_index = __pyx_t_22;
+
+        /* "alazar\board.pyx":546
+ *                 for buf_num in xrange(buffers_per_acquisition):
+ *                     buffer_index = buf_num % buffer_count
+ *                     buf_view_short = buffer_addresses[buffer_index]             # <<<<<<<<<<<<<<
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ *                                                                           &buf_view_short[0],
+ */
+        __pyx_t_12 = __Pyx_GetItemInt_List(__pyx_v_buffer_addresses, __pyx_v_buffer_index, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_12 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 546; __pyx_clineno = __LINE__; goto __pyx_L25_error;};
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_33 = __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_short(__pyx_t_12);
+        if (unlikely(!__pyx_t_33.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 546; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_short, 1);
+        __pyx_v_buf_view_short = __pyx_t_33;
+        __pyx_t_33.memview = NULL;
+        __pyx_t_33.data = NULL;
+
+        /* "alazar\board.pyx":548
+ *                     buf_view_short = buffer_addresses[buffer_index]
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ *                                                                           &buf_view_short[0],             # <<<<<<<<<<<<<<
+ *                                                                           timeout)
+ *                     _check_return_code_processing(ret_code,
+ */
+        __pyx_t_35 = 0;
+        __pyx_t_22 = -1;
+        if (__pyx_t_35 < 0) {
+          __pyx_t_35 += __pyx_v_buf_view_short.shape[0];
+          if (unlikely(__pyx_t_35 < 0)) __pyx_t_22 = 0;
+        } else if (unlikely(__pyx_t_35 >= __pyx_v_buf_view_short.shape[0])) __pyx_t_22 = 0;
+        if (unlikely(__pyx_t_22 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_22);
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 548; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        }
+
+        /* "alazar\board.pyx":549
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+ *                                                                           &buf_view_short[0],
+ *                                                                           timeout)             # <<<<<<<<<<<<<<
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ */
+        __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_timeout); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 549; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+
+        /* "alazar\board.pyx":547
+ *                     buffer_index = buf_num % buffer_count
+ *                     buf_view_short = buffer_addresses[buffer_index]
+ *                     ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,             # <<<<<<<<<<<<<<
+ *                                                                           &buf_view_short[0],
+ *                                                                           timeout)
+ */
+        __pyx_v_ret_code = AlazarWaitAsyncBufferComplete(__pyx_v_self->board, (&(*((unsigned short *) ( /* dim=0 */ (__pyx_v_buf_view_short.data + __pyx_t_35 * __pyx_v_buf_view_short.strides[0]) )))), __pyx_t_15);
+
+        /* "alazar\board.pyx":550
+ *                                                                           &buf_view_short[0],
+ *                                                                           timeout)
+ *                     _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ *                                                   .format(buf_num),
+ */
+        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 550; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 550; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+
+        /* "alazar\board.pyx":552
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ *                                                   .format(buf_num),             # <<<<<<<<<<<<<<
+ *                                                   buf_queue)
+ *                     # pickles the buffer and sends to the worker
+ */
+        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Wait_for_buffer_complete_failed, __pyx_n_s_format); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_8);
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_buf_num); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_5);
+        __pyx_t_3 = NULL;
+        if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_8))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_8);
+          if (likely(__pyx_t_3)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
+            __Pyx_INCREF(__pyx_t_3);
             __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_12, function);
+            __Pyx_DECREF_SET(__pyx_t_8, function);
           }
         }
-        if (__pyx_t_24) {
-          __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_24); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
-          __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+        if (!__pyx_t_3) {
+          __pyx_t_24 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_GOTREF(__pyx_t_24);
         } else {
-          __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+          __pyx_t_1 = PyTuple_New(1+1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3); __pyx_t_3 = NULL;
+          __Pyx_GIVEREF(__pyx_t_5);
+          PyTuple_SET_ITEM(__pyx_t_1, 0+1, __pyx_t_5);
+          __pyx_t_5 = 0;
+          __pyx_t_24 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_1, NULL); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+          __Pyx_GOTREF(__pyx_t_24);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         }
-        __Pyx_GOTREF(__pyx_t_4);
-        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      }
-      if (PY_MAJOR_VERSION >= 3) {
-        __Pyx_XGIVEREF(__pyx_t_30);
-        __Pyx_XGIVEREF(__pyx_t_31);
-        __Pyx_XGIVEREF(__pyx_t_32);
-        __Pyx_ExceptionReset(__pyx_t_30, __pyx_t_31, __pyx_t_32);
-      }
-      __Pyx_XGIVEREF(__pyx_t_27);
-      __Pyx_XGIVEREF(__pyx_t_28);
-      __Pyx_XGIVEREF(__pyx_t_29);
-      __Pyx_ErrRestore(__pyx_t_27, __pyx_t_28, __pyx_t_29);
-      __pyx_t_27 = 0; __pyx_t_28 = 0; __pyx_t_29 = 0; __pyx_t_30 = 0; __pyx_t_31 = 0; __pyx_t_32 = 0;
-      __pyx_lineno = __pyx_t_10; __pyx_clineno = __pyx_t_21; __pyx_filename = __pyx_t_26;
-      goto __pyx_L1_error;
-      __pyx_L22_error:;
-      if (PY_MAJOR_VERSION >= 3) {
-        __Pyx_XGIVEREF(__pyx_t_30);
-        __Pyx_XGIVEREF(__pyx_t_31);
-        __Pyx_XGIVEREF(__pyx_t_32);
-        __Pyx_ExceptionReset(__pyx_t_30, __pyx_t_31, __pyx_t_32);
-      }
-      __Pyx_XDECREF(__pyx_t_27); __pyx_t_27 = 0;
-      __Pyx_XDECREF(__pyx_t_28); __pyx_t_28 = 0;
-      __Pyx_XDECREF(__pyx_t_29); __pyx_t_29 = 0;
-      __pyx_t_30 = 0; __pyx_t_31 = 0; __pyx_t_32 = 0;
-      goto __pyx_L1_error;
-    }
-    __pyx_L16:;
-  }
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-  /* "alazar\board.pyx":506
- *             self._abort_acquisition()
- *         # get the processors and return them
- *         return comm.get()             # <<<<<<<<<<<<<<
+        /* "alazar\board.pyx":553
+ *                                                   "Wait for buffer complete failed on buffer {}:"
+ *                                                   .format(buf_num),
+ *                                                   buf_queue)             # <<<<<<<<<<<<<<
+ *                     # pickles the buffer and sends to the worker
+ *                     buf_queue.put( (buffers[buffer_index], None) )
+ */
+        __pyx_t_8 = NULL;
+        __pyx_t_7 = 0;
+        if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_8)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_8);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+            __pyx_t_7 = 1;
+          }
+        }
+        __pyx_t_1 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 550; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_1);
+        if (__pyx_t_8) {
+          __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_8); __pyx_t_8 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_6);
+        PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_7, __pyx_t_6);
+        __Pyx_GIVEREF(__pyx_t_24);
+        PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_7, __pyx_t_24);
+        __Pyx_INCREF(__pyx_v_buf_queue);
+        __Pyx_GIVEREF(__pyx_v_buf_queue);
+        PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_7, __pyx_v_buf_queue);
+        __pyx_t_6 = 0;
+        __pyx_t_24 = 0;
+        __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 550; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+
+        /* "alazar\board.pyx":555
+ *                                                   buf_queue)
+ *                     # pickles the buffer and sends to the worker
+ *                     buf_queue.put( (buffers[buffer_index], None) )             # <<<<<<<<<<<<<<
+ *                     # hand the buffer back to the board
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ */
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_buf_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 555; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_buffers, __pyx_v_buffer_index, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 555; __pyx_clineno = __LINE__; goto __pyx_L25_error;};
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_24 = PyTuple_New(2); if (unlikely(!__pyx_t_24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 555; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_24);
+        __Pyx_GIVEREF(__pyx_t_1);
+        PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_1);
+        __Pyx_INCREF(Py_None);
+        __Pyx_GIVEREF(Py_None);
+        PyTuple_SET_ITEM(__pyx_t_24, 1, Py_None);
+        __pyx_t_1 = 0;
+        __pyx_t_1 = NULL;
+        if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        if (!__pyx_t_1) {
+          __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_24); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 555; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+          __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+          __Pyx_GOTREF(__pyx_t_12);
+        } else {
+          __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 555; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+          __Pyx_GOTREF(__pyx_t_6);
+          __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1); __pyx_t_1 = NULL;
+          __Pyx_GIVEREF(__pyx_t_24);
+          PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_24);
+          __pyx_t_24 = 0;
+          __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 555; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+          __Pyx_GOTREF(__pyx_t_12);
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        }
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+
+        /* "alazar\board.pyx":558
+ *                     # hand the buffer back to the board
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_short[0],             # <<<<<<<<<<<<<<
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,
+ */
+        __pyx_t_36 = 0;
+        __pyx_t_22 = -1;
+        if (__pyx_t_36 < 0) {
+          __pyx_t_36 += __pyx_v_buf_view_short.shape[0];
+          if (unlikely(__pyx_t_36 < 0)) __pyx_t_22 = 0;
+        } else if (unlikely(__pyx_t_36 >= __pyx_v_buf_view_short.shape[0])) __pyx_t_22 = 0;
+        if (unlikely(__pyx_t_22 != -1)) {
+          __Pyx_RaiseBufferIndexError(__pyx_t_22);
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        }
+
+        /* "alazar\board.pyx":559
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+ *                                                                   &buf_view_short[0],
+ *                                                                   bytes_per_buffer)             # <<<<<<<<<<<<<<
+ *                     _check_return_code_processing(ret_code,
+ *                                                   "Failed to send buffer address back "
+ */
+        __pyx_t_15 = __Pyx_PyInt_As_U32(__pyx_v_bytes_per_buffer); if (unlikely((__pyx_t_15 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+
+        /* "alazar\board.pyx":557
+ *                     buf_queue.put( (buffers[buffer_index], None) )
+ *                     # hand the buffer back to the board
+ *                     ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,             # <<<<<<<<<<<<<<
+ *                                                                   &buf_view_short[0],
+ *                                                                   bytes_per_buffer)
+ */
+        __pyx_v_ret_code = AlazarPostAsyncBuffer(__pyx_v_self->board, (&(*((unsigned short *) ( /* dim=0 */ (__pyx_v_buf_view_short.data + __pyx_t_36 * __pyx_v_buf_view_short.strides[0]) )))), __pyx_t_15);
+
+        /* "alazar\board.pyx":560
+ *                                                                   &buf_view_short[0],
+ *                                                                   bytes_per_buffer)
+ *                     _check_return_code_processing(ret_code,             # <<<<<<<<<<<<<<
+ *                                                   "Failed to send buffer address back "
+ *                                                   "to board during acquisition:",
+ */
+        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code_processing); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_6 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+
+        /* "alazar\board.pyx":563
+ *                                                   "Failed to send buffer address back "
+ *                                                   "to board during acquisition:",
+ *                                                   buf_queue)             # <<<<<<<<<<<<<<
+ *                 # done with acquisition
+ *             finally:
+ */
+        __pyx_t_24 = NULL;
+        __pyx_t_7 = 0;
+        if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_24)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_24);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+            __pyx_t_7 = 1;
+          }
+        }
+        __pyx_t_1 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_1);
+        if (__pyx_t_24) {
+          __Pyx_GIVEREF(__pyx_t_24); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_24); __pyx_t_24 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_6);
+        PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_7, __pyx_t_6);
+        __Pyx_INCREF(__pyx_kp_s_Failed_to_send_buffer_address_ba);
+        __Pyx_GIVEREF(__pyx_kp_s_Failed_to_send_buffer_address_ba);
+        PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_7, __pyx_kp_s_Failed_to_send_buffer_address_ba);
+        __Pyx_INCREF(__pyx_v_buf_queue);
+        __Pyx_GIVEREF(__pyx_v_buf_queue);
+        PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_7, __pyx_v_buf_queue);
+        __pyx_t_6 = 0;
+        __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L25_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+      }
+    }
+
+    /* "alazar\board.pyx":567
+ *             finally:
+ *                 # make sure we abort the acquisition so the board doesn't get stuck
+ *                 self._abort_acquisition()             # <<<<<<<<<<<<<<
+ *             # get the processors and return them
+ *             return comm.get()
+ */
+    /*finally:*/ {
+      /*normal exit:*/{
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_abort_acquisition); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 567; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_1 = NULL;
+        if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_1)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_1);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        if (__pyx_t_1) {
+          __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 567; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        } else {
+          __pyx_t_12 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 567; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        }
+        __Pyx_GOTREF(__pyx_t_12);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        goto __pyx_L26;
+      }
+      /*exception exit:*/{
+        __pyx_L25_error:;
+        __pyx_t_32 = 0; __pyx_t_31 = 0; __pyx_t_30 = 0; __pyx_t_29 = 0; __pyx_t_28 = 0; __pyx_t_27 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_t_33, 1);
+        __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+        __Pyx_XDECREF(__pyx_t_24); __pyx_t_24 = 0;
+        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+        if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_29, &__pyx_t_28, &__pyx_t_27);
+        if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_32, &__pyx_t_31, &__pyx_t_30) < 0)) __Pyx_ErrFetch(&__pyx_t_32, &__pyx_t_31, &__pyx_t_30);
+        __Pyx_XGOTREF(__pyx_t_32);
+        __Pyx_XGOTREF(__pyx_t_31);
+        __Pyx_XGOTREF(__pyx_t_30);
+        __Pyx_XGOTREF(__pyx_t_29);
+        __Pyx_XGOTREF(__pyx_t_28);
+        __Pyx_XGOTREF(__pyx_t_27);
+        __pyx_t_21 = __pyx_lineno; __pyx_t_10 = __pyx_clineno; __pyx_t_37 = __pyx_filename;
+        {
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_abort_acquisition); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 567; __pyx_clineno = __LINE__; goto __pyx_L34_error;}
+          __Pyx_GOTREF(__pyx_t_4);
+          __pyx_t_1 = NULL;
+          if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
+            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+            if (likely(__pyx_t_1)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_4, function);
+            }
+          }
+          if (__pyx_t_1) {
+            __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 567; __pyx_clineno = __LINE__; goto __pyx_L34_error;}
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          } else {
+            __pyx_t_12 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 567; __pyx_clineno = __LINE__; goto __pyx_L34_error;}
+          }
+          __Pyx_GOTREF(__pyx_t_12);
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        }
+        if (PY_MAJOR_VERSION >= 3) {
+          __Pyx_XGIVEREF(__pyx_t_29);
+          __Pyx_XGIVEREF(__pyx_t_28);
+          __Pyx_XGIVEREF(__pyx_t_27);
+          __Pyx_ExceptionReset(__pyx_t_29, __pyx_t_28, __pyx_t_27);
+        }
+        __Pyx_XGIVEREF(__pyx_t_32);
+        __Pyx_XGIVEREF(__pyx_t_31);
+        __Pyx_XGIVEREF(__pyx_t_30);
+        __Pyx_ErrRestore(__pyx_t_32, __pyx_t_31, __pyx_t_30);
+        __pyx_t_32 = 0; __pyx_t_31 = 0; __pyx_t_30 = 0; __pyx_t_29 = 0; __pyx_t_28 = 0; __pyx_t_27 = 0;
+        __pyx_lineno = __pyx_t_21; __pyx_clineno = __pyx_t_10; __pyx_filename = __pyx_t_37;
+        goto __pyx_L1_error;
+        __pyx_L34_error:;
+        if (PY_MAJOR_VERSION >= 3) {
+          __Pyx_XGIVEREF(__pyx_t_29);
+          __Pyx_XGIVEREF(__pyx_t_28);
+          __Pyx_XGIVEREF(__pyx_t_27);
+          __Pyx_ExceptionReset(__pyx_t_29, __pyx_t_28, __pyx_t_27);
+        }
+        __Pyx_XDECREF(__pyx_t_32); __pyx_t_32 = 0;
+        __Pyx_XDECREF(__pyx_t_31); __pyx_t_31 = 0;
+        __Pyx_XDECREF(__pyx_t_30); __pyx_t_30 = 0;
+        __pyx_t_29 = 0; __pyx_t_28 = 0; __pyx_t_27 = 0;
+        goto __pyx_L1_error;
+      }
+      __pyx_L26:;
+    }
+
+    /* "alazar\board.pyx":569
+ *                 self._abort_acquisition()
+ *             # get the processors and return them
+ *             return comm.get()             # <<<<<<<<<<<<<<
  * 
  *     def _abort_acquisition(self):
  */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_comm, __pyx_n_s_get); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 506; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_24 = NULL;
-  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
-    __pyx_t_24 = PyMethod_GET_SELF(__pyx_t_12);
-    if (likely(__pyx_t_24)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-      __Pyx_INCREF(__pyx_t_24);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_12, function);
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_comm, __pyx_n_s_get); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 569; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = NULL;
+    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
+      }
     }
+    if (__pyx_t_1) {
+      __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 569; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    } else {
+      __pyx_t_12 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 569; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+    __Pyx_GOTREF(__pyx_t_12);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_r = __pyx_t_12;
+    __pyx_t_12 = 0;
+    goto __pyx_L0;
   }
-  if (__pyx_t_24) {
-    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_24); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 506; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-  } else {
-    __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 506; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  }
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  __pyx_r = __pyx_t_4;
-  __pyx_t_4 = 0;
-  goto __pyx_L0;
 
   /* "alazar\board.pyx":329
  * 
@@ -9245,6 +10029,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
   __Pyx_XDECREF(__pyx_t_12);
   __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
   __Pyx_XDECREF(__pyx_t_24);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_33, 1);
   __Pyx_AddTraceback("alazar.board.Alazar.acquire", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -9260,7 +10045,8 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
   __Pyx_XDECREF(__pyx_v_buf_processor);
   __Pyx_XDECREF(__pyx_v_buffers);
   __Pyx_XDECREF(__pyx_v_buffer_addresses);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_char, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_buf_view_short, 1);
   __Pyx_XDECREF(__pyx_v_buf);
   __Pyx_XDECREF(__pyx_v_b);
   __Pyx_XDECREF(__pyx_v_n);
@@ -9269,8 +10055,8 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":508
- *         return comm.get()
+/* "alazar\board.pyx":571
+ *             return comm.get()
  * 
  *     def _abort_acquisition(self):             # <<<<<<<<<<<<<<
  *         """Command the board to abort a running acquisition.
@@ -9306,7 +10092,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_14_abort_acquisition(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_abort_acquisition", 0);
 
-  /* "alazar\board.pyx":515
+  /* "alazar\board.pyx":578
  *         This is left exposed as a method for debugging purposes if the board has
  *         gotten stuck in DmaInProgress."""
  *         ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)             # <<<<<<<<<<<<<<
@@ -9315,16 +10101,16 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_14_abort_acquisition(struct __p
  */
   __pyx_v_ret_code = AlazarAbortAsyncRead(__pyx_v_self->board);
 
-  /* "alazar\board.pyx":516
+  /* "alazar\board.pyx":579
  *         gotten stuck in DmaInProgress."""
  *         ret_code = c_alazar_api.AlazarAbortAsyncRead(self.board)
  *         _check_return_code(ret_code,"Failed to abort acquisition:")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 579; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_enum___RETURN_CODE(__pyx_v_ret_code); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 579; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -9338,7 +10124,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_14_abort_acquisition(struct __p
       __pyx_t_5 = 1;
     }
   }
-  __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 579; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   if (__pyx_t_4) {
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -9349,14 +10135,14 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_14_abort_acquisition(struct __p
   __Pyx_GIVEREF(__pyx_kp_s_Failed_to_abort_acquisition);
   PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_kp_s_Failed_to_abort_acquisition);
   __pyx_t_3 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 579; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":508
- *         return comm.get()
+  /* "alazar\board.pyx":571
+ *             return comm.get()
  * 
  *     def _abort_acquisition(self):             # <<<<<<<<<<<<<<
  *         """Command the board to abort a running acquisition.
@@ -9380,7 +10166,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_14_abort_acquisition(struct __p
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":522
+/* "alazar\board.pyx":585
  * 
  * # helper function for processing
  * def _reshape_buffer(buf, chan, acq_params):             # <<<<<<<<<<<<<<
@@ -9423,16 +10209,16 @@ static PyObject *__pyx_pw_6alazar_5board_1_reshape_buffer(PyObject *__pyx_self, 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_chan)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_reshape_buffer", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_reshape_buffer", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_acq_params)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_reshape_buffer", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_reshape_buffer", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_reshape_buffer") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_reshape_buffer") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -9447,7 +10233,7 @@ static PyObject *__pyx_pw_6alazar_5board_1_reshape_buffer(PyObject *__pyx_self, 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_reshape_buffer", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_reshape_buffer", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("alazar.board._reshape_buffer", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9473,67 +10259,67 @@ static PyObject *__pyx_pf_6alazar_5board__reshape_buffer(CYTHON_UNUSED PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_reshape_buffer", 0);
 
-  /* "alazar\board.pyx":524
+  /* "alazar\board.pyx":587
  * def _reshape_buffer(buf, chan, acq_params):
  *     """Reshape a buffer from linear into n_records x m_samples."""
  *     chunk_size = acq_params["channel_chunk_size"]             # <<<<<<<<<<<<<<
  *     chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
  *     chan_dat.shape = (acq_params["records_per_buffer"],
  */
-  __pyx_t_1 = PyObject_GetItem(__pyx_v_acq_params, __pyx_n_s_channel_chunk_size); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_1 = PyObject_GetItem(__pyx_v_acq_params, __pyx_n_s_channel_chunk_size); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 587; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chunk_size = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":525
+  /* "alazar\board.pyx":588
  *     """Reshape a buffer from linear into n_records x m_samples."""
  *     chunk_size = acq_params["channel_chunk_size"]
  *     chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]             # <<<<<<<<<<<<<<
  *     chan_dat.shape = (acq_params["records_per_buffer"],
  *                       acq_params["samples_per_record"])
  */
-  __pyx_t_1 = PyNumber_Multiply(__pyx_v_chan, __pyx_v_chunk_size); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_Multiply(__pyx_v_chan, __pyx_v_chunk_size); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 588; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_chan, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_chan, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 588; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_chunk_size); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_chunk_size); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 588; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_v_buf, 0, 0, &__pyx_t_1, &__pyx_t_3, NULL, 0, 0, 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_v_buf, 0, 0, &__pyx_t_1, &__pyx_t_3, NULL, 0, 0, 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 588; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_chan_dat = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "alazar\board.pyx":526
+  /* "alazar\board.pyx":589
  *     chunk_size = acq_params["channel_chunk_size"]
  *     chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
  *     chan_dat.shape = (acq_params["records_per_buffer"],             # <<<<<<<<<<<<<<
  *                       acq_params["samples_per_record"])
  *     return chan_dat
  */
-  __pyx_t_2 = PyObject_GetItem(__pyx_v_acq_params, __pyx_n_s_records_per_buffer); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_acq_params, __pyx_n_s_records_per_buffer); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 589; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "alazar\board.pyx":527
+  /* "alazar\board.pyx":590
  *     chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
  *     chan_dat.shape = (acq_params["records_per_buffer"],
  *                       acq_params["samples_per_record"])             # <<<<<<<<<<<<<<
  *     return chan_dat
  * 
  */
-  __pyx_t_3 = PyObject_GetItem(__pyx_v_acq_params, __pyx_n_s_samples_per_record); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 527; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_3 = PyObject_GetItem(__pyx_v_acq_params, __pyx_n_s_samples_per_record); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 590; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "alazar\board.pyx":526
+  /* "alazar\board.pyx":589
  *     chunk_size = acq_params["channel_chunk_size"]
  *     chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
  *     chan_dat.shape = (acq_params["records_per_buffer"],             # <<<<<<<<<<<<<<
  *                       acq_params["samples_per_record"])
  *     return chan_dat
  */
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 589; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -9541,10 +10327,10 @@ static PyObject *__pyx_pf_6alazar_5board__reshape_buffer(CYTHON_UNUSED PyObject 
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_chan_dat, __pyx_n_s_shape, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_chan_dat, __pyx_n_s_shape, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 589; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":528
+  /* "alazar\board.pyx":591
  *     chan_dat.shape = (acq_params["records_per_buffer"],
  *                       acq_params["samples_per_record"])
  *     return chan_dat             # <<<<<<<<<<<<<<
@@ -9556,7 +10342,7 @@ static PyObject *__pyx_pf_6alazar_5board__reshape_buffer(CYTHON_UNUSED PyObject 
   __pyx_r = __pyx_v_chan_dat;
   goto __pyx_L0;
 
-  /* "alazar\board.pyx":522
+  /* "alazar\board.pyx":585
  * 
  * # helper function for processing
  * def _reshape_buffer(buf, chan, acq_params):             # <<<<<<<<<<<<<<
@@ -9579,7 +10365,7 @@ static PyObject *__pyx_pf_6alazar_5board__reshape_buffer(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":530
+/* "alazar\board.pyx":593
  *     return chan_dat
  * 
  * def def_acq_params(samples_per_record,             # <<<<<<<<<<<<<<
@@ -9626,26 +10412,26 @@ static PyObject *__pyx_pw_6alazar_5board_3def_acq_params(PyObject *__pyx_self, P
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_records_per_acquisition)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_records_per_buffer)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_channel_count)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_dtype)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "def_acq_params") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "def_acq_params") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -9664,7 +10450,7 @@ static PyObject *__pyx_pw_6alazar_5board_3def_acq_params(PyObject *__pyx_self, P
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("def_acq_params", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("alazar.board.def_acq_params", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9688,7 +10474,7 @@ static PyObject *__pyx_pf_6alazar_5board_2def_acq_params(CYTHON_UNUSED PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("def_acq_params", 0);
 
-  /* "alazar\board.pyx":536
+  /* "alazar\board.pyx":599
  *                    dtype):
  *     """Return a dictionary containing useful acquisition parameters."""
  *     return dict(samples_per_record=samples_per_record,             # <<<<<<<<<<<<<<
@@ -9696,89 +10482,89 @@ static PyObject *__pyx_pf_6alazar_5board_2def_acq_params(CYTHON_UNUSED PyObject 
  *                 records_per_buffer = records_per_buffer,
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_samples_per_record, __pyx_v_samples_per_record) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_samples_per_record, __pyx_v_samples_per_record) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":537
+  /* "alazar\board.pyx":600
  *     """Return a dictionary containing useful acquisition parameters."""
  *     return dict(samples_per_record=samples_per_record,
  *                 records_per_acquisition = records_per_acquisition,             # <<<<<<<<<<<<<<
  *                 records_per_buffer = records_per_buffer,
  *                 channel_count = channel_count,
  */
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_records_per_acquisition, __pyx_v_records_per_acquisition) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_records_per_acquisition, __pyx_v_records_per_acquisition) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":538
+  /* "alazar\board.pyx":601
  *     return dict(samples_per_record=samples_per_record,
  *                 records_per_acquisition = records_per_acquisition,
  *                 records_per_buffer = records_per_buffer,             # <<<<<<<<<<<<<<
  *                 channel_count = channel_count,
  *                 samples_per_buffer = samples_per_record * records_per_buffer * channel_count,
  */
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_records_per_buffer, __pyx_v_records_per_buffer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_records_per_buffer, __pyx_v_records_per_buffer) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":539
+  /* "alazar\board.pyx":602
  *                 records_per_acquisition = records_per_acquisition,
  *                 records_per_buffer = records_per_buffer,
  *                 channel_count = channel_count,             # <<<<<<<<<<<<<<
  *                 samples_per_buffer = samples_per_record * records_per_buffer * channel_count,
  *                 channel_chunk_size = samples_per_record * records_per_buffer,
  */
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_channel_count, __pyx_v_channel_count) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_channel_count, __pyx_v_channel_count) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":540
+  /* "alazar\board.pyx":603
  *                 records_per_buffer = records_per_buffer,
  *                 channel_count = channel_count,
  *                 samples_per_buffer = samples_per_record * records_per_buffer * channel_count,             # <<<<<<<<<<<<<<
  *                 channel_chunk_size = samples_per_record * records_per_buffer,
  *                 buffers_per_acquisition = records_per_acquisition / records_per_buffer,
  */
-  __pyx_t_2 = PyNumber_Multiply(__pyx_v_samples_per_record, __pyx_v_records_per_buffer); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 540; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Multiply(__pyx_v_samples_per_record, __pyx_v_records_per_buffer); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_channel_count); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 540; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_channel_count); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_samples_per_buffer, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_samples_per_buffer, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "alazar\board.pyx":541
+  /* "alazar\board.pyx":604
  *                 channel_count = channel_count,
  *                 samples_per_buffer = samples_per_record * records_per_buffer * channel_count,
  *                 channel_chunk_size = samples_per_record * records_per_buffer,             # <<<<<<<<<<<<<<
  *                 buffers_per_acquisition = records_per_acquisition / records_per_buffer,
  *                 dtype = dtype)
  */
-  __pyx_t_3 = PyNumber_Multiply(__pyx_v_samples_per_record, __pyx_v_records_per_buffer); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_Multiply(__pyx_v_samples_per_record, __pyx_v_records_per_buffer); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_channel_chunk_size, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_channel_chunk_size, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "alazar\board.pyx":542
+  /* "alazar\board.pyx":605
  *                 samples_per_buffer = samples_per_record * records_per_buffer * channel_count,
  *                 channel_chunk_size = samples_per_record * records_per_buffer,
  *                 buffers_per_acquisition = records_per_acquisition / records_per_buffer,             # <<<<<<<<<<<<<<
  *                 dtype = dtype)
  * 
  */
-  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_records_per_acquisition, __pyx_v_records_per_buffer); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_records_per_acquisition, __pyx_v_records_per_buffer); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_buffers_per_acquisition, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_buffers_per_acquisition, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "alazar\board.pyx":543
+  /* "alazar\board.pyx":606
  *                 channel_chunk_size = samples_per_record * records_per_buffer,
  *                 buffers_per_acquisition = records_per_acquisition / records_per_buffer,
  *                 dtype = dtype)             # <<<<<<<<<<<<<<
  * 
  * def get_systems_and_boards():
  */
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_v_dtype) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_v_dtype) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "alazar\board.pyx":530
+  /* "alazar\board.pyx":593
  *     return chan_dat
  * 
  * def def_acq_params(samples_per_record,             # <<<<<<<<<<<<<<
@@ -9799,7 +10585,7 @@ static PyObject *__pyx_pf_6alazar_5board_2def_acq_params(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":545
+/* "alazar\board.pyx":608
  *                 dtype = dtype)
  * 
  * def get_systems_and_boards():             # <<<<<<<<<<<<<<
@@ -9839,7 +10625,7 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_systems_and_boards", 0);
 
-  /* "alazar\board.pyx":549
+  /* "alazar\board.pyx":612
  * 
  *     Obnoxiously, Alazar indexes the systems and boards from 1 rather than 0."""
  *     n_sys = c_alazar_api.AlazarNumOfSystems()             # <<<<<<<<<<<<<<
@@ -9848,42 +10634,42 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
  */
   __pyx_v_n_sys = AlazarNumOfSystems();
 
-  /* "alazar\board.pyx":550
+  /* "alazar\board.pyx":613
  *     Obnoxiously, Alazar indexes the systems and boards from 1 rather than 0."""
  *     n_sys = c_alazar_api.AlazarNumOfSystems()
  *     n_b = {}             # <<<<<<<<<<<<<<
  *     for s in xrange(n_sys):
  *         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 550; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 613; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_n_b = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":551
+  /* "alazar\board.pyx":614
  *     n_sys = c_alazar_api.AlazarNumOfSystems()
  *     n_b = {}
  *     for s in xrange(n_sys):             # <<<<<<<<<<<<<<
  *         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)
  *     return n_b
  */
-  __pyx_t_1 = __Pyx_PyInt_From_U32(__pyx_v_n_sys); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_U32(__pyx_v_n_sys); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_xrange, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_xrange, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
     __pyx_t_2 = __pyx_t_1; __Pyx_INCREF(__pyx_t_2); __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -9891,17 +10677,17 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_3 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -9911,7 +10697,7 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 614; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -9920,26 +10706,26 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
     __Pyx_XDECREF_SET(__pyx_v_s, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "alazar\board.pyx":552
+    /* "alazar\board.pyx":615
  *     n_b = {}
  *     for s in xrange(n_sys):
  *         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)             # <<<<<<<<<<<<<<
  *     return n_b
  * 
  */
-    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_s, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_s, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyInt_As_U32(__pyx_t_1); if (unlikely((__pyx_t_5 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyInt_As_U32(__pyx_t_1); if (unlikely((__pyx_t_5 == (U32)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_From_U32(AlazarBoardsInSystemBySystemID(__pyx_t_5)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyInt_From_U32(AlazarBoardsInSystemBySystemID(__pyx_t_5)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_s, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_s, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
-    if (unlikely(PyDict_SetItem(__pyx_v_n_b, __pyx_t_6, __pyx_t_1) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(PyDict_SetItem(__pyx_v_n_b, __pyx_t_6, __pyx_t_1) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "alazar\board.pyx":551
+    /* "alazar\board.pyx":614
  *     n_sys = c_alazar_api.AlazarNumOfSystems()
  *     n_b = {}
  *     for s in xrange(n_sys):             # <<<<<<<<<<<<<<
@@ -9949,7 +10735,7 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "alazar\board.pyx":553
+  /* "alazar\board.pyx":616
  *     for s in xrange(n_sys):
  *         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)
  *     return n_b             # <<<<<<<<<<<<<<
@@ -9961,7 +10747,7 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
   __pyx_r = __pyx_v_n_b;
   goto __pyx_L0;
 
-  /* "alazar\board.pyx":545
+  /* "alazar\board.pyx":608
  *                 dtype = dtype)
  * 
  * def get_systems_and_boards():             # <<<<<<<<<<<<<<
@@ -9984,7 +10770,7 @@ static PyObject *__pyx_pf_6alazar_5board_4get_systems_and_boards(CYTHON_UNUSED P
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":563
+/* "alazar\board.pyx":626
  * 
  * 
  * def _check_return_code(return_code, msg):             # <<<<<<<<<<<<<<
@@ -10025,11 +10811,11 @@ static PyObject *__pyx_pw_6alazar_5board_7_check_return_code(PyObject *__pyx_sel
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_msg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_check_return_code", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_check_return_code", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_return_code") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_return_code") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -10042,7 +10828,7 @@ static PyObject *__pyx_pw_6alazar_5board_7_check_return_code(PyObject *__pyx_sel
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_check_return_code", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_check_return_code", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("alazar.board._check_return_code", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -10071,30 +10857,30 @@ static PyObject *__pyx_pf_6alazar_5board_6_check_return_code(CYTHON_UNUSED PyObj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_check_return_code", 0);
 
-  /* "alazar\board.pyx":569
+  /* "alazar\board.pyx":632
  *     provided message and the text version of the Alazar error code.
  *     """
  *     if return_code != 512:             # <<<<<<<<<<<<<<
  *         raise AlazarException(msg + " " + _return_code_to_string(return_code))
  * 
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_return_code, __pyx_int_512, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 569; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 569; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_return_code, __pyx_int_512, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 632; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 632; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "alazar\board.pyx":570
+    /* "alazar\board.pyx":633
  *     """
  *     if return_code != 512:
  *         raise AlazarException(msg + " " + _return_code_to_string(return_code))             # <<<<<<<<<<<<<<
  * 
  * def _check_return_code_processing(return_code, msg, buf_queue):
  */
-    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyNumber_Add(__pyx_v_msg, __pyx_kp_s__4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_Add(__pyx_v_msg, __pyx_kp_s__4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_return_code_to_string); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_return_code_to_string); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_7 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_6))) {
@@ -10107,21 +10893,21 @@ static PyObject *__pyx_pf_6alazar_5board_6_check_return_code(CYTHON_UNUSED PyObj
       }
     }
     if (!__pyx_t_7) {
-      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_return_code); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_return_code); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
     } else {
-      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
       __Pyx_INCREF(__pyx_v_return_code);
       __Pyx_GIVEREF(__pyx_v_return_code);
       PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_v_return_code);
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyNumber_Add(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyNumber_Add(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -10136,26 +10922,26 @@ static PyObject *__pyx_pf_6alazar_5board_6_check_return_code(CYTHON_UNUSED PyObj
       }
     }
     if (!__pyx_t_5) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_t_6);
       __pyx_t_6 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "alazar\board.pyx":569
+    /* "alazar\board.pyx":632
  *     provided message and the text version of the Alazar error code.
  *     """
  *     if return_code != 512:             # <<<<<<<<<<<<<<
@@ -10164,7 +10950,7 @@ static PyObject *__pyx_pf_6alazar_5board_6_check_return_code(CYTHON_UNUSED PyObj
  */
   }
 
-  /* "alazar\board.pyx":563
+  /* "alazar\board.pyx":626
  * 
  * 
  * def _check_return_code(return_code, msg):             # <<<<<<<<<<<<<<
@@ -10191,7 +10977,7 @@ static PyObject *__pyx_pf_6alazar_5board_6_check_return_code(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":572
+/* "alazar\board.pyx":635
  *         raise AlazarException(msg + " " + _return_code_to_string(return_code))
  * 
  * def _check_return_code_processing(return_code, msg, buf_queue):             # <<<<<<<<<<<<<<
@@ -10234,16 +11020,16 @@ static PyObject *__pyx_pw_6alazar_5board_9_check_return_code_processing(PyObject
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_msg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_check_return_code_processing", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_check_return_code_processing", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_buf_queue)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_check_return_code_processing", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_check_return_code_processing", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_return_code_processing") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_return_code_processing") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -10258,7 +11044,7 @@ static PyObject *__pyx_pw_6alazar_5board_9_check_return_code_processing(PyObject
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_check_return_code_processing", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_check_return_code_processing", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("alazar.board._check_return_code_processing", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -10287,12 +11073,13 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
   PyObject *__pyx_t_10 = NULL;
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
+  PyObject *__pyx_t_13 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_check_return_code_processing", 0);
 
-  /* "alazar\board.pyx":574
+  /* "alazar\board.pyx":637
  * def _check_return_code_processing(return_code, msg, buf_queue):
  *     """Check an Alazar return code for success and send error to processor."""
  *     try:             # <<<<<<<<<<<<<<
@@ -10306,14 +11093,14 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "alazar\board.pyx":575
+      /* "alazar\board.pyx":638
  *     """Check an Alazar return code for success and send error to processor."""
  *     try:
  *         _check_return_code(return_code, msg)             # <<<<<<<<<<<<<<
  *     except AlazarException as err:
- *         buf_queue.put(None, err)
+ *         buf_queue.put((None, err))
  */
-      __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 575; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_return_code); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 638; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_6 = NULL;
       __pyx_t_7 = 0;
@@ -10327,7 +11114,7 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
           __pyx_t_7 = 1;
         }
       }
-      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 575; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 638; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       __Pyx_GOTREF(__pyx_t_8);
       if (__pyx_t_6) {
         __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -10338,13 +11125,13 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
       __Pyx_INCREF(__pyx_v_msg);
       __Pyx_GIVEREF(__pyx_v_msg);
       PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_v_msg);
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 575; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 638; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "alazar\board.pyx":574
+      /* "alazar\board.pyx":637
  * def _check_return_code_processing(return_code, msg, buf_queue):
  *     """Check an Alazar return code for success and send error to processor."""
  *     try:             # <<<<<<<<<<<<<<
@@ -10362,78 +11149,85 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "alazar\board.pyx":576
+    /* "alazar\board.pyx":639
  *     try:
  *         _check_return_code(return_code, msg)
  *     except AlazarException as err:             # <<<<<<<<<<<<<<
- *         buf_queue.put(None, err)
+ *         buf_queue.put((None, err))
  *         raise err
  */
-    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 576; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 639; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_9 = PyErr_ExceptionMatches(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_9) {
       __Pyx_AddTraceback("alazar.board._check_return_code_processing", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_5, &__pyx_t_8) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 576; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_5, &__pyx_t_8) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 639; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_INCREF(__pyx_t_5);
       __pyx_v_err = __pyx_t_5;
 
-      /* "alazar\board.pyx":577
+      /* "alazar\board.pyx":640
  *         _check_return_code(return_code, msg)
  *     except AlazarException as err:
- *         buf_queue.put(None, err)             # <<<<<<<<<<<<<<
+ *         buf_queue.put((None, err))             # <<<<<<<<<<<<<<
  *         raise err
  * 
  */
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_buf_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 577; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_buf_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 640; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_11 = NULL;
-      __pyx_t_7 = 0;
-      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_10))) {
-        __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_10);
-        if (likely(__pyx_t_11)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
-          __Pyx_INCREF(__pyx_t_11);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_10, function);
-          __pyx_t_7 = 1;
-        }
-      }
-      __pyx_t_12 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 577; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
-      __Pyx_GOTREF(__pyx_t_12);
-      if (__pyx_t_11) {
-        __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_11); __pyx_t_11 = NULL;
-      }
+      __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 640; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+      __Pyx_GOTREF(__pyx_t_11);
       __Pyx_INCREF(Py_None);
       __Pyx_GIVEREF(Py_None);
-      PyTuple_SET_ITEM(__pyx_t_12, 0+__pyx_t_7, Py_None);
+      PyTuple_SET_ITEM(__pyx_t_11, 0, Py_None);
       __Pyx_INCREF(__pyx_v_err);
       __Pyx_GIVEREF(__pyx_v_err);
-      PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_7, __pyx_v_err);
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_12, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 577; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+      PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_v_err);
+      __pyx_t_12 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_10))) {
+        __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_10);
+        if (likely(__pyx_t_12)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+          __Pyx_INCREF(__pyx_t_12);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_10, function);
+        }
+      }
+      if (!__pyx_t_12) {
+        __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_11); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 640; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+        __Pyx_GOTREF(__pyx_t_6);
+      } else {
+        __pyx_t_13 = PyTuple_New(1+1); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 640; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_12); __pyx_t_12 = NULL;
+        __Pyx_GIVEREF(__pyx_t_11);
+        PyTuple_SET_ITEM(__pyx_t_13, 0+1, __pyx_t_11);
+        __pyx_t_11 = 0;
+        __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_13, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 640; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+      }
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "alazar\board.pyx":578
+      /* "alazar\board.pyx":641
  *     except AlazarException as err:
- *         buf_queue.put(None, err)
+ *         buf_queue.put((None, err))
  *         raise err             # <<<<<<<<<<<<<<
  * 
  * def _return_code_to_string(return_code):
  */
       __Pyx_Raise(__pyx_v_err, 0, 0, 0);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 578; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
     }
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "alazar\board.pyx":574
+    /* "alazar\board.pyx":637
  * def _check_return_code_processing(return_code, msg, buf_queue):
  *     """Check an Alazar return code for success and send error to processor."""
  *     try:             # <<<<<<<<<<<<<<
@@ -10448,7 +11242,7 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
     __pyx_L10_try_end:;
   }
 
-  /* "alazar\board.pyx":572
+  /* "alazar\board.pyx":635
  *         raise AlazarException(msg + " " + _return_code_to_string(return_code))
  * 
  * def _check_return_code_processing(return_code, msg, buf_queue):             # <<<<<<<<<<<<<<
@@ -10467,6 +11261,7 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
   __Pyx_XDECREF(__pyx_t_10);
   __Pyx_XDECREF(__pyx_t_11);
   __Pyx_XDECREF(__pyx_t_12);
+  __Pyx_XDECREF(__pyx_t_13);
   __Pyx_AddTraceback("alazar.board._check_return_code_processing", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -10476,7 +11271,7 @@ static PyObject *__pyx_pf_6alazar_5board_8_check_return_code_processing(CYTHON_U
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":580
+/* "alazar\board.pyx":643
  *         raise err
  * 
  * def _return_code_to_string(return_code):             # <<<<<<<<<<<<<<
@@ -10509,7 +11304,7 @@ static PyObject *__pyx_pf_6alazar_5board_10_return_code_to_string(CYTHON_UNUSED 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_return_code_to_string", 0);
 
-  /* "alazar\board.pyx":585
+  /* "alazar\board.pyx":648
  *     This function assumes a valid return code.
  *     """
  *     return <bytes> c_alazar_api.AlazarErrorToText(return_code)             # <<<<<<<<<<<<<<
@@ -10517,15 +11312,15 @@ static PyObject *__pyx_pf_6alazar_5board_10_return_code_to_string(CYTHON_UNUSED 
  * # --- valid parameter settings by board type
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((enum _RETURN_CODE)__Pyx_PyInt_As_enum___RETURN_CODE(__pyx_v_return_code)); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyBytes_FromString(AlazarErrorToText(__pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((enum _RETURN_CODE)__Pyx_PyInt_As_enum___RETURN_CODE(__pyx_v_return_code)); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 648; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyBytes_FromString(AlazarErrorToText(__pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 648; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject*)__pyx_t_2));
   __pyx_r = __pyx_t_2;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "alazar\board.pyx":580
+  /* "alazar\board.pyx":643
  *         raise err
  * 
  * def _return_code_to_string(return_code):             # <<<<<<<<<<<<<<
@@ -10544,7 +11339,7 @@ static PyObject *__pyx_pf_6alazar_5board_10_return_code_to_string(CYTHON_UNUSED 
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":589
+/* "alazar\board.pyx":652
  * # --- valid parameter settings by board type
  * 
  * def channels(board_type):             # <<<<<<<<<<<<<<
@@ -10582,14 +11377,14 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("channels", 0);
 
-  /* "alazar\board.pyx":594
+  /* "alazar\board.pyx":657
  *     board_type can be the numerical ID or the string "ATS####"
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
  *         return params.channels
  *     else:
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -10602,28 +11397,28 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (!__pyx_t_6) {
   } else {
     __pyx_t_1 = __pyx_t_6;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -10636,27 +11431,27 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = __pyx_t_6;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "alazar\board.pyx":595
+    /* "alazar\board.pyx":658
  *     """
  *     if is_9870(board_type) or is_9360(board_type):
  *         return params.channels             # <<<<<<<<<<<<<<
@@ -10664,16 +11459,16 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
  *         raise AlazarException("Could not get channels for board type " + str(board_type))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 595; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 658; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_channels); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 595; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_channels); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 658; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":594
+    /* "alazar\board.pyx":657
  *     board_type can be the numerical ID or the string "ATS####"
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -10682,7 +11477,7 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
  */
   }
 
-  /* "alazar\board.pyx":597
+  /* "alazar\board.pyx":660
  *         return params.channels
  *     else:
  *         raise AlazarException("Could not get channels for board type " + str(board_type))             # <<<<<<<<<<<<<<
@@ -10690,17 +11485,17 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
  * def trigger_sources(board_type):
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_board_type);
-    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyNumber_Add(__pyx_kp_s_Could_not_get_channels_for_board, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_Add(__pyx_kp_s_Could_not_get_channels_for_board, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -10714,27 +11509,27 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
       }
     }
     if (!__pyx_t_5) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":589
+  /* "alazar\board.pyx":652
  * # --- valid parameter settings by board type
  * 
  * def channels(board_type):             # <<<<<<<<<<<<<<
@@ -10757,7 +11552,7 @@ static PyObject *__pyx_pf_6alazar_5board_12channels(CYTHON_UNUSED PyObject *__py
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":599
+/* "alazar\board.pyx":662
  *         raise AlazarException("Could not get channels for board type " + str(board_type))
  * 
  * def trigger_sources(board_type):             # <<<<<<<<<<<<<<
@@ -10795,14 +11590,14 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("trigger_sources", 0);
 
-  /* "alazar\board.pyx":604
+  /* "alazar\board.pyx":667
  *     board_type can be the numerical ID or the string "ATS####"
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
  *         return params.trig_sources
  *     else:
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -10815,28 +11610,28 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (!__pyx_t_6) {
   } else {
     __pyx_t_1 = __pyx_t_6;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -10849,27 +11644,27 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = __pyx_t_6;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "alazar\board.pyx":605
+    /* "alazar\board.pyx":668
  *     """
  *     if is_9870(board_type) or is_9360(board_type):
  *         return params.trig_sources             # <<<<<<<<<<<<<<
@@ -10877,16 +11672,16 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
  *         raise AlazarException("Could not get trigger sources for board type " + str(board_type))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_trig_sources); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_trig_sources); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":604
+    /* "alazar\board.pyx":667
  *     board_type can be the numerical ID or the string "ATS####"
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -10895,7 +11690,7 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
  */
   }
 
-  /* "alazar\board.pyx":607
+  /* "alazar\board.pyx":670
  *         return params.trig_sources
  *     else:
  *         raise AlazarException("Could not get trigger sources for board type " + str(board_type))             # <<<<<<<<<<<<<<
@@ -10903,17 +11698,17 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
  * def clock_sources(board_type):
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_board_type);
-    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyNumber_Add(__pyx_kp_s_Could_not_get_trigger_sources_fo, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_Add(__pyx_kp_s_Could_not_get_trigger_sources_fo, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -10927,27 +11722,27 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
       }
     }
     if (!__pyx_t_5) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":599
+  /* "alazar\board.pyx":662
  *         raise AlazarException("Could not get channels for board type " + str(board_type))
  * 
  * def trigger_sources(board_type):             # <<<<<<<<<<<<<<
@@ -10970,7 +11765,7 @@ static PyObject *__pyx_pf_6alazar_5board_14trigger_sources(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":609
+/* "alazar\board.pyx":672
  *         raise AlazarException("Could not get trigger sources for board type " + str(board_type))
  * 
  * def clock_sources(board_type):             # <<<<<<<<<<<<<<
@@ -11008,14 +11803,14 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("clock_sources", 0);
 
-  /* "alazar\board.pyx":615
+  /* "alazar\board.pyx":678
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
  *         return params.clock_sources
  *     else:
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -11028,28 +11823,28 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (!__pyx_t_6) {
   } else {
     __pyx_t_1 = __pyx_t_6;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -11062,27 +11857,27 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 615; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = __pyx_t_6;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "alazar\board.pyx":616
+    /* "alazar\board.pyx":679
  *     """
  *     if is_9870(board_type) or is_9360(board_type):
  *         return params.clock_sources             # <<<<<<<<<<<<<<
@@ -11090,16 +11885,16 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
  *         raise AlazarException("Could not get clock sources for board type " + str(board_type))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 616; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 679; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_clock_sources); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 616; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_clock_sources); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 679; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":615
+    /* "alazar\board.pyx":678
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -11108,7 +11903,7 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
  */
   }
 
-  /* "alazar\board.pyx":618
+  /* "alazar\board.pyx":681
  *         return params.clock_sources
  *     else:
  *         raise AlazarException("Could not get clock sources for board type " + str(board_type))             # <<<<<<<<<<<<<<
@@ -11116,17 +11911,17 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
  * def sample_rates(board_type):
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_board_type);
-    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyNumber_Add(__pyx_kp_s_Could_not_get_clock_sources_for, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_Add(__pyx_kp_s_Could_not_get_clock_sources_for, __pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -11140,27 +11935,27 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
       }
     }
     if (!__pyx_t_5) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 618; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 681; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":609
+  /* "alazar\board.pyx":672
  *         raise AlazarException("Could not get trigger sources for board type " + str(board_type))
  * 
  * def clock_sources(board_type):             # <<<<<<<<<<<<<<
@@ -11183,7 +11978,7 @@ static PyObject *__pyx_pf_6alazar_5board_16clock_sources(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":620
+/* "alazar\board.pyx":683
  *         raise AlazarException("Could not get clock sources for board type " + str(board_type))
  * 
  * def sample_rates(board_type):             # <<<<<<<<<<<<<<
@@ -11220,14 +12015,14 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("sample_rates", 0);
 
-  /* "alazar\board.pyx":626
+  /* "alazar\board.pyx":689
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
  *         return params.sample_rates_9870
  *     elif is_9360(board_type):
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 689; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -11240,25 +12035,25 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 689; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 689; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 689; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 689; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":627
+    /* "alazar\board.pyx":690
  *     """
  *     if is_9870(board_type):
  *         return params.sample_rates_9870             # <<<<<<<<<<<<<<
@@ -11266,16 +12061,16 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
  *         return params.sample_rates_9360
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 627; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 690; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sample_rates_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 627; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sample_rates_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 690; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":626
+    /* "alazar\board.pyx":689
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -11284,14 +12079,14 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
  */
   }
 
-  /* "alazar\board.pyx":628
+  /* "alazar\board.pyx":691
  *     if is_9870(board_type):
  *         return params.sample_rates_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
  *         return params.sample_rates_9360
  *     else:
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 628; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 691; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -11304,25 +12099,25 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 628; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 691; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 628; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 691; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 628; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 691; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 628; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 691; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":629
+    /* "alazar\board.pyx":692
  *         return params.sample_rates_9870
  *     elif is_9360(board_type):
  *         return params.sample_rates_9360             # <<<<<<<<<<<<<<
@@ -11330,16 +12125,16 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
  *         raise AlazarException("Could not get sample rates for board type " + str(board_type))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 629; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 692; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_sample_rates_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 629; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_sample_rates_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 692; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":628
+    /* "alazar\board.pyx":691
  *     if is_9870(board_type):
  *         return params.sample_rates_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -11348,7 +12143,7 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
  */
   }
 
-  /* "alazar\board.pyx":631
+  /* "alazar\board.pyx":694
  *         return params.sample_rates_9360
  *     else:
  *         raise AlazarException("Could not get sample rates for board type " + str(board_type))             # <<<<<<<<<<<<<<
@@ -11356,17 +12151,17 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
  * def ranges(board_type):
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_board_type);
-    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_sample_rates_for_b, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_sample_rates_for_b, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -11380,27 +12175,27 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 631; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":620
+  /* "alazar\board.pyx":683
  *         raise AlazarException("Could not get clock sources for board type " + str(board_type))
  * 
  * def sample_rates(board_type):             # <<<<<<<<<<<<<<
@@ -11423,7 +12218,7 @@ static PyObject *__pyx_pf_6alazar_5board_18sample_rates(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":633
+/* "alazar\board.pyx":696
  *         raise AlazarException("Could not get sample rates for board type " + str(board_type))
  * 
  * def ranges(board_type):             # <<<<<<<<<<<<<<
@@ -11460,14 +12255,14 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("ranges", 0);
 
-  /* "alazar\board.pyx":639
+  /* "alazar\board.pyx":702
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
  *         return params.ranges_9870
  *     elif is_9360(board_type):
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 639; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -11480,25 +12275,25 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 639; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 639; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 639; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 639; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":640
+    /* "alazar\board.pyx":703
  *     """
  *     if is_9870(board_type):
  *         return params.ranges_9870             # <<<<<<<<<<<<<<
@@ -11506,16 +12301,16 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
  *         return params.ranges_9360
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 640; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 703; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ranges_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 640; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ranges_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 703; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":639
+    /* "alazar\board.pyx":702
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -11524,14 +12319,14 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
  */
   }
 
-  /* "alazar\board.pyx":641
+  /* "alazar\board.pyx":704
  *     if is_9870(board_type):
  *         return params.ranges_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
  *         return params.ranges_9360
  *     else:
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -11544,25 +12339,25 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 641; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":642
+    /* "alazar\board.pyx":705
  *         return params.ranges_9870
  *     elif is_9360(board_type):
  *         return params.ranges_9360             # <<<<<<<<<<<<<<
@@ -11570,16 +12365,16 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
  *         raise AlazarException("Could not get input ranges for board type " + str(board_type))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 642; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 705; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ranges_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 642; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ranges_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 705; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":641
+    /* "alazar\board.pyx":704
  *     if is_9870(board_type):
  *         return params.ranges_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -11588,7 +12383,7 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
  */
   }
 
-  /* "alazar\board.pyx":644
+  /* "alazar\board.pyx":707
  *         return params.ranges_9360
  *     else:
  *         raise AlazarException("Could not get input ranges for board type " + str(board_type))             # <<<<<<<<<<<<<<
@@ -11596,17 +12391,17 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
  * def input_couplings(board_type):
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_board_type);
-    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_input_ranges_for_b, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_input_ranges_for_b, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -11620,27 +12415,27 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 644; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 707; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":633
+  /* "alazar\board.pyx":696
  *         raise AlazarException("Could not get sample rates for board type " + str(board_type))
  * 
  * def ranges(board_type):             # <<<<<<<<<<<<<<
@@ -11663,7 +12458,7 @@ static PyObject *__pyx_pf_6alazar_5board_20ranges(CYTHON_UNUSED PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":646
+/* "alazar\board.pyx":709
  *         raise AlazarException("Could not get input ranges for board type " + str(board_type))
  * 
  * def input_couplings(board_type):             # <<<<<<<<<<<<<<
@@ -11700,14 +12495,14 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("input_couplings", 0);
 
-  /* "alazar\board.pyx":652
+  /* "alazar\board.pyx":715
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
  *         return params.couplings_9870
  *     elif is_9360(board_type):
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -11720,25 +12515,25 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":653
+    /* "alazar\board.pyx":716
  *     """
  *     if is_9870(board_type):
  *         return params.couplings_9870             # <<<<<<<<<<<<<<
@@ -11746,16 +12541,16 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
  *         return params.couplings_9360
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 653; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 716; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_couplings_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 653; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_couplings_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 716; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":652
+    /* "alazar\board.pyx":715
  *     At present, only the ATS9870 and ATS9360 are supported.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -11764,14 +12559,14 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
  */
   }
 
-  /* "alazar\board.pyx":654
+  /* "alazar\board.pyx":717
  *     if is_9870(board_type):
  *         return params.couplings_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
  *         return params.couplings_9360
  *     else:
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 654; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -11784,25 +12579,25 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 654; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 654; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 654; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 654; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":655
+    /* "alazar\board.pyx":718
  *         return params.couplings_9870
  *     elif is_9360(board_type):
  *         return params.couplings_9360             # <<<<<<<<<<<<<<
@@ -11810,16 +12605,16 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
  *         raise AlazarException("Could not get input couplings for board type " + str(board_type))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 655; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 718; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_couplings_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 655; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_couplings_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 718; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":654
+    /* "alazar\board.pyx":717
  *     if is_9870(board_type):
  *         return params.couplings_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -11828,7 +12623,7 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
  */
   }
 
-  /* "alazar\board.pyx":657
+  /* "alazar\board.pyx":720
  *         return params.couplings_9360
  *     else:
  *         raise AlazarException("Could not get input couplings for board type " + str(board_type))             # <<<<<<<<<<<<<<
@@ -11836,17 +12631,17 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
  * def ext_trig_range(board_type):
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_board_type);
-    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_input_couplings_fo, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_input_couplings_fo, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -11860,27 +12655,27 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 657; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":646
+  /* "alazar\board.pyx":709
  *         raise AlazarException("Could not get input ranges for board type " + str(board_type))
  * 
  * def input_couplings(board_type):             # <<<<<<<<<<<<<<
@@ -11903,7 +12698,7 @@ static PyObject *__pyx_pf_6alazar_5board_22input_couplings(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":659
+/* "alazar\board.pyx":722
  *         raise AlazarException("Could not get input couplings for board type " + str(board_type))
  * 
  * def ext_trig_range(board_type):             # <<<<<<<<<<<<<<
@@ -11940,14 +12735,14 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("ext_trig_range", 0);
 
-  /* "alazar\board.pyx":666
+  /* "alazar\board.pyx":729
  *     The SDK guide does specify which ranges are valid for which board.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
  *         return params.trig_ranges_9870
  *     elif is_9360(board_type):
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 666; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -11960,25 +12755,25 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 666; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 666; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 666; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 666; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":667
+    /* "alazar\board.pyx":730
  *     """
  *     if is_9870(board_type):
  *         return params.trig_ranges_9870             # <<<<<<<<<<<<<<
@@ -11986,16 +12781,16 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
  *         return params.trig_ranges_9360
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 730; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_trig_ranges_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_trig_ranges_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 730; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":666
+    /* "alazar\board.pyx":729
  *     The SDK guide does specify which ranges are valid for which board.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -12004,14 +12799,14 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
  */
   }
 
-  /* "alazar\board.pyx":668
+  /* "alazar\board.pyx":731
  *     if is_9870(board_type):
  *         return params.trig_ranges_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
  *         return params.trig_ranges_9360
  *     else:
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 731; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -12024,25 +12819,25 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 731; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 731; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 731; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 731; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":669
+    /* "alazar\board.pyx":732
  *         return params.trig_ranges_9870
  *     elif is_9360(board_type):
  *         return params.trig_ranges_9360             # <<<<<<<<<<<<<<
@@ -12050,16 +12845,16 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
  *         raise AlazarException("Could not get trigger input ranges for board type " + str(board_type))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 669; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_params); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 732; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_trig_ranges_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 669; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_trig_ranges_9360); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 732; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":668
+    /* "alazar\board.pyx":731
  *     if is_9870(board_type):
  *         return params.trig_ranges_9870
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -12068,7 +12863,7 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
  */
   }
 
-  /* "alazar\board.pyx":671
+  /* "alazar\board.pyx":734
  *         return params.trig_ranges_9360
  *     else:
  *         raise AlazarException("Could not get trigger input ranges for board type " + str(board_type))             # <<<<<<<<<<<<<<
@@ -12076,17 +12871,17 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
  * # --- parameter validation
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_board_type);
-    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_trigger_input_rang, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_Add(__pyx_kp_s_Could_not_get_trigger_input_rang, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -12100,27 +12895,27 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":659
+  /* "alazar\board.pyx":722
  *         raise AlazarException("Could not get input couplings for board type " + str(board_type))
  * 
  * def ext_trig_range(board_type):             # <<<<<<<<<<<<<<
@@ -12143,7 +12938,7 @@ static PyObject *__pyx_pf_6alazar_5board_24ext_trig_range(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":677
+/* "alazar\board.pyx":740
  * max_decimation = 100000
  * 
  * def _check_decimation(board_type, decimation):             # <<<<<<<<<<<<<<
@@ -12184,11 +12979,11 @@ static PyObject *__pyx_pw_6alazar_5board_27_check_decimation(PyObject *__pyx_sel
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_decimation)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_check_decimation", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_check_decimation", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_decimation") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_decimation") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -12201,7 +12996,7 @@ static PyObject *__pyx_pw_6alazar_5board_27_check_decimation(PyObject *__pyx_sel
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_check_decimation", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_check_decimation", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("alazar.board._check_decimation", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -12229,22 +13024,22 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_check_decimation", 0);
 
-  /* "alazar\board.pyx":683
+  /* "alazar\board.pyx":746
  *     This function currently only supports the ATS9870.
  *     """
  *     if decimation >= max_decimation:             # <<<<<<<<<<<<<<
  *         return False
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_max_decimation); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_max_decimation); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 746; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_decimation, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_decimation, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 746; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 746; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "alazar\board.pyx":684
+    /* "alazar\board.pyx":747
  *     """
  *     if decimation >= max_decimation:
  *         return False             # <<<<<<<<<<<<<<
@@ -12256,7 +13051,7 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
     __pyx_r = Py_False;
     goto __pyx_L0;
 
-    /* "alazar\board.pyx":683
+    /* "alazar\board.pyx":746
  *     This function currently only supports the ATS9870.
  *     """
  *     if decimation >= max_decimation:             # <<<<<<<<<<<<<<
@@ -12265,14 +13060,14 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
  */
   }
 
-  /* "alazar\board.pyx":686
+  /* "alazar\board.pyx":749
  *         return False
  * 
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
  *         if decimation in [1,2,4] or (decimation >= 0 and decimation % 10 == 0):
  *             # 10 MHz ref requires decimation of 1, 2, 4, or mult. of 10
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 686; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 749; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -12285,25 +13080,25 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 686; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 749; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 686; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 749; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 686; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 749; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 686; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 749; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "alazar\board.pyx":687
+    /* "alazar\board.pyx":750
  * 
  *     if is_9870(board_type):
  *         if decimation in [1,2,4] or (decimation >= 0 and decimation % 10 == 0):             # <<<<<<<<<<<<<<
@@ -12312,27 +13107,27 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
  */
     __Pyx_INCREF(__pyx_v_decimation);
     __pyx_t_2 = __pyx_v_decimation;
-    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (!__pyx_t_7) {
     } else {
       __pyx_t_6 = __pyx_t_7;
       goto __pyx_L8_bool_binop_done;
     }
-    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (!__pyx_t_7) {
     } else {
       __pyx_t_6 = __pyx_t_7;
       goto __pyx_L8_bool_binop_done;
     }
-    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_4, 4, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_4, 4, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_6 = __pyx_t_7;
     __pyx_L8_bool_binop_done:;
@@ -12343,26 +13138,26 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
       __pyx_t_3 = __pyx_t_7;
       goto __pyx_L6_bool_binop_done;
     }
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_decimation, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_decimation, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_7) {
     } else {
       __pyx_t_3 = __pyx_t_7;
       goto __pyx_L6_bool_binop_done;
     }
-    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_v_decimation, __pyx_int_10, 10, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_v_decimation, __pyx_int_10, 10, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 687; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_3 = __pyx_t_7;
     __pyx_L6_bool_binop_done:;
     if (__pyx_t_3) {
 
-      /* "alazar\board.pyx":689
+      /* "alazar\board.pyx":752
  *         if decimation in [1,2,4] or (decimation >= 0 and decimation % 10 == 0):
  *             # 10 MHz ref requires decimation of 1, 2, 4, or mult. of 10
  *             return True             # <<<<<<<<<<<<<<
@@ -12374,7 +13169,7 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "alazar\board.pyx":687
+      /* "alazar\board.pyx":750
  * 
  *     if is_9870(board_type):
  *         if decimation in [1,2,4] or (decimation >= 0 and decimation % 10 == 0):             # <<<<<<<<<<<<<<
@@ -12383,7 +13178,7 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
  */
     }
 
-    /* "alazar\board.pyx":691
+    /* "alazar\board.pyx":754
  *             return True
  *         else:
  *             return False             # <<<<<<<<<<<<<<
@@ -12397,7 +13192,7 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
       goto __pyx_L0;
     }
 
-    /* "alazar\board.pyx":686
+    /* "alazar\board.pyx":749
  *         return False
  * 
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -12406,7 +13201,7 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
  */
   }
 
-  /* "alazar\board.pyx":693
+  /* "alazar\board.pyx":756
  *             return False
  *     else:
  *         return False             # <<<<<<<<<<<<<<
@@ -12420,7 +13215,7 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
     goto __pyx_L0;
   }
 
-  /* "alazar\board.pyx":677
+  /* "alazar\board.pyx":740
  * max_decimation = 100000
  * 
  * def _check_decimation(board_type, decimation):             # <<<<<<<<<<<<<<
@@ -12442,7 +13237,7 @@ static PyObject *__pyx_pf_6alazar_5board_26_check_decimation(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":695
+/* "alazar\board.pyx":758
  *         return False
  * 
  * def _check_buffer_alignment(board_type, n_samples):             # <<<<<<<<<<<<<<
@@ -12483,11 +13278,11 @@ static PyObject *__pyx_pw_6alazar_5board_29_check_buffer_alignment(PyObject *__p
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_n_samples)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_check_buffer_alignment", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_check_buffer_alignment", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 758; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_buffer_alignment") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_buffer_alignment") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 758; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -12500,7 +13295,7 @@ static PyObject *__pyx_pw_6alazar_5board_29_check_buffer_alignment(PyObject *__p
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_check_buffer_alignment", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_check_buffer_alignment", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 758; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("alazar.board._check_buffer_alignment", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -12532,14 +13327,14 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_check_buffer_alignment", 0);
 
-  /* "alazar\board.pyx":700
+  /* "alazar\board.pyx":763
  *     This function currently only supports the ATS9870.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
  *         # ATS9870: min record size is 256, n_samples must be a multiple of 64.
  *         min_record_size = 256
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -12552,25 +13347,25 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":702
+    /* "alazar\board.pyx":765
  *     if is_9870(board_type):
  *         # ATS9870: min record size is 256, n_samples must be a multiple of 64.
  *         min_record_size = 256             # <<<<<<<<<<<<<<
@@ -12579,7 +13374,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
  */
     __pyx_v_min_record_size = 0x100;
 
-    /* "alazar\board.pyx":703
+    /* "alazar\board.pyx":766
  *         # ATS9870: min record size is 256, n_samples must be a multiple of 64.
  *         min_record_size = 256
  *         buffer_alignment = 64             # <<<<<<<<<<<<<<
@@ -12589,7 +13384,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     __Pyx_INCREF(__pyx_int_64);
     __pyx_v_buffer_alignment = __pyx_int_64;
 
-    /* "alazar\board.pyx":700
+    /* "alazar\board.pyx":763
  *     This function currently only supports the ATS9870.
  *     """
  *     if is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -12599,14 +13394,14 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     goto __pyx_L3;
   }
 
-  /* "alazar\board.pyx":704
+  /* "alazar\board.pyx":767
  *         min_record_size = 256
  *         buffer_alignment = 64
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
  *         # ATS9360: min record size is 256, n_samples must be a multiple of 128.
  *         min_record_size = 256
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 767; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -12619,25 +13414,25 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board_type); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 767; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 767; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, __pyx_v_board_type);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 767; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 704; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 767; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":706
+    /* "alazar\board.pyx":769
  *     elif is_9360(board_type):
  *         # ATS9360: min record size is 256, n_samples must be a multiple of 128.
  *         min_record_size = 256             # <<<<<<<<<<<<<<
@@ -12646,7 +13441,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
  */
     __pyx_v_min_record_size = 0x100;
 
-    /* "alazar\board.pyx":707
+    /* "alazar\board.pyx":770
  *         # ATS9360: min record size is 256, n_samples must be a multiple of 128.
  *         min_record_size = 256
  *         buffer_alignment = 128             # <<<<<<<<<<<<<<
@@ -12656,7 +13451,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     __Pyx_INCREF(__pyx_int_128);
     __pyx_v_buffer_alignment = __pyx_int_128;
 
-    /* "alazar\board.pyx":704
+    /* "alazar\board.pyx":767
  *         min_record_size = 256
  *         buffer_alignment = 64
  *     elif is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -12666,7 +13461,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     goto __pyx_L3;
   }
 
-  /* "alazar\board.pyx":709
+  /* "alazar\board.pyx":772
  *         buffer_alignment = 128
  *     else:
  *         raise AlazarException("Could not validate record length for board type {}."             # <<<<<<<<<<<<<<
@@ -12674,17 +13469,17 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
  * 
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 772; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "alazar\board.pyx":710
+    /* "alazar\board.pyx":773
  *     else:
  *         raise AlazarException("Could not validate record length for board type {}."
  *                               .format(board_type))             # <<<<<<<<<<<<<<
  * 
  *     if n_samples < min_record_size:
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Could_not_validate_record_length, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 710; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Could_not_validate_record_length, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 773; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_6 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -12697,16 +13492,16 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
       }
     }
     if (!__pyx_t_6) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_board_type); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 710; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_board_type); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 773; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 710; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 773; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
       __Pyx_INCREF(__pyx_v_board_type);
       __Pyx_GIVEREF(__pyx_v_board_type);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_v_board_type);
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 710; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 773; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
@@ -12722,62 +13517,62 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 772; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 772; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 772; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 772; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_L3:;
 
-  /* "alazar\board.pyx":712
+  /* "alazar\board.pyx":775
  *                               .format(board_type))
  * 
  *     if n_samples < min_record_size:             # <<<<<<<<<<<<<<
  *         raise AlazarException("Minimum record length is {}. Provided: {}"
  *                               .format(min_record_size,n_samples))
  */
-  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_min_record_size); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 712; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_min_record_size); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 775; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_n_samples, __pyx_t_1, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 712; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_n_samples, __pyx_t_1, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 775; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 712; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 775; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":713
+    /* "alazar\board.pyx":776
  * 
  *     if n_samples < min_record_size:
  *         raise AlazarException("Minimum record length is {}. Provided: {}"             # <<<<<<<<<<<<<<
  *                               .format(min_record_size,n_samples))
  *     elif n_samples % buffer_alignment != 0:
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 713; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "alazar\board.pyx":714
+    /* "alazar\board.pyx":777
  *     if n_samples < min_record_size:
  *         raise AlazarException("Minimum record length is {}. Provided: {}"
  *                               .format(min_record_size,n_samples))             # <<<<<<<<<<<<<<
  *     elif n_samples % buffer_alignment != 0:
  *         raise AlazarException("Sample size must be a multiple of {}. Provided: {}"
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Minimum_record_length_is_Provide, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 714; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Minimum_record_length_is_Provide, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 777; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyInt_From_long(__pyx_v_min_record_size); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 714; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyInt_From_long(__pyx_v_min_record_size); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 777; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_6 = NULL;
     __pyx_t_8 = 0;
@@ -12791,7 +13586,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
         __pyx_t_8 = 1;
       }
     }
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 714; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 777; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_9);
     if (__pyx_t_6) {
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -12802,7 +13597,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     __Pyx_GIVEREF(__pyx_v_n_samples);
     PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_v_n_samples);
     __pyx_t_4 = 0;
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_9, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 714; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_9, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 777; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -12817,26 +13612,26 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
       }
     }
     if (!__pyx_t_3) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 713; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_2);
     } else {
-      __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 713; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_3); __pyx_t_3 = NULL;
       __Pyx_GIVEREF(__pyx_t_7);
       PyTuple_SET_ITEM(__pyx_t_9, 0+1, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 713; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 713; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "alazar\board.pyx":712
+    /* "alazar\board.pyx":775
  *                               .format(board_type))
  * 
  *     if n_samples < min_record_size:             # <<<<<<<<<<<<<<
@@ -12845,39 +13640,39 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
  */
   }
 
-  /* "alazar\board.pyx":715
+  /* "alazar\board.pyx":778
  *         raise AlazarException("Minimum record length is {}. Provided: {}"
  *                               .format(min_record_size,n_samples))
  *     elif n_samples % buffer_alignment != 0:             # <<<<<<<<<<<<<<
  *         raise AlazarException("Sample size must be a multiple of {}. Provided: {}"
  *                               .format(buffer_alignment, n_samples))
  */
-  __pyx_t_2 = PyNumber_Remainder(__pyx_v_n_samples, __pyx_v_buffer_alignment); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Remainder(__pyx_v_n_samples, __pyx_v_buffer_alignment); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 778; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_2, __pyx_int_0, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_2, __pyx_int_0, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 778; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 778; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "alazar\board.pyx":716
+    /* "alazar\board.pyx":779
  *                               .format(min_record_size,n_samples))
  *     elif n_samples % buffer_alignment != 0:
  *         raise AlazarException("Sample size must be a multiple of {}. Provided: {}"             # <<<<<<<<<<<<<<
  *                               .format(buffer_alignment, n_samples))
  * 
  */
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 716; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 779; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "alazar\board.pyx":717
+    /* "alazar\board.pyx":780
  *     elif n_samples % buffer_alignment != 0:
  *         raise AlazarException("Sample size must be a multiple of {}. Provided: {}"
  *                               .format(buffer_alignment, n_samples))             # <<<<<<<<<<<<<<
  * 
  * # build the channel mask
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Sample_size_must_be_a_multiple_o, __pyx_n_s_format); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Sample_size_must_be_a_multiple_o, __pyx_n_s_format); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 780; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_3 = NULL;
     __pyx_t_8 = 0;
@@ -12891,7 +13686,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
         __pyx_t_8 = 1;
       }
     }
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 780; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -12902,7 +13697,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
     __Pyx_INCREF(__pyx_v_n_samples);
     __Pyx_GIVEREF(__pyx_v_n_samples);
     PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_8, __pyx_v_n_samples);
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_4, NULL); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 717; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_4, NULL); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 780; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -12917,26 +13712,26 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
       }
     }
     if (!__pyx_t_7) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 716; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 779; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 716; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 779; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_7); __pyx_t_7 = NULL;
       __Pyx_GIVEREF(__pyx_t_9);
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_t_9);
       __pyx_t_9 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 716; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 779; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 716; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 779; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "alazar\board.pyx":715
+    /* "alazar\board.pyx":778
  *         raise AlazarException("Minimum record length is {}. Provided: {}"
  *                               .format(min_record_size,n_samples))
  *     elif n_samples % buffer_alignment != 0:             # <<<<<<<<<<<<<<
@@ -12945,7 +13740,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
  */
   }
 
-  /* "alazar\board.pyx":695
+  /* "alazar\board.pyx":758
  *         return False
  * 
  * def _check_buffer_alignment(board_type, n_samples):             # <<<<<<<<<<<<<<
@@ -12973,7 +13768,7 @@ static PyObject *__pyx_pf_6alazar_5board_28_check_buffer_alignment(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":722
+/* "alazar\board.pyx":785
  * # channels interface will require refactoring to support boards with
  * # more than two channels.
  * def _make_channel_mask(board_type, channels):             # <<<<<<<<<<<<<<
@@ -13014,11 +13809,11 @@ static PyObject *__pyx_pw_6alazar_5board_31_make_channel_mask(PyObject *__pyx_se
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_channels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_make_channel_mask", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_make_channel_mask", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 785; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_make_channel_mask") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_make_channel_mask") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 785; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -13031,7 +13826,7 @@ static PyObject *__pyx_pw_6alazar_5board_31_make_channel_mask(PyObject *__pyx_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_make_channel_mask", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_make_channel_mask", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 785; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("alazar.board._make_channel_mask", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -13068,14 +13863,14 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_make_channel_mask", 0);
 
-  /* "alazar\board.pyx":733
+  /* "alazar\board.pyx":796
  *     Returns a tuple with the channel mask and channel count.
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
  *         if channels == "all":
  *             return (3,2)
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9870); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -13088,28 +13883,28 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (!__pyx_t_6) {
   } else {
     __pyx_t_1 = __pyx_t_6;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_is_9360); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -13122,37 +13917,37 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
     __Pyx_INCREF(__pyx_v_board_type);
     __Pyx_GIVEREF(__pyx_v_board_type);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_board_type);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 796; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = __pyx_t_6;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "alazar\board.pyx":734
+    /* "alazar\board.pyx":797
  *     """
  *     if is_9870(board_type) or is_9360(board_type):
  *         if channels == "all":             # <<<<<<<<<<<<<<
  *             return (3,2)
  *         else:
  */
-    __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_channels, __pyx_n_s_all, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 734; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_channels, __pyx_n_s_all, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 797; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (__pyx_t_1) {
 
-      /* "alazar\board.pyx":735
+      /* "alazar\board.pyx":798
  *     if is_9870(board_type) or is_9360(board_type):
  *         if channels == "all":
  *             return (3,2)             # <<<<<<<<<<<<<<
@@ -13164,7 +13959,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
       __pyx_r = __pyx_tuple__5;
       goto __pyx_L0;
 
-      /* "alazar\board.pyx":734
+      /* "alazar\board.pyx":797
  *     """
  *     if is_9870(board_type) or is_9360(board_type):
  *         if channels == "all":             # <<<<<<<<<<<<<<
@@ -13173,7 +13968,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
  */
     }
 
-    /* "alazar\board.pyx":737
+    /* "alazar\board.pyx":800
  *             return (3,2)
  *         else:
  *             try:             # <<<<<<<<<<<<<<
@@ -13188,7 +13983,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
         __Pyx_XGOTREF(__pyx_t_9);
         /*try:*/ {
 
-          /* "alazar\board.pyx":738
+          /* "alazar\board.pyx":801
  *         else:
  *             try:
  *                 channel_mask = channels(board_type)[channels]             # <<<<<<<<<<<<<<
@@ -13207,27 +14002,27 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
             }
           }
           if (!__pyx_t_4) {
-            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 738; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_type); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
           } else {
-            __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 738; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
             __Pyx_INCREF(__pyx_v_board_type);
             __Pyx_GIVEREF(__pyx_v_board_type);
             PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_board_type);
-            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 738; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_v_channels); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 738; __pyx_clineno = __LINE__; goto __pyx_L7_error;};
+          __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_v_channels); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L7_error;};
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_channel_mask = __pyx_t_3;
           __pyx_t_3 = 0;
 
-          /* "alazar\board.pyx":737
+          /* "alazar\board.pyx":800
  *             return (3,2)
  *         else:
  *             try:             # <<<<<<<<<<<<<<
@@ -13245,7 +14040,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "alazar\board.pyx":739
+        /* "alazar\board.pyx":802
  *             try:
  *                 channel_mask = channels(board_type)[channels]
  *             except KeyError:             # <<<<<<<<<<<<<<
@@ -13255,21 +14050,21 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
         __pyx_t_10 = PyErr_ExceptionMatches(__pyx_builtin_KeyError);
         if (__pyx_t_10) {
           __Pyx_AddTraceback("alazar.board._make_channel_mask", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_2, &__pyx_t_5) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 739; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_2, &__pyx_t_5) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 802; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_5);
 
-          /* "alazar\board.pyx":740
+          /* "alazar\board.pyx":803
  *                 channel_mask = channels(board_type)[channels]
  *             except KeyError:
  *                 raise AlazarException("Invalid channel selection: '{}'".format(channels))             # <<<<<<<<<<<<<<
  *             return (channel_mask,1)
  *     else:
  */
-          __pyx_t_11 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          __pyx_t_11 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           __Pyx_GOTREF(__pyx_t_11);
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Invalid_channel_selection, __pyx_n_s_format); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Invalid_channel_selection, __pyx_n_s_format); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_t_14 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_13))) {
@@ -13282,16 +14077,16 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
             }
           }
           if (!__pyx_t_14) {
-            __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_v_channels); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+            __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_v_channels); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
             __Pyx_GOTREF(__pyx_t_12);
           } else {
-            __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+            __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
             __Pyx_GOTREF(__pyx_t_15);
             __Pyx_GIVEREF(__pyx_t_14); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_14); __pyx_t_14 = NULL;
             __Pyx_INCREF(__pyx_v_channels);
             __Pyx_GIVEREF(__pyx_v_channels);
             PyTuple_SET_ITEM(__pyx_t_15, 0+1, __pyx_v_channels);
-            __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_15, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+            __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_15, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
             __Pyx_GOTREF(__pyx_t_12);
             __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
           }
@@ -13307,29 +14102,29 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
             }
           }
           if (!__pyx_t_13) {
-            __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+            __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_12); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
             __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
             __Pyx_GOTREF(__pyx_t_4);
           } else {
-            __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+            __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
             __Pyx_GOTREF(__pyx_t_15);
             __Pyx_GIVEREF(__pyx_t_13); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_13); __pyx_t_13 = NULL;
             __Pyx_GIVEREF(__pyx_t_12);
             PyTuple_SET_ITEM(__pyx_t_15, 0+1, __pyx_t_12);
             __pyx_t_12 = 0;
-            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_15, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_15, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_Raise(__pyx_t_4, 0, 0, 0);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 803; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
         }
         goto __pyx_L9_except_error;
         __pyx_L9_except_error:;
 
-        /* "alazar\board.pyx":737
+        /* "alazar\board.pyx":800
  *             return (3,2)
  *         else:
  *             try:             # <<<<<<<<<<<<<<
@@ -13344,7 +14139,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
         __pyx_L14_try_end:;
       }
 
-      /* "alazar\board.pyx":741
+      /* "alazar\board.pyx":804
  *             except KeyError:
  *                 raise AlazarException("Invalid channel selection: '{}'".format(channels))
  *             return (channel_mask,1)             # <<<<<<<<<<<<<<
@@ -13352,7 +14147,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
  *         raise AlazarException("Could not make channel mask for board type {}.".format(board_type))
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 741; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 804; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_INCREF(__pyx_v_channel_mask);
       __Pyx_GIVEREF(__pyx_v_channel_mask);
@@ -13365,7 +14160,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
       goto __pyx_L0;
     }
 
-    /* "alazar\board.pyx":733
+    /* "alazar\board.pyx":796
  *     Returns a tuple with the channel mask and channel count.
  *     """
  *     if is_9870(board_type) or is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -13374,7 +14169,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
  */
   }
 
-  /* "alazar\board.pyx":743
+  /* "alazar\board.pyx":806
  *             return (channel_mask,1)
  *     else:
  *         raise AlazarException("Could not make channel mask for board type {}.".format(board_type))             # <<<<<<<<<<<<<<
@@ -13382,9 +14177,9 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
  * # --- helper functions
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AlazarException); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Could_not_make_channel_mask_for, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Could_not_make_channel_mask_for, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_11 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -13397,16 +14192,16 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
       }
     }
     if (!__pyx_t_11) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_board_type); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_board_type); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
     } else {
-      __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_11); __pyx_t_11 = NULL;
       __Pyx_INCREF(__pyx_v_board_type);
       __Pyx_GIVEREF(__pyx_v_board_type);
       PyTuple_SET_ITEM(__pyx_t_15, 0+1, __pyx_v_board_type);
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_15, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_15, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
@@ -13422,27 +14217,27 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_5);
     } else {
-      __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_15, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_15, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_15, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_5, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 743; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 806; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "alazar\board.pyx":722
+  /* "alazar\board.pyx":785
  * # channels interface will require refactoring to support boards with
  * # more than two channels.
  * def _make_channel_mask(board_type, channels):             # <<<<<<<<<<<<<<
@@ -13470,7 +14265,7 @@ static PyObject *__pyx_pf_6alazar_5board_30_make_channel_mask(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":747
+/* "alazar\board.pyx":810
  * # --- helper functions
  * 
  * def is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -13503,7 +14298,7 @@ static PyObject *__pyx_pf_6alazar_5board_32is_9870(CYTHON_UNUSED PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("is_9870", 0);
 
-  /* "alazar\board.pyx":748
+  /* "alazar\board.pyx":811
  * 
  * def is_9870(board_type):
  *     return board_type == 13 or board_type == "ATS9870"             # <<<<<<<<<<<<<<
@@ -13511,9 +14306,9 @@ static PyObject *__pyx_pf_6alazar_5board_32is_9870(CYTHON_UNUSED PyObject *__pyx
  * def is_9360(board_type):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_board_type, __pyx_int_13, 13, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 748; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_board_type, __pyx_int_13, 13, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 811; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 748; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 811; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (!__pyx_t_3) {
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else {
@@ -13522,7 +14317,7 @@ static PyObject *__pyx_pf_6alazar_5board_32is_9870(CYTHON_UNUSED PyObject *__pyx
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     goto __pyx_L3_bool_binop_done;
   }
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_board_type, __pyx_n_s_ATS9870, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 748; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_board_type, __pyx_n_s_ATS9870, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 811; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_INCREF(__pyx_t_2);
   __pyx_t_1 = __pyx_t_2;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -13531,7 +14326,7 @@ static PyObject *__pyx_pf_6alazar_5board_32is_9870(CYTHON_UNUSED PyObject *__pyx
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "alazar\board.pyx":747
+  /* "alazar\board.pyx":810
  * # --- helper functions
  * 
  * def is_9870(board_type):             # <<<<<<<<<<<<<<
@@ -13551,7 +14346,7 @@ static PyObject *__pyx_pf_6alazar_5board_32is_9870(CYTHON_UNUSED PyObject *__pyx
   return __pyx_r;
 }
 
-/* "alazar\board.pyx":750
+/* "alazar\board.pyx":813
  *     return board_type == 13 or board_type == "ATS9870"
  * 
  * def is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -13583,15 +14378,15 @@ static PyObject *__pyx_pf_6alazar_5board_34is_9360(CYTHON_UNUSED PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("is_9360", 0);
 
-  /* "alazar\board.pyx":751
+  /* "alazar\board.pyx":814
  * 
  * def is_9360(board_type):
  *     return board_type == 25 or board_type == "ATS9360"             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_board_type, __pyx_int_25, 25, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 751; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_board_type, __pyx_int_25, 25, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 751; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (!__pyx_t_3) {
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else {
@@ -13600,7 +14395,7 @@ static PyObject *__pyx_pf_6alazar_5board_34is_9360(CYTHON_UNUSED PyObject *__pyx
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     goto __pyx_L3_bool_binop_done;
   }
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_board_type, __pyx_n_s_ATS9360, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 751; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_board_type, __pyx_n_s_ATS9360, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_INCREF(__pyx_t_2);
   __pyx_t_1 = __pyx_t_2;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -13609,7 +14404,7 @@ static PyObject *__pyx_pf_6alazar_5board_34is_9360(CYTHON_UNUSED PyObject *__pyx
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "alazar\board.pyx":750
+  /* "alazar\board.pyx":813
  *     return board_type == 13 or board_type == "ATS9870"
  * 
  * def is_9360(board_type):             # <<<<<<<<<<<<<<
@@ -28315,7 +29110,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 101; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #if PY_MAJOR_VERSION >= 3
   __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -28362,14 +29157,14 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "alazar\board.pyx":735
+  /* "alazar\board.pyx":798
  *     if is_9870(board_type) or is_9360(board_type):
  *         if channels == "all":
  *             return (3,2)             # <<<<<<<<<<<<<<
  *         else:
  *             try:
  */
-  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_int_3, __pyx_int_2); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 735; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_int_3, __pyx_int_2); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 798; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
@@ -28585,220 +29380,220 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
 
-  /* "alazar\board.pyx":522
+  /* "alazar\board.pyx":585
  * 
  * # helper function for processing
  * def _reshape_buffer(buf, chan, acq_params):             # <<<<<<<<<<<<<<
  *     """Reshape a buffer from linear into n_records x m_samples."""
  *     chunk_size = acq_params["channel_chunk_size"]
  */
-  __pyx_tuple__25 = PyTuple_Pack(5, __pyx_n_s_buf, __pyx_n_s_chan, __pyx_n_s_acq_params, __pyx_n_s_chunk_size, __pyx_n_s_chan_dat); if (unlikely(!__pyx_tuple__25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__25 = PyTuple_Pack(5, __pyx_n_s_buf, __pyx_n_s_chan, __pyx_n_s_acq_params, __pyx_n_s_chunk_size, __pyx_n_s_chan_dat); if (unlikely(!__pyx_tuple__25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__25);
   __Pyx_GIVEREF(__pyx_tuple__25);
-  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_reshape_buffer, 522, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_reshape_buffer, 585, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":530
+  /* "alazar\board.pyx":593
  *     return chan_dat
  * 
  * def def_acq_params(samples_per_record,             # <<<<<<<<<<<<<<
  *                    records_per_acquisition,
  *                    records_per_buffer,
  */
-  __pyx_tuple__27 = PyTuple_Pack(5, __pyx_n_s_samples_per_record, __pyx_n_s_records_per_acquisition, __pyx_n_s_records_per_buffer, __pyx_n_s_channel_count, __pyx_n_s_dtype); if (unlikely(!__pyx_tuple__27)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__27 = PyTuple_Pack(5, __pyx_n_s_samples_per_record, __pyx_n_s_records_per_acquisition, __pyx_n_s_records_per_buffer, __pyx_n_s_channel_count, __pyx_n_s_dtype); if (unlikely(!__pyx_tuple__27)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
-  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_def_acq_params, 530, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_def_acq_params, 593, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":545
+  /* "alazar\board.pyx":608
  *                 dtype = dtype)
  * 
  * def get_systems_and_boards():             # <<<<<<<<<<<<<<
  *     """Return a dict of the number of boards in each Alazar system detected.
  * 
  */
-  __pyx_tuple__29 = PyTuple_Pack(3, __pyx_n_s_n_sys, __pyx_n_s_n_b, __pyx_n_s_s); if (unlikely(!__pyx_tuple__29)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__29 = PyTuple_Pack(3, __pyx_n_s_n_sys, __pyx_n_s_n_b, __pyx_n_s_s); if (unlikely(!__pyx_tuple__29)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 608; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__29);
   __Pyx_GIVEREF(__pyx_tuple__29);
-  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(0, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_get_systems_and_boards, 545, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(0, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_get_systems_and_boards, 608, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 608; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":563
+  /* "alazar\board.pyx":626
  * 
  * 
  * def _check_return_code(return_code, msg):             # <<<<<<<<<<<<<<
  *     """Check an Alazar return code for success.
  * 
  */
-  __pyx_tuple__31 = PyTuple_Pack(2, __pyx_n_s_return_code, __pyx_n_s_msg); if (unlikely(!__pyx_tuple__31)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__31 = PyTuple_Pack(2, __pyx_n_s_return_code, __pyx_n_s_msg); if (unlikely(!__pyx_tuple__31)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__31);
   __Pyx_GIVEREF(__pyx_tuple__31);
-  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_return_code, 563, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_return_code, 626, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":572
+  /* "alazar\board.pyx":635
  *         raise AlazarException(msg + " " + _return_code_to_string(return_code))
  * 
  * def _check_return_code_processing(return_code, msg, buf_queue):             # <<<<<<<<<<<<<<
  *     """Check an Alazar return code for success and send error to processor."""
  *     try:
  */
-  __pyx_tuple__33 = PyTuple_Pack(4, __pyx_n_s_return_code, __pyx_n_s_msg, __pyx_n_s_buf_queue, __pyx_n_s_err); if (unlikely(!__pyx_tuple__33)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__33 = PyTuple_Pack(4, __pyx_n_s_return_code, __pyx_n_s_msg, __pyx_n_s_buf_queue, __pyx_n_s_err); if (unlikely(!__pyx_tuple__33)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__33);
   __Pyx_GIVEREF(__pyx_tuple__33);
-  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_return_code_processing, 572, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_return_code_processing, 635, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":580
+  /* "alazar\board.pyx":643
  *         raise err
  * 
  * def _return_code_to_string(return_code):             # <<<<<<<<<<<<<<
  *     """Convert a Alazar return code to a string.
  * 
  */
-  __pyx_tuple__35 = PyTuple_Pack(1, __pyx_n_s_return_code); if (unlikely(!__pyx_tuple__35)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 580; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__35 = PyTuple_Pack(1, __pyx_n_s_return_code); if (unlikely(!__pyx_tuple__35)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 643; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__35);
   __Pyx_GIVEREF(__pyx_tuple__35);
-  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_return_code_to_string, 580, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 580; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_return_code_to_string, 643, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 643; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":589
+  /* "alazar\board.pyx":652
  * # --- valid parameter settings by board type
  * 
  * def channels(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of channel names.
  * 
  */
-  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__37)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 589; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__37)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__37);
   __Pyx_GIVEREF(__pyx_tuple__37);
-  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_channels, 589, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 589; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_channels, 652, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":599
+  /* "alazar\board.pyx":662
  *         raise AlazarException("Could not get channels for board type " + str(board_type))
  * 
  * def trigger_sources(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of trigger sources.
  * 
  */
-  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__39)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__39)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 662; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__39);
   __Pyx_GIVEREF(__pyx_tuple__39);
-  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_trigger_sources, 599, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_trigger_sources, 662, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 662; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":609
+  /* "alazar\board.pyx":672
  *         raise AlazarException("Could not get trigger sources for board type " + str(board_type))
  * 
  * def clock_sources(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid clock sources for this board type.
  * 
  */
-  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__41)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__41)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 672; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__41);
   __Pyx_GIVEREF(__pyx_tuple__41);
-  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_clock_sources, 609, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_clock_sources, 672, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 672; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":620
+  /* "alazar\board.pyx":683
  *         raise AlazarException("Could not get clock sources for board type " + str(board_type))
  * 
  * def sample_rates(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid sample rates for this board type.
  * 
  */
-  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__43)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 620; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__43)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__43);
   __Pyx_GIVEREF(__pyx_tuple__43);
-  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_sample_rates, 620, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 620; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_sample_rates, 683, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":633
+  /* "alazar\board.pyx":696
  *         raise AlazarException("Could not get sample rates for board type " + str(board_type))
  * 
  * def ranges(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid range names.
  * 
  */
-  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__45)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__45)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 696; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__45);
   __Pyx_GIVEREF(__pyx_tuple__45);
-  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__45, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_ranges, 633, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__45, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_ranges, 696, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 696; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":646
+  /* "alazar\board.pyx":709
  *         raise AlazarException("Could not get input ranges for board type " + str(board_type))
  * 
  * def input_couplings(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid input coupings.
  * 
  */
-  __pyx_tuple__47 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__47)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 646; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__47 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__47)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__47);
   __Pyx_GIVEREF(__pyx_tuple__47);
-  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_input_couplings, 646, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 646; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_input_couplings, 709, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":659
+  /* "alazar\board.pyx":722
  *         raise AlazarException("Could not get input couplings for board type " + str(board_type))
  * 
  * def ext_trig_range(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid external trigger ranges.
  * 
  */
-  __pyx_tuple__49 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__49)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__49 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__49)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__49);
   __Pyx_GIVEREF(__pyx_tuple__49);
-  __pyx_codeobj__50 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__49, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_ext_trig_range, 659, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__50)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__50 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__49, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_ext_trig_range, 722, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__50)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":677
+  /* "alazar\board.pyx":740
  * max_decimation = 100000
  * 
  * def _check_decimation(board_type, decimation):             # <<<<<<<<<<<<<<
  *     """Check the decimation parameter given a board type.
  * 
  */
-  __pyx_tuple__51 = PyTuple_Pack(2, __pyx_n_s_board_type, __pyx_n_s_decimation); if (unlikely(!__pyx_tuple__51)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__51 = PyTuple_Pack(2, __pyx_n_s_board_type, __pyx_n_s_decimation); if (unlikely(!__pyx_tuple__51)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__51);
   __Pyx_GIVEREF(__pyx_tuple__51);
-  __pyx_codeobj__52 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__51, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_decimation, 677, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__52)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__52 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__51, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_decimation, 740, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__52)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":695
+  /* "alazar\board.pyx":758
  *         return False
  * 
  * def _check_buffer_alignment(board_type, n_samples):             # <<<<<<<<<<<<<<
  *     """Check the record length for minimum length and buffer alignment.
  * 
  */
-  __pyx_tuple__53 = PyTuple_Pack(4, __pyx_n_s_board_type, __pyx_n_s_n_samples, __pyx_n_s_min_record_size, __pyx_n_s_buffer_alignment); if (unlikely(!__pyx_tuple__53)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__53 = PyTuple_Pack(4, __pyx_n_s_board_type, __pyx_n_s_n_samples, __pyx_n_s_min_record_size, __pyx_n_s_buffer_alignment); if (unlikely(!__pyx_tuple__53)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 758; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__53);
   __Pyx_GIVEREF(__pyx_tuple__53);
-  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_buffer_alignment, 695, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_check_buffer_alignment, 758, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 758; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":722
+  /* "alazar\board.pyx":785
  * # channels interface will require refactoring to support boards with
  * # more than two channels.
  * def _make_channel_mask(board_type, channels):             # <<<<<<<<<<<<<<
  *     """Make the channel mask for a channel selection.
  * 
  */
-  __pyx_tuple__55 = PyTuple_Pack(3, __pyx_n_s_board_type, __pyx_n_s_channels, __pyx_n_s_channel_mask); if (unlikely(!__pyx_tuple__55)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__55 = PyTuple_Pack(3, __pyx_n_s_board_type, __pyx_n_s_channels, __pyx_n_s_channel_mask); if (unlikely(!__pyx_tuple__55)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 785; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__55);
   __Pyx_GIVEREF(__pyx_tuple__55);
-  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_make_channel_mask, 722, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_make_channel_mask, 785, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 785; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":747
+  /* "alazar\board.pyx":810
  * # --- helper functions
  * 
  * def is_9870(board_type):             # <<<<<<<<<<<<<<
  *     return board_type == 13 or board_type == "ATS9870"
  * 
  */
-  __pyx_tuple__57 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__57)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 747; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__57 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__57)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__57);
   __Pyx_GIVEREF(__pyx_tuple__57);
-  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_is_9870, 747, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 747; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_is_9870, 810, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":750
+  /* "alazar\board.pyx":813
  *     return board_type == 13 or board_type == "ATS9870"
  * 
  * def is_9360(board_type):             # <<<<<<<<<<<<<<
  *     return board_type == 25 or board_type == "ATS9360"
  */
-  __pyx_tuple__59 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__59)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__59 = PyTuple_Pack(1, __pyx_n_s_board_type); if (unlikely(!__pyx_tuple__59)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 813; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__59);
   __Pyx_GIVEREF(__pyx_tuple__59);
-  __pyx_codeobj__60 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__59, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_is_9360, 750, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__60)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__60 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__59, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_C_Users_qnl_src_pyalazar_alazar, __pyx_n_s_is_9360, 813, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__60)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 813; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "View.MemoryView":278
  *         return self.name
@@ -29159,252 +29954,252 @@ PyMODINIT_FUNC PyInit_board(void)
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":522
+  /* "alazar\board.pyx":585
  * 
  * # helper function for processing
  * def _reshape_buffer(buf, chan, acq_params):             # <<<<<<<<<<<<<<
  *     """Reshape a buffer from linear into n_records x m_samples."""
  *     chunk_size = acq_params["channel_chunk_size"]
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_1_reshape_buffer, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_1_reshape_buffer, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_reshape_buffer, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_reshape_buffer, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 585; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":530
+  /* "alazar\board.pyx":593
  *     return chan_dat
  * 
  * def def_acq_params(samples_per_record,             # <<<<<<<<<<<<<<
  *                    records_per_acquisition,
  *                    records_per_buffer,
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_3def_acq_params, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_3def_acq_params, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_def_acq_params, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_def_acq_params, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":545
+  /* "alazar\board.pyx":608
  *                 dtype = dtype)
  * 
  * def get_systems_and_boards():             # <<<<<<<<<<<<<<
  *     """Return a dict of the number of boards in each Alazar system detected.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_5get_systems_and_boards, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_5get_systems_and_boards, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 608; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_systems_and_boards, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_systems_and_boards, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 608; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":559
+  /* "alazar\board.pyx":622
  * 
  * 
  * class AlazarException(Exception):             # <<<<<<<<<<<<<<
  *     pass
  * 
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_builtin_Exception);
   __Pyx_GIVEREF(__pyx_builtin_Exception);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_builtin_Exception);
-  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_AlazarException, __pyx_n_s_AlazarException, (PyObject *) NULL, __pyx_n_s_alazar_board, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_AlazarException, __pyx_n_s_AlazarException, (PyObject *) NULL, __pyx_n_s_alazar_board, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_AlazarException, __pyx_t_1, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_AlazarException, __pyx_t_1, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_AlazarException, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_AlazarException, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":563
+  /* "alazar\board.pyx":626
  * 
  * 
  * def _check_return_code(return_code, msg):             # <<<<<<<<<<<<<<
  *     """Check an Alazar return code for success.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_7_check_return_code, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_7_check_return_code, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_return_code, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_return_code, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 626; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":572
+  /* "alazar\board.pyx":635
  *         raise AlazarException(msg + " " + _return_code_to_string(return_code))
  * 
  * def _check_return_code_processing(return_code, msg, buf_queue):             # <<<<<<<<<<<<<<
  *     """Check an Alazar return code for success and send error to processor."""
  *     try:
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_9_check_return_code_processing, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_9_check_return_code_processing, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_return_code_processing, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_return_code_processing, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":580
+  /* "alazar\board.pyx":643
  *         raise err
  * 
  * def _return_code_to_string(return_code):             # <<<<<<<<<<<<<<
  *     """Convert a Alazar return code to a string.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_11_return_code_to_string, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 580; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_11_return_code_to_string, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 643; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_return_code_to_string, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 580; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_return_code_to_string, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 643; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":589
+  /* "alazar\board.pyx":652
  * # --- valid parameter settings by board type
  * 
  * def channels(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of channel names.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_13channels, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 589; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_13channels, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_channels, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 589; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_channels, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":599
+  /* "alazar\board.pyx":662
  *         raise AlazarException("Could not get channels for board type " + str(board_type))
  * 
  * def trigger_sources(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of trigger sources.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_15trigger_sources, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_15trigger_sources, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 662; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_trigger_sources, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 599; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_trigger_sources, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 662; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":609
+  /* "alazar\board.pyx":672
  *         raise AlazarException("Could not get trigger sources for board type " + str(board_type))
  * 
  * def clock_sources(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid clock sources for this board type.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_17clock_sources, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_17clock_sources, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 672; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_clock_sources, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_clock_sources, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 672; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":620
+  /* "alazar\board.pyx":683
  *         raise AlazarException("Could not get clock sources for board type " + str(board_type))
  * 
  * def sample_rates(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid sample rates for this board type.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_19sample_rates, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 620; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_19sample_rates, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_sample_rates, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 620; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_sample_rates, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":633
+  /* "alazar\board.pyx":696
  *         raise AlazarException("Could not get sample rates for board type " + str(board_type))
  * 
  * def ranges(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid range names.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_21ranges, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_21ranges, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 696; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ranges, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 633; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ranges, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 696; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":646
+  /* "alazar\board.pyx":709
  *         raise AlazarException("Could not get input ranges for board type " + str(board_type))
  * 
  * def input_couplings(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid input coupings.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_23input_couplings, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 646; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_23input_couplings, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_input_couplings, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 646; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_input_couplings, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":659
+  /* "alazar\board.pyx":722
  *         raise AlazarException("Could not get input couplings for board type " + str(board_type))
  * 
  * def ext_trig_range(board_type):             # <<<<<<<<<<<<<<
  *     """Get the dictionary of valid external trigger ranges.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_25ext_trig_range, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_25ext_trig_range, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ext_trig_range, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 659; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ext_trig_range, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":675
+  /* "alazar\board.pyx":738
  * # --- parameter validation
  * 
  * max_decimation = 100000             # <<<<<<<<<<<<<<
  * 
  * def _check_decimation(board_type, decimation):
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_max_decimation, __pyx_int_100000) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 675; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_max_decimation, __pyx_int_100000) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 738; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "alazar\board.pyx":677
+  /* "alazar\board.pyx":740
  * max_decimation = 100000
  * 
  * def _check_decimation(board_type, decimation):             # <<<<<<<<<<<<<<
  *     """Check the decimation parameter given a board type.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_27_check_decimation, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_27_check_decimation, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_decimation, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_decimation, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 740; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":695
+  /* "alazar\board.pyx":758
  *         return False
  * 
  * def _check_buffer_alignment(board_type, n_samples):             # <<<<<<<<<<<<<<
  *     """Check the record length for minimum length and buffer alignment.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_29_check_buffer_alignment, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_29_check_buffer_alignment, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 758; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_buffer_alignment, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_buffer_alignment, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 758; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":722
+  /* "alazar\board.pyx":785
  * # channels interface will require refactoring to support boards with
  * # more than two channels.
  * def _make_channel_mask(board_type, channels):             # <<<<<<<<<<<<<<
  *     """Make the channel mask for a channel selection.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_31_make_channel_mask, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_31_make_channel_mask, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 785; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_make_channel_mask, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 722; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_make_channel_mask, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 785; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":747
+  /* "alazar\board.pyx":810
  * # --- helper functions
  * 
  * def is_9870(board_type):             # <<<<<<<<<<<<<<
  *     return board_type == 13 or board_type == "ATS9870"
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_33is_9870, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 747; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_33is_9870, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_is_9870, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 747; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_is_9870, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "alazar\board.pyx":750
+  /* "alazar\board.pyx":813
  *     return board_type == 13 or board_type == "ATS9870"
  * 
  * def is_9360(board_type):             # <<<<<<<<<<<<<<
  *     return board_type == 25 or board_type == "ATS9360"
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_35is_9360, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6alazar_5board_35is_9360, NULL, __pyx_n_s_alazar_board); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 813; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_is_9360, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 750; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_is_9360, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 813; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "alazar\board.pyx":1
@@ -33086,6 +33881,227 @@ static int __pyx_memview_set_unsigned_char(const char *itemp, PyObject *obj) {
     return 1;
 }
 
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_short(unsigned short value) {
+    const unsigned short neg_one = (unsigned short) -1, const_zero = (unsigned short) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(unsigned short) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(unsigned short) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+        } else if (sizeof(unsigned short) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+        }
+    } else {
+        if (sizeof(unsigned short) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(unsigned short) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(unsigned short),
+                                     little, !is_unsigned);
+    }
+}
+
+static CYTHON_INLINE unsigned short __Pyx_PyInt_As_unsigned_short(PyObject *x) {
+    const unsigned short neg_one = (unsigned short) -1, const_zero = (unsigned short) 0;
+    const int is_unsigned = neg_one > const_zero;
+#if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_Check(x))) {
+        if (sizeof(unsigned short) < sizeof(long)) {
+            __PYX_VERIFY_RETURN_INT(unsigned short, long, PyInt_AS_LONG(x))
+        } else {
+            long val = PyInt_AS_LONG(x);
+            if (is_unsigned && unlikely(val < 0)) {
+                goto raise_neg_overflow;
+            }
+            return (unsigned short) val;
+        }
+    } else
+#endif
+    if (likely(PyLong_Check(x))) {
+        if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (unsigned short) 0;
+                case  1: __PYX_VERIFY_RETURN_INT(unsigned short, digit, digits[0])
+                case 2:
+                    if (8 * sizeof(unsigned short) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) >= 2 * PyLong_SHIFT) {
+                            return (unsigned short) (((((unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(unsigned short) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) >= 3 * PyLong_SHIFT) {
+                            return (unsigned short) (((((((unsigned short)digits[2]) << PyLong_SHIFT) | (unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(unsigned short) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) >= 4 * PyLong_SHIFT) {
+                            return (unsigned short) (((((((((unsigned short)digits[3]) << PyLong_SHIFT) | (unsigned short)digits[2]) << PyLong_SHIFT) | (unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0]));
+                        }
+                    }
+                    break;
+            }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON
+            if (unlikely(Py_SIZE(x) < 0)) {
+                goto raise_neg_overflow;
+            }
+#else
+            {
+                int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+                if (unlikely(result < 0))
+                    return (unsigned short) -1;
+                if (unlikely(result == 1))
+                    goto raise_neg_overflow;
+            }
+#endif
+            if (sizeof(unsigned short) <= sizeof(unsigned long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(unsigned short, unsigned long, PyLong_AsUnsignedLong(x))
+            } else if (sizeof(unsigned short) <= sizeof(unsigned PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(unsigned short, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+            }
+        } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (unsigned short) 0;
+                case -1: __PYX_VERIFY_RETURN_INT(unsigned short, sdigit, -(sdigit) digits[0])
+                case  1: __PYX_VERIFY_RETURN_INT(unsigned short,  digit, +digits[0])
+                case -2:
+                    if (8 * sizeof(unsigned short) - 1 > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) - 1 > 2 * PyLong_SHIFT) {
+                            return (unsigned short) (((unsigned short)-1)*(((((unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if (8 * sizeof(unsigned short) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) - 1 > 2 * PyLong_SHIFT) {
+                            return (unsigned short) ((((((unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if (8 * sizeof(unsigned short) - 1 > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) - 1 > 3 * PyLong_SHIFT) {
+                            return (unsigned short) (((unsigned short)-1)*(((((((unsigned short)digits[2]) << PyLong_SHIFT) | (unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(unsigned short) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) - 1 > 3 * PyLong_SHIFT) {
+                            return (unsigned short) ((((((((unsigned short)digits[2]) << PyLong_SHIFT) | (unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if (8 * sizeof(unsigned short) - 1 > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) - 1 > 4 * PyLong_SHIFT) {
+                            return (unsigned short) (((unsigned short)-1)*(((((((((unsigned short)digits[3]) << PyLong_SHIFT) | (unsigned short)digits[2]) << PyLong_SHIFT) | (unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(unsigned short) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(unsigned short, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(unsigned short) - 1 > 4 * PyLong_SHIFT) {
+                            return (unsigned short) ((((((((((unsigned short)digits[3]) << PyLong_SHIFT) | (unsigned short)digits[2]) << PyLong_SHIFT) | (unsigned short)digits[1]) << PyLong_SHIFT) | (unsigned short)digits[0])));
+                        }
+                    }
+                    break;
+            }
+#endif
+            if (sizeof(unsigned short) <= sizeof(long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(unsigned short, long, PyLong_AsLong(x))
+            } else if (sizeof(unsigned short) <= sizeof(PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(unsigned short, PY_LONG_LONG, PyLong_AsLongLong(x))
+            }
+        }
+        {
+#if CYTHON_COMPILING_IN_PYPY && !defined(_PyLong_AsByteArray)
+            PyErr_SetString(PyExc_RuntimeError,
+                            "_PyLong_AsByteArray() not available in PyPy, cannot convert large numbers");
+#else
+            unsigned short val;
+            PyObject *v = __Pyx_PyNumber_Int(x);
+ #if PY_MAJOR_VERSION < 3
+            if (likely(v) && !PyLong_Check(v)) {
+                PyObject *tmp = v;
+                v = PyNumber_Long(tmp);
+                Py_DECREF(tmp);
+            }
+ #endif
+            if (likely(v)) {
+                int one = 1; int is_little = (int)*(unsigned char *)&one;
+                unsigned char *bytes = (unsigned char *)&val;
+                int ret = _PyLong_AsByteArray((PyLongObject *)v,
+                                              bytes, sizeof(val),
+                                              is_little, !is_unsigned);
+                Py_DECREF(v);
+                if (likely(!ret))
+                    return val;
+            }
+#endif
+            return (unsigned short) -1;
+        }
+    } else {
+        unsigned short val;
+        PyObject *tmp = __Pyx_PyNumber_Int(x);
+        if (!tmp) return (unsigned short) -1;
+        val = __Pyx_PyInt_As_unsigned_short(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to unsigned short");
+    return (unsigned short) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to unsigned short");
+    return (unsigned short) -1;
+}
+
+static PyObject *__pyx_memview_get_unsigned_short(const char *itemp) {
+    return (PyObject *) __Pyx_PyInt_From_unsigned_short(*(unsigned short *) itemp);
+}
+static int __pyx_memview_set_unsigned_short(const char *itemp, PyObject *obj) {
+    unsigned short value = __Pyx_PyInt_As_unsigned_short(obj);
+    if ((value == (unsigned short)-1) && PyErr_Occurred())
+        return 0;
+    *(unsigned short *) itemp = value;
+    return 1;
+}
+
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_U32(U32 value) {
     const U32 neg_one = (U32) -1, const_zero = (U32) 0;
     const int is_unsigned = neg_one > const_zero;
@@ -34298,6 +35314,28 @@ static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_uns
     retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
                                                  PyBUF_RECORDS, 1,
                                                  &__Pyx_TypeInfo_unsigned_char, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
+
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_unsigned_short(PyObject *obj) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
+                                                 PyBUF_RECORDS, 1,
+                                                 &__Pyx_TypeInfo_unsigned_short, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))
         goto __pyx_fail;
