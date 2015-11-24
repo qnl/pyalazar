@@ -581,15 +581,6 @@ cdef class Alazar(object):
 
 # end of Alazar() class definition
 
-# helper function for processing
-def _reshape_buffer(buf, chan, acq_params):
-    """Reshape a buffer from linear into n_records x m_samples."""
-    chunk_size = acq_params["channel_chunk_size"]
-    chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
-    chan_dat.shape = (acq_params["records_per_buffer"],
-                      acq_params["samples_per_record"])
-    return chan_dat
-
 def def_acq_params(samples_per_record,
                    records_per_acquisition,
                    records_per_buffer,
