@@ -468,16 +468,13 @@ cdef class Alazar(object):
 
         if sample_type == np.uint8:
             # 8-bit buffer branch
-
-            # make a Cython memoryview of each buffer and add it to the list
-            # get a C pointer to the buffer with the syntax &buf_vew[0]
-
-            for buf in buffers:
-                buf_view_char = buf
-                buffer_addresses.append(buf_view_char)
-
-
             try:
+                # make a Cython memoryview of each buffer and add it to the list
+                # get a C pointer to the buffer with the syntax &buf_vew[0]
+
+                for buf in buffers:
+                    buf_view_char = buf
+                    buffer_addresses.append(buf_view_char)
                 # add the buffers to the list of buffers available to the board
                 for b in xrange(buffer_count):
                     buf_view_char = buffer_addresses[b]
@@ -522,16 +519,13 @@ cdef class Alazar(object):
 
         else:
             # 16-bit buffer branch
-
-            # make a Cython memoryview of each buffer and add it to the list
-            # get a C pointer to the buffer with the syntax &buf_vew[0]
-
-            for buf in buffers:
-                buf_view_short = buf
-                buffer_addresses.append(buf_view_short)
-
-
             try:
+                # make a Cython memoryview of each buffer and add it to the list
+                # get a C pointer to the buffer with the syntax &buf_vew[0]
+
+                for buf in buffers:
+                    buf_view_short = buf
+                    buffer_addresses.append(buf_view_short)
                 # add the buffers to the list of buffers available to the board
                 for b in xrange(buffer_count):
                     buf_view_short = buffer_addresses[b]
