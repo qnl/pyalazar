@@ -454,7 +454,29 @@ cdef class Alazar(object):
         cdef list buffer_addresses = []
         # make a Cython memoryview of each buffer and add it to the list
         # get a C pointer to the buffer with the syntax &buf_vew[0]
-        cdef unsigned char[:] buf_view
+        if sample_type == np.uint8:
+            cdef unsigned char[:] buf_view
+
+            return self._do_acquire(buffers, buf_view, buffer_addresses,
+                                    buffer_count, bytes_per_buffer, buf_queue,
+                                    comm, buffers_per_acquisition, timeout)
+        else:
+            cdef unsigned short[:] buf_view
+
+            return self._do_acquire(buffers, buf_view, buffer_addresses,
+                                    buffer_count, bytes_per_buffer, buf_queue,
+                                    comm, buffers_per_acquisition, timeout)
+
+    def _do_acquire(self, buffers, buf_view, buffer_addresses, buffer_count,
+                    bytes_per_buffer, buf_queue, comm, buffers_per_acquisition,
+                    timeout,):
+        """Encapsulate the remainder of the acquisition code.
+
+        Have to do this to permit polymorphism between 8-bit and 10+ bit
+        digitizers without repeating all the code, due to C static variable
+        scoping.
+        """
+        print type(buf_view)
         for buf in buffers:
             buf_view = buf
             buffer_addresses.append(buf_view)
