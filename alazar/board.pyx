@@ -21,6 +21,7 @@ import multiprocessing as mp
 
 from alazar import params
 from alazar.process import _process_buffers
+from alazar.exceptions import AlazarException
 from alazar.processor import BufferProcessor
 
 # C wrapper class to represent an Alazar digitizer
@@ -606,13 +607,7 @@ def get_systems_and_boards():
         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)
     return n_b
 
-
-# --- Exception and error handling for Alazar boards
-
-
-class AlazarException(Exception):
-    pass
-
+# --- error handling ---
 
 def _check_return_code(return_code, msg):
     """Check an Alazar return code for success.

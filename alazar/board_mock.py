@@ -19,9 +19,10 @@ import pickle
 import numpy as np
 
 from board import (def_acq_params, AlazarException, is_9870, is_9360,
-                   _reshape_buffer, _make_channel_mask)
+                   _make_channel_mask)
 import params
 
+from process import _reshape_buffer
 from processor import BufferProcessor
 
 
