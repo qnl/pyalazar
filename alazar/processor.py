@@ -225,6 +225,9 @@ class Chunk(BufferProcessor):
     def __init__(self, n_rec_types, start, stop, name=None):
         """Create a new Chunk processor.
 
+        A Chunk is defined as the record-by-record average over a specified
+        range of the acquired data array.
+
         Args:
             n_rec_types (int): The number of record types.  Must
                 be a positive non-zero integer.  The number of records in the
