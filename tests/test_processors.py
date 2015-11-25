@@ -29,7 +29,8 @@ def mock_acq_params():
                           records_per_acquisition=128,
                           records_per_buffer=64,
                           channel_count=2,
-                          dtype=dtype)
+                          dtype=dtype,
+                          bit_depth=8)
 
 # make a bunch of test buffers with the same value
 def buffers_same_val(params, value):

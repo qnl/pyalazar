@@ -397,7 +397,8 @@ cdef class Alazar(object):
 
         bytes_per_sample = (bits_per_sample + 7) / 8
         bytes_per_record = bytes_per_sample * samples_per_record
-        bytes_per_buffer = bytes_per_record * records_per_buffer * channel_count
+        samples_per_buffer = records_per_buffer * samples_per_record * channel_count
+        bytes_per_buffer = samples_per_buffer * bytes_per_sample
 
         # set the record size
         ret_code = c_alazar_api.AlazarSetRecordSize(self.board, 0, samples_per_record)
@@ -411,7 +412,8 @@ cdef class Alazar(object):
                                     records_per_acquisition,
                                     records_per_buffer,
                                     channel_count,
-                                    sample_type)
+                                    sample_type,
+                                    bits_per_sample,)
 
         # configure the board to make an NPT AutoDMA acquisition
         # first flag is the value of ADMA_EXTERNAL_STARTCAPTURE
@@ -449,7 +451,7 @@ cdef class Alazar(object):
         # allocate list of NumPy arrays as data buffers
         # indexing this will cost a Python overhead, but this probably isn't important
         # these are refcounted so we don't need to manually manage their memory
-        cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type)
+        cdef list buffers = [np.empty(samples_per_buffer, dtype=sample_type)
                              for n in xrange(buffer_count)]
         # make a list of the address of each buffer to pass to the digitizer
         cdef list buffer_addresses = []
@@ -586,7 +588,8 @@ def def_acq_params(samples_per_record,
                    records_per_acquisition,
                    records_per_buffer,
                    channel_count,
-                   dtype):
+                   dtype,
+                   bit_depth):
     """Return a dictionary containing useful acquisition parameters."""
     return dict(samples_per_record=samples_per_record,
                 records_per_acquisition = records_per_acquisition,
@@ -595,7 +598,8 @@ def def_acq_params(samples_per_record,
                 samples_per_buffer = samples_per_record * records_per_buffer * channel_count,
                 channel_chunk_size = samples_per_record * records_per_buffer,
                 buffers_per_acquisition = records_per_acquisition / records_per_buffer,
-                dtype = dtype)
+                dtype = dtype,
+                bit_depth = bit_depth)
 
 def get_systems_and_boards():
     """Return a dict of the number of boards in each Alazar system detected.
