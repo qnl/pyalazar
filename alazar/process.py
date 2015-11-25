@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Move this function to a separate module to work around cython packaging issue."""
 
+from numpy import uint8
+
 def _process_buffers(buf_queue,
                     comm,
                     processors,
@@ -49,3 +51,18 @@ def _process_buffers(buf_queue,
     # send the finished processors back
     comm.put(processors)
     # done with buffer processing
+
+# helper function for processing
+def _reshape_buffer(buf, chan, acq_params):
+    """Reshape a buffer from linear into n_records x m_samples."""
+    chunk_size = acq_params["channel_chunk_size"]
+    chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
+    chan_dat.shape = (acq_params["records_per_buffer"],
+                      acq_params["samples_per_record"])
+    # the 12-bit digitizers always write into the MSB; bit shift
+    # the buffer back towards 0
+    bit_depth = acq_params["bit_depth"]
+    if bit_depth > 8:
+        return chan_dat >> (16 - bit_depth)
+    else:
+        return chan_dat

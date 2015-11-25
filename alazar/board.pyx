@@ -21,6 +21,7 @@ import multiprocessing as mp
 
 from alazar import params
 from alazar.process import _process_buffers
+from alazar.exceptions import AlazarException
 from alazar.processor import BufferProcessor
 
 # C wrapper class to represent an Alazar digitizer
@@ -396,7 +397,8 @@ cdef class Alazar(object):
 
         bytes_per_sample = (bits_per_sample + 7) / 8
         bytes_per_record = bytes_per_sample * samples_per_record
-        bytes_per_buffer = bytes_per_record * records_per_buffer * channel_count
+        samples_per_buffer = records_per_buffer * samples_per_record * channel_count
+        bytes_per_buffer = samples_per_buffer * bytes_per_sample
 
         # set the record size
         ret_code = c_alazar_api.AlazarSetRecordSize(self.board, 0, samples_per_record)
@@ -410,7 +412,8 @@ cdef class Alazar(object):
                                     records_per_acquisition,
                                     records_per_buffer,
                                     channel_count,
-                                    sample_type)
+                                    sample_type,
+                                    bits_per_sample,)
 
         # configure the board to make an NPT AutoDMA acquisition
         # first flag is the value of ADMA_EXTERNAL_STARTCAPTURE
@@ -448,84 +451,125 @@ cdef class Alazar(object):
         # allocate list of NumPy arrays as data buffers
         # indexing this will cost a Python overhead, but this probably isn't important
         # these are refcounted so we don't need to manually manage their memory
-        cdef list buffers = [np.empty(bytes_per_buffer, dtype=sample_type)
+        cdef list buffers = [np.empty(samples_per_buffer, dtype=sample_type)
                              for n in xrange(buffer_count)]
         # make a list of the address of each buffer to pass to the digitizer
         cdef list buffer_addresses = []
-        # make a Cython memoryview of each buffer and add it to the list
-        # get a C pointer to the buffer with the syntax &buf_vew[0]
-        if sample_type == np.uint8:
-            cdef unsigned char[:] buf_view
 
-            return self._do_acquire(buffers, buf_view, buffer_addresses,
-                                    buffer_count, bytes_per_buffer, buf_queue,
-                                    comm, buffers_per_acquisition, timeout)
-        else:
-            cdef unsigned short[:] buf_view
+        # because Cython has no support for polymorphism, we have to branch
+        # the rest of this function based on whether or not the buffers are
+        # 8 bit or 16 bit.  If this section of code needs to be modified,
+        # make the modifications in one section, copy/paste the code into the
+        # other branch, and change the references to buf_view_*size* into the
+        # appropriate variable for that branch.
+        cdef unsigned char[:] buf_view_char
+        cdef unsigned short[:] buf_view_short
 
-            return self._do_acquire(buffers, buf_view, buffer_addresses,
-                                    buffer_count, bytes_per_buffer, buf_queue,
-                                    comm, buffers_per_acquisition, timeout)
-
-    def _do_acquire(self, buffers, buf_view, buffer_addresses, buffer_count,
-                    bytes_per_buffer, buf_queue, comm, buffers_per_acquisition,
-                    timeout,):
-        """Encapsulate the remainder of the acquisition code.
-
-        Have to do this to permit polymorphism between 8-bit and 10+ bit
-        digitizers without repeating all the code, due to C static variable
-        scoping.
-        """
-        print type(buf_view)
-        for buf in buffers:
-            buf_view = buf
-            buffer_addresses.append(buf_view)
         # preallocate all of the c variables
         cdef int buf_num
         cdef int buffer_index
 
-        try:
-            # add the buffers to the list of buffers available to the board
-            for b in xrange(buffer_count):
-                buf_view = buffer_addresses[b]
-                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
-                                                              &buf_view[0],
-                                                              bytes_per_buffer)
+        if sample_type == np.uint8:
+            # 8-bit buffer branch
+            try:
+                # make a Cython memoryview of each buffer and add it to the list
+                # get a C pointer to the buffer with the syntax &buf_vew[0]
+
+                for buf in buffers:
+                    buf_view_char = buf
+                    buffer_addresses.append(buf_view_char)
+                # add the buffers to the list of buffers available to the board
+                for b in xrange(buffer_count):
+                    buf_view_char = buffer_addresses[b]
+                    ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+                                                                  &buf_view_char[0],
+                                                                  bytes_per_buffer)
+                    _check_return_code_processing(ret_code,
+                                                  "Failed to send buffer address to board:",
+                                                  buf_queue)
+                # arm the board
+                ret_code = c_alazar_api.AlazarStartCapture(self.board)
                 _check_return_code_processing(ret_code,
-                                              "Failed to send buffer address to board:",
+                                              "Failed to start capture:",
                                               buf_queue)
-            # arm the board
-            ret_code = c_alazar_api.AlazarStartCapture(self.board)
-            _check_return_code_processing(ret_code,
-                                          "Failed to start capture:",
-                                          buf_queue)
-            # handle each buffer
-            for buf_num in xrange(buffers_per_acquisition):
-                buffer_index = buf_num % buffer_count
-                buf_view = buffer_addresses[buffer_index]
-                ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
-                                                                      &buf_view[0],
-                                                                      timeout)
+                # handle each buffer
+                for buf_num in xrange(buffers_per_acquisition):
+                    buffer_index = buf_num % buffer_count
+                    buf_view_char = buffer_addresses[buffer_index]
+                    ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+                                                                          &buf_view_char[0],
+                                                                          timeout)
+                    _check_return_code_processing(ret_code,
+                                                  "Wait for buffer complete failed on buffer {}:"
+                                                  .format(buf_num),
+                                                  buf_queue)
+                    # pickles the buffer and sends to the worker
+                    buf_queue.put( (buffers[buffer_index], None) )
+                    # hand the buffer back to the board
+                    ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+                                                                  &buf_view_char[0],
+                                                                  bytes_per_buffer)
+                    _check_return_code_processing(ret_code,
+                                                  "Failed to send buffer address back "
+                                                  "to board during acquisition:",
+                                                  buf_queue)
+                # done with acquisition
+            finally:
+                # make sure we abort the acquisition so the board doesn't get stuck
+                self._abort_acquisition()
+            # get the processors and return them
+            return comm.get()
+
+        else:
+            # 16-bit buffer branch
+            try:
+                # make a Cython memoryview of each buffer and add it to the list
+                # get a C pointer to the buffer with the syntax &buf_vew[0]
+
+                for buf in buffers:
+                    buf_view_short = buf
+                    buffer_addresses.append(buf_view_short)
+                # add the buffers to the list of buffers available to the board
+                for b in xrange(buffer_count):
+                    buf_view_short = buffer_addresses[b]
+                    ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+                                                                  &buf_view_short[0],
+                                                                  bytes_per_buffer)
+                    _check_return_code_processing(ret_code,
+                                                  "Failed to send buffer address to board:",
+                                                  buf_queue)
+                # arm the board
+                ret_code = c_alazar_api.AlazarStartCapture(self.board)
                 _check_return_code_processing(ret_code,
-                                              "Wait for buffer complete failed on buffer {}:"
-                                              .format(buf_num),
+                                              "Failed to start capture:",
                                               buf_queue)
-                # pickles the buffer and sends to the worker
-                buf_queue.put( (buffers[buffer_index], None) )
-                # hand the buffer back to the board
-                ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
-                                                              &buf_view[0],
-                                                              bytes_per_buffer)
-                _check_return_code_processing(ret_code,
-                                              "Failed to send buffer address back "
-                                              "to board during acquisition:",
-                                              buf_queue)
-            # done with acquisition
-        finally:
-            # make sure we abort the acquisition so the board doesn't get stuck
-            self._abort_acquisition()
-        # get the processors and return them
-        return comm.get()
+                # handle each buffer
+                for buf_num in xrange(buffers_per_acquisition):
+                    buffer_index = buf_num % buffer_count
+                    buf_view_short = buffer_addresses[buffer_index]
+                    ret_code = c_alazar_api.AlazarWaitAsyncBufferComplete(self.board,
+                                                                          &buf_view_short[0],
+                                                                          timeout)
+                    _check_return_code_processing(ret_code,
+                                                  "Wait for buffer complete failed on buffer {}:"
+                                                  .format(buf_num),
+                                                  buf_queue)
+                    # pickles the buffer and sends to the worker
+                    buf_queue.put( (buffers[buffer_index], None) )
+                    # hand the buffer back to the board
+                    ret_code = c_alazar_api.AlazarPostAsyncBuffer(self.board,
+                                                                  &buf_view_short[0],
+                                                                  bytes_per_buffer)
+                    _check_return_code_processing(ret_code,
+                                                  "Failed to send buffer address back "
+                                                  "to board during acquisition:",
+                                                  buf_queue)
+                # done with acquisition
+            finally:
+                # make sure we abort the acquisition so the board doesn't get stuck
+                self._abort_acquisition()
+            # get the processors and return them
+            return comm.get()
 
     def _abort_acquisition(self):
         """Command the board to abort a running acquisition.
@@ -540,20 +584,12 @@ cdef class Alazar(object):
 
 # end of Alazar() class definition
 
-# helper function for processing
-def _reshape_buffer(buf, chan, acq_params):
-    """Reshape a buffer from linear into n_records x m_samples."""
-    chunk_size = acq_params["channel_chunk_size"]
-    chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
-    chan_dat.shape = (acq_params["records_per_buffer"],
-                      acq_params["samples_per_record"])
-    return chan_dat
-
 def def_acq_params(samples_per_record,
                    records_per_acquisition,
                    records_per_buffer,
                    channel_count,
-                   dtype):
+                   dtype,
+                   bit_depth):
     """Return a dictionary containing useful acquisition parameters."""
     return dict(samples_per_record=samples_per_record,
                 records_per_acquisition = records_per_acquisition,
@@ -562,7 +598,8 @@ def def_acq_params(samples_per_record,
                 samples_per_buffer = samples_per_record * records_per_buffer * channel_count,
                 channel_chunk_size = samples_per_record * records_per_buffer,
                 buffers_per_acquisition = records_per_acquisition / records_per_buffer,
-                dtype = dtype)
+                dtype = dtype,
+                bit_depth = bit_depth)
 
 def get_systems_and_boards():
     """Return a dict of the number of boards in each Alazar system detected.
@@ -574,13 +611,7 @@ def get_systems_and_boards():
         n_b[s+1] = c_alazar_api.AlazarBoardsInSystemBySystemID(s+1)
     return n_b
 
-
-# --- Exception and error handling for Alazar boards
-
-
-class AlazarException(Exception):
-    pass
-
+# --- error handling ---
 
 def _check_return_code(return_code, msg):
     """Check an Alazar return code for success.
@@ -596,7 +627,7 @@ def _check_return_code_processing(return_code, msg, buf_queue):
     try:
         _check_return_code(return_code, msg)
     except AlazarException as err:
-        buf_queue.put(None, err)
+        buf_queue.put((None, err))
         raise err
 
 def _return_code_to_string(return_code):

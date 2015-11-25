@@ -13,15 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Mock of a board for testing purposes."""
-
-import pickle
+import multiprocessing as mp
 
 import numpy as np
 
 from board import (def_acq_params, AlazarException, is_9870, is_9360,
-                   _reshape_buffer, _make_channel_mask)
+                   _make_channel_mask)
 import params
 
+from process import _process_buffers, _reshape_buffer
 from processor import BufferProcessor
 
 
@@ -121,36 +121,54 @@ class MockAlazar(object):
                                     records_per_acquisition,
                                     records_per_buffer,
                                     channel_count,
-                                    sample_type)
+                                    sample_type,
+                                    bits_per_sample)
+        # get a queue to send buffers to the buffer processor
+        buf_queue = mp.Queue()
+        # get a queue to receive messages back from the processors
+        comm = mp.Queue()
+        # start a buffer processor to do the acquisition:
+        buf_processor = mp.Process(target = _process_buffers,
+                                   args = (buf_queue,
+                                           comm,
+                                           processors,
+                                           acq_params,))
+        buf_processor.start()
 
-        mock_buffer = make_mock_buffer(records_per_buffer, samples_per_record,
+        try:
+
+            ch1_buf = make_mock_buffer(records_per_buffer, samples_per_record,
                                        bits_per_sample, sample_type)
+            ch1_buf.shape = records_per_buffer * samples_per_record
 
-        chan_bufs = [mock_buffer for _ in xrange(channel_count)]
+            ch2_buf = make_mock_buffer(records_per_buffer, samples_per_record,
+                                       bits_per_sample, sample_type, True)
+            ch2_buf.shape = records_per_buffer * samples_per_record
 
-        # pickle and unpickle the processors
-        # could probably just use deepcopy or something but this mimics how the
-        # real board processes data as closely as possible.
-        processors = pickle.loads(pickle.dumps(processors))
+            buf = ch1_buf
 
-        # initialize the processors
-        for proc in processors:
-            proc.initialize(acq_params)
+            if channel_count > 1:
+                buf = np.append(ch1_buf, ch2_buf)
 
-        for buf_num in xrange(buffers_per_acquisition):
-            for proc in processors:
-                proc.process(chan_bufs, buf_num)
+            # handle each buffer
+            for _ in xrange(buffers_per_acquisition):
 
-        for proc in processors:
-            proc.post_process()
+                # pickles the buffer and sends to the worker
+                buf_queue.put( (buf, None) )
+        except Exception as err:
+            buf_queue.put((None, err))
 
-        return processors
+        # get the processors and return them
+        return comm.get()
 
 
-def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype):
-    """Return a buffer of rising sawtooth records.
+def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype, reverse=False):
+    """Return a buffer of sawtooth records.
 
-    Each record has the form [0, 1, 2, 3, ... 2**bit_depth - 1, 0, 1, ...]
+    Each record has the form [0, 1, 2, 3, ... 2**bit_depth - 1, 0, 1, ...];
+    however, for sample depths greater than 8 bits, this value is bit-shifted
+    into the most significant bits to fully mimic the behavior of the Alazar
+    boards.
 
     Args:
         records_per_buffer: the number of records in the buffer, also the first
@@ -159,12 +177,19 @@ def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype):
             of the shape of the output array
         bit_depth: the bit depth of the board to emulate
         dtype: the dtype of the resulting numpy array
+        reverse (default=False): reverse the sawtooth pattern
     """
     buff = np.empty((records_per_buffer, record_len), dtype=dtype)
-    for i in xrange(record_len):
+    the_iter = xrange(record_len)
+    if reverse:
+        the_iter = reversed(the_iter)
+    for i in the_iter:
         buff[:, i] = i % bit_depth
 
-    return buff
+    if bit_depth > 8:
+        return buff << (16 - bit_depth)
+    else:
+        return buff
 
 
 # --- Exception and error handling for MockAlazar boards
