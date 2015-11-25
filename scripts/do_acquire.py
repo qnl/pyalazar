@@ -10,7 +10,7 @@ def do_acquire():
 
     board_model = b.get_board_model()
 
-    b.setup_capture_clock("internal", "100 MS/s")
+    b.setup_capture_clock("internal", "10 MS/s")
 
     if board_model == 'ATS9360':
         b.setup_input_channels("400 mV")
@@ -39,8 +39,8 @@ def main():
 
     stat_str = 'shape = {}, min = {}, max = {}, delta = {}, mean = {}'
 
-    plt.plot(range(1024), chA[0,:], 'r-')
-    plt.plot(range(1024), chB[0,:], 'g-')
+    plt.plot(range(1024), chA[3,:], 'r-')
+    plt.plot(range(1024), chB[3,:], 'g-')
     plt.show()
 
     print 'acquisition statistics:'
