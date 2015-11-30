@@ -9125,7 +9125,6 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
       /*exception exit:*/{
         __pyx_L14_error:;
         __pyx_t_27 = 0; __pyx_t_28 = 0; __pyx_t_29 = 0; __pyx_t_30 = 0; __pyx_t_31 = 0; __pyx_t_32 = 0;
-        __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -9134,6 +9133,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
         __Pyx_XDECREF(__pyx_t_24); __pyx_t_24 = 0;
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
         if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_30, &__pyx_t_31, &__pyx_t_32);
         if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_27, &__pyx_t_28, &__pyx_t_29) < 0)) __Pyx_ErrFetch(&__pyx_t_27, &__pyx_t_28, &__pyx_t_29);
         __Pyx_XGOTREF(__pyx_t_27);
@@ -9843,7 +9843,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
  *                 # make sure we abort the acquisition so the board doesn't get stuck
  *                 self._abort_acquisition()             # <<<<<<<<<<<<<<
  *             # get the processors and return them
- *             return buffers
+ *             return comm.get()
  */
     /*finally:*/ {
       /*normal exit:*/{
@@ -9873,8 +9873,6 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
       /*exception exit:*/{
         __pyx_L25_error:;
         __pyx_t_32 = 0; __pyx_t_31 = 0; __pyx_t_30 = 0; __pyx_t_29 = 0; __pyx_t_28 = 0; __pyx_t_27 = 0;
-        __PYX_XDEC_MEMVIEW(&__pyx_t_33, 1);
-        __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -9883,6 +9881,8 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __PYX_XDEC_MEMVIEW(&__pyx_t_33, 1);
+        __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
         if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_29, &__pyx_t_28, &__pyx_t_27);
         if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_32, &__pyx_t_31, &__pyx_t_30) < 0)) __Pyx_ErrFetch(&__pyx_t_32, &__pyx_t_31, &__pyx_t_30);
         __Pyx_XGOTREF(__pyx_t_32);
@@ -9947,13 +9947,33 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
     /* "alazar\board.pyx":574
  *                 self._abort_acquisition()
  *             # get the processors and return them
- *             return buffers             # <<<<<<<<<<<<<<
+ *             return comm.get()             # <<<<<<<<<<<<<<
  * 
  *     def _abort_acquisition(self):
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_INCREF(__pyx_v_buffers);
-    __pyx_r = __pyx_v_buffers;
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_comm, __pyx_n_s_get); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 574; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = NULL;
+    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
+      }
+    }
+    if (__pyx_t_1) {
+      __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 574; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    } else {
+      __pyx_t_12 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 574; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+    __Pyx_GOTREF(__pyx_t_12);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_r = __pyx_t_12;
+    __pyx_t_12 = 0;
     goto __pyx_L0;
   }
 
@@ -10004,7 +10024,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_12acquire(struct __pyx_obj_6ala
 }
 
 /* "alazar\board.pyx":576
- *             return buffers
+ *             return comm.get()
  * 
  *     def _abort_acquisition(self):             # <<<<<<<<<<<<<<
  *         """Command the board to abort a running acquisition.
@@ -10090,7 +10110,7 @@ static PyObject *__pyx_pf_6alazar_5board_6Alazar_14_abort_acquisition(struct __p
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "alazar\board.pyx":576
- *             return buffers
+ *             return comm.get()
  * 
  *     def _abort_acquisition(self):             # <<<<<<<<<<<<<<
  *         """Command the board to abort a running acquisition.
