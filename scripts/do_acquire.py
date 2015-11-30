@@ -33,17 +33,18 @@ def stats(chan):
     return chan.shape, cmin, cmax, cmax - cmin, np.mean(chan[:])
 
 def main():
-    bufs = do_acquire()
 
-    plt.plot(bufs[0])
+    buf = do_acquire()
+    plt.plot(buf[0])
     plt.show()
+    # procs = do_acquire()
 
     # chA, chB = procs[0].get_result()
 
     # stat_str = 'shape = {}, min = {}, max = {}, delta = {}, mean = {}'
 
-    # plt.plot(range(1024), chA[3,:], 'r-')
-    # plt.plot(range(1024), chB[3,:], 'g-')
+    # plt.plot(range(1024), chA[0,:], 'r-')
+    # plt.plot(range(1024), chB[0,:], 'g-')
     # plt.show()
 
     # print 'acquisition statistics:'

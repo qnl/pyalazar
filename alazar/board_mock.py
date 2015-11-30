@@ -135,14 +135,12 @@ class MockAlazar(object):
                                    args = (buf_queue,
                                            comm,
                                            processors,
-                                           acq_params,
-                                           self.board_type))
+                                           acq_params,))
         buf_processor.start()
 
         try:
             buf = make_mock_buffer(records_per_buffer, samples_per_record,
-                                   bits_per_sample, sample_type, channel_count,
-                                   interleave)
+                                   bits_per_sample, sample_type, channel_count)
             # handle each buffer
             for _ in xrange(buffers_per_acquisition):
                 # pickles the buffer and sends to the worker
@@ -155,7 +153,7 @@ class MockAlazar(object):
 
 
 def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype,
-                     chan_count, interleave=False):
+                     chan_count):
     """Return a buffer of sawtooth records.
 
     Each record has the form [0, 1, 2, 3, ... 2**bit_depth - 1, 0, 1, ...];
@@ -172,10 +170,6 @@ def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype,
         bit_depth: the bit depth of the board to emulate
         dtype: the dtype of the resulting numpy array
         chan_count: the number of acquisition channels
-        interleave (default=False): interleave the records for each channel, to
-            mimic the behavior of the 9360 (why Alazar, why).  If True, the
-            records will be arranged in the buffer as R0[A], R0[B], R1[A], R1[B],
-            ... instead of R0[A], R1[A], ..., RN[A], R0[B], R1[B], ...
     """
     buffer_length = records_per_buffer * record_len * chan_count
     buff = np.empty(buffer_length, dtype=dtype)
@@ -185,11 +179,8 @@ def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype,
             record_vals = mock_record(record_len, reverse=(chan==1), bit_depth=bit_depth)
             record = np.fromiter(record_vals, dtype=dtype, count=record_len)
 
-            if interleave:
-                rec_start = record_len*(2*rec+chan)
-            else:
-                rec_start = record_len*(rec+(chan*records_per_buffer))
-            buff[rec_start:rec_start+record_len] = record
+            rec_start = 2*rec*record_len + chan
+            buff[rec_start:rec_start+2*record_len:2] = record
 
     if bit_depth > 8:
         return buff << (16 - bit_depth)

@@ -19,8 +19,7 @@ import numpy as np
 def _process_buffers(buf_queue,
                      comm,
                      processors,
-                     acq_params,
-                     board_type,):
+                     acq_params,):
     """Process buffers from the board."""
     # initialize the buffer processors
     for processor in processors:
@@ -40,7 +39,7 @@ def _process_buffers(buf_queue,
             # end processing
             break
         # reshape the buffer
-        chan_bufs = [_reshape_buffer(buf, chan, acq_params, board_type)
+        chan_bufs = [_reshape_buffer(buf, chan, acq_params)
                      for chan in xrange(acq_params["channel_count"])]
         for proc in processors:
             proc.process(chan_bufs, buf_num)
@@ -54,25 +53,12 @@ def _process_buffers(buf_queue,
     # done with buffer processing
 
 # helper function for processing
-def _reshape_buffer(buf, chan, acq_params, board_type):
-    """Reshape a buffer from linear into n_records x m_samples.
+def _reshape_buffer(buf, chan, acq_params):
+    """Reshape a interleaved buffer into n_records x m_samples."""
+    chan_dat = buf[chan::2]
 
-    This function only supports the ATS9870 and ATS9360.
-    """
-    if board_type == 13:
-        # ATS9870, channel records are contiguous
-        chunk_size = acq_params["channel_chunk_size"]
-        chan_dat = buf[chan*chunk_size : (chan+1)*chunk_size]
-        chan_dat.shape = (acq_params["records_per_buffer"],
-                          acq_params["samples_per_record"])
-    else:
-        # assume ATS9360, channel records are interleaved
-        rec_per_buf = acq_params["records_per_buffer"]
-        samp_per_rec = acq_params["samples_per_record"]
-        chan_dat = np.empty((rec_per_buf, samp_per_rec), dtype=buf.dtype)
-        for rec in xrange(rec_per_buf):
-            rec_start = samp_per_rec*(2*rec+chan)
-            chan_dat[rec,:] = buf[rec_start:rec_start+samp_per_rec]
+    chan_dat.shape = (acq_params["records_per_buffer"],
+                      acq_params["samples_per_record"])
 
     # the 12-bit digitizers always write into the MSB; bit shift
     # the buffer back towards 0

@@ -419,7 +419,9 @@ cdef class Alazar(object):
         # first flag is the value of ADMA_EXTERNAL_STARTCAPTURE
         # second flag is the value of ADMA_NPT and sets no pretrigger sample acquisition
         if self.board_type == 13: #9870:
-            autoDMA_flags = 0x00000001 | 0x00000200
+            autoDMA_flags = 0x00000001 | 0x00000200 | 0x00001000
+            # third flag commands the 9870 to return interleaved samples, to match
+            # the buffer formatting of the 9360
         elif self.board_type == 25: #9360:
             autoDMA_flags = 0x00000001 | 0x00000200 | 0x00000800
             # third flag is ADMA_FIFO_ONLY_STREAMING
@@ -443,8 +445,7 @@ cdef class Alazar(object):
                                    args = (buf_queue,
                                            comm,
                                            processors,
-                                           acq_params,
-                                           self.board_type))
+                                           acq_params,))
         buf_processor.start()
         # enure that from this point on, if we throw any exceptions we send them
         # to the processor or it will never return
@@ -570,7 +571,7 @@ cdef class Alazar(object):
                 # make sure we abort the acquisition so the board doesn't get stuck
                 self._abort_acquisition()
             # get the processors and return them
-            return buffers
+            return comm.get()
 
     def _abort_acquisition(self):
         """Command the board to abort a running acquisition.
