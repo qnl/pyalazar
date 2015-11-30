@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Mock of a board for testing purposes."""
 import multiprocessing as mp
+from itertools import izip
 
 import numpy as np
 
@@ -102,10 +103,12 @@ class MockAlazar(object):
 
         if is_9870(self.board_type):
             bits_per_sample = 8
+            interleave = False
         elif is_9360(self.board_type):
             bits_per_sample = 12
+            interleave = True
         else:
-            raise MockAlazarException("MockAlazar only has bit depths for the "
+            raise MockAlazarException("MockAlazar only can mimic the "
                                       "9870 and 9360; got board type of {}"
                                       .format(self.board_type))
 
@@ -132,27 +135,16 @@ class MockAlazar(object):
                                    args = (buf_queue,
                                            comm,
                                            processors,
-                                           acq_params,))
+                                           acq_params,
+                                           self.board_type))
         buf_processor.start()
 
         try:
-
-            ch1_buf = make_mock_buffer(records_per_buffer, samples_per_record,
-                                       bits_per_sample, sample_type)
-            ch1_buf.shape = records_per_buffer * samples_per_record
-
-            ch2_buf = make_mock_buffer(records_per_buffer, samples_per_record,
-                                       bits_per_sample, sample_type, True)
-            ch2_buf.shape = records_per_buffer * samples_per_record
-
-            buf = ch1_buf
-
-            if channel_count > 1:
-                buf = np.append(ch1_buf, ch2_buf)
-
+            buf = make_mock_buffer(records_per_buffer, samples_per_record,
+                                   bits_per_sample, sample_type, channel_count,
+                                   interleave)
             # handle each buffer
             for _ in xrange(buffers_per_acquisition):
-
                 # pickles the buffer and sends to the worker
                 buf_queue.put( (buf, None) )
         except Exception as err:
@@ -162,13 +154,15 @@ class MockAlazar(object):
         return comm.get()
 
 
-def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype, reverse=False):
+def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype,
+                     chan_count, interleave=False):
     """Return a buffer of sawtooth records.
 
     Each record has the form [0, 1, 2, 3, ... 2**bit_depth - 1, 0, 1, ...];
     however, for sample depths greater than 8 bits, this value is bit-shifted
     into the most significant bits to fully mimic the behavior of the Alazar
-    boards.
+    boards.  The records for channel A are rising sawtooths, while the records
+    for channel B are falling sawtooths.
 
     Args:
         records_per_buffer: the number of records in the buffer, also the first
@@ -177,20 +171,46 @@ def make_mock_buffer(records_per_buffer, record_len, bit_depth, dtype, reverse=F
             of the shape of the output array
         bit_depth: the bit depth of the board to emulate
         dtype: the dtype of the resulting numpy array
-        reverse (default=False): reverse the sawtooth pattern
+        chan_count: the number of acquisition channels
+        interleave (default=False): interleave the records for each channel, to
+            mimic the behavior of the 9360 (why Alazar, why).  If True, the
+            records will be arranged in the buffer as R0[A], R0[B], R1[A], R1[B],
+            ... instead of R0[A], R1[A], ..., RN[A], R0[B], R1[B], ...
     """
-    buff = np.empty((records_per_buffer, record_len), dtype=dtype)
-    the_iter = xrange(record_len)
-    if reverse:
-        the_iter = reversed(the_iter)
-    for i in the_iter:
-        buff[:, i] = i % bit_depth
+    buffer_length = records_per_buffer * record_len * chan_count
+    buff = np.empty(buffer_length, dtype=dtype)
+    
+    for chan in xrange(chan_count):
+        for rec in xrange(records_per_buffer):
+            record_vals = mock_record(record_len, reverse=(chan==1), bit_depth=bit_depth)
+            record = np.fromiter(record_vals, dtype=dtype, count=record_len)
+
+            if interleave:
+                rec_start = record_len*(2*rec+chan)
+            else:
+                rec_start = record_len*(rec+(chan*records_per_buffer))
+            buff[rec_start:rec_start+record_len] = record
 
     if bit_depth > 8:
         return buff << (16 - bit_depth)
     else:
         return buff
 
+def mock_record(record_len, reverse, bit_depth):
+    """Generate the values in a single measurement record.
+
+    Args:
+        record_len: The number of samples in the record.
+        reverse (bool): If True, generate a falling sawtooth pattern.
+            Otherwise, rising.
+        bit_depth: The bit depth of the ADC.
+    """
+    limit = 2**bit_depth
+    the_iter = xrange(record_len)
+    if reverse:
+        the_iter = reversed(the_iter)
+    for val in the_iter:
+        yield val % limit
 
 # --- Exception and error handling for MockAlazar boards
 

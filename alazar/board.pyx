@@ -443,7 +443,8 @@ cdef class Alazar(object):
                                    args = (buf_queue,
                                            comm,
                                            processors,
-                                           acq_params,))
+                                           acq_params,
+                                           self.board_type))
         buf_processor.start()
         # enure that from this point on, if we throw any exceptions we send them
         # to the processor or it will never return
@@ -569,7 +570,7 @@ cdef class Alazar(object):
                 # make sure we abort the acquisition so the board doesn't get stuck
                 self._abort_acquisition()
             # get the processors and return them
-            return comm.get()
+            return buffers
 
     def _abort_acquisition(self):
         """Command the board to abort a running acquisition.

@@ -10,7 +10,7 @@ def do_acquire():
 
     board_model = b.get_board_model()
 
-    b.setup_capture_clock("internal", "10 MS/s")
+    b.setup_capture_clock("internal", "100 MS/s")
 
     if board_model == 'ATS9360':
         b.setup_input_channels("400 mV")
@@ -33,21 +33,24 @@ def stats(chan):
     return chan.shape, cmin, cmax, cmax - cmin, np.mean(chan[:])
 
 def main():
-    procs = do_acquire()
+    bufs = do_acquire()
 
-    chA, chB = procs[0].get_result()
-
-    stat_str = 'shape = {}, min = {}, max = {}, delta = {}, mean = {}'
-
-    plt.plot(range(1024), chA[3,:], 'r-')
-    plt.plot(range(1024), chB[3,:], 'g-')
+    plt.plot(bufs[0])
     plt.show()
 
-    print 'acquisition statistics:'
-    print 'channel A:'
-    print stat_str.format(*stats(chA))
-    print 'channel B:'
-    print stat_str.format(*stats(chB))
+    # chA, chB = procs[0].get_result()
+
+    # stat_str = 'shape = {}, min = {}, max = {}, delta = {}, mean = {}'
+
+    # plt.plot(range(1024), chA[3,:], 'r-')
+    # plt.plot(range(1024), chB[3,:], 'g-')
+    # plt.show()
+
+    # print 'acquisition statistics:'
+    # print 'channel A:'
+    # print stat_str.format(*stats(chA))
+    # print 'channel B:'
+    # print stat_str.format(*stats(chB))
 
 if __name__ == '__main__':
     main()
