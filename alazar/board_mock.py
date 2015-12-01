@@ -147,6 +147,7 @@ class MockAlazar(object):
                 buf_queue.put( (buf, None) )
         except Exception as err:
             buf_queue.put((None, err))
+            raise
 
         # get the processors and return them
         return comm.get()
