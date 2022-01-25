@@ -1,5 +1,7 @@
 # pyalazar
 
+NOTE: UNUSED AND OUTDATED. SEE ALAZAR COMPANY FOR PYTHON INTERFACE
+
 Native Python api for Alazar Technologies GS/s digitizer modules.
 
 This package currently supports the ATS-9870 and the ATS-9360.
